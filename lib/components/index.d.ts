@@ -58,5 +58,6 @@ export * from './custom-counter-input/custom-counter-input.component';
 export * from './custom-smp-file-upload/custom-smp-file-upload.component';
 export * from './custom-toast-viewport/custom-toast-viewport.component';
 export * from './custom-status-label/custom-status-label.component';
+export * from './custom-place-holder/custom-place-holder.component';
 export * from './custom-expanding-container/custom-expanding-container.component';
 export * from './custom-calender-open-form/custom-calender-open-form.component';

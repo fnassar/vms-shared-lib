@@ -4,6 +4,7 @@ export interface IDropdownOption {
     nameEn: string;
     serialNumber?: string;
     status?: string;
+    enumValue?: string;
 }
 export interface IFunctionDropdown extends IDropdownOption {
     iconPath?: string;
