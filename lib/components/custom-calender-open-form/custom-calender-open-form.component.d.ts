@@ -24,6 +24,7 @@ export declare class CustomCalenderOpenFormComponent {
     showCalendarForm: boolean;
     currentMonth: Date;
     days: Date[];
+    today: Date;
     private _value;
     private onChange;
     private onTouched;
@@ -41,6 +42,7 @@ export declare class CustomCalenderOpenFormComponent {
     onMonthChange(event: Event): void;
     onYearChange(event: Event): void;
     private updateCalendarFromDropdowns;
+    isToday(day: Date): boolean;
     prevMonth(): void;
     nextMonth(): void;
     get value(): Date | null;
