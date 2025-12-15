@@ -1,5 +1,10 @@
 import { EventEmitter } from '@angular/core';
 import * as i0 from "@angular/core";
+export type CalendarValue = Date | null;
+export interface CalendarRange {
+    startDate: Date | null;
+    endDate: Date | null;
+}
 export declare class CustomCalendarComponent {
     label: string;
     placeholder: string;
@@ -9,25 +14,43 @@ export declare class CustomCalendarComponent {
     calendarContainerClass: string;
     minDate: Date | null;
     maxDate: Date | null;
-    value: Date | null;
-    valueChange: EventEmitter<Date | null>;
     height: string;
+    value: CalendarValue;
+    rangeMode: boolean;
     showCalendar: boolean;
+    startDate: Date | null;
+    endDate: Date | null;
+    valueChange: EventEmitter<CalendarValue>;
+    rangeChange: EventEmitter<CalendarRange>;
+    isFocused: boolean;
+    viewMode: 'days' | 'months' | 'years';
     currentMonth: Date;
     days: Date[];
     weekdays: string[];
+    months: string[];
+    years: number[];
     constructor();
     toggleCalendar(): void;
     selectDate(date: Date): void;
-    prevMonth(): void;
-    nextMonth(): void;
+    handleRangeSelection(date: Date): void;
     generateCalendar(): void;
-    isSelected(date: Date): boolean;
+    isSelected(date: Date): boolean | null;
+    isInRange(date: Date): boolean;
     isCurrentMonth(date: Date): boolean;
-    isDisabled(date: Date): boolean;
+    isDisabled(date: Date): boolean | null;
     getMonthName(): string;
     getYear(): number;
     formatDisplayDate(): string;
+    clearSelection(event: Event): void;
+    generateYears(): void;
+    openMonthPicker(event: MouseEvent): void;
+    openYearPicker(event: MouseEvent): void;
+    selectMonth(index: number, event: MouseEvent): void;
+    selectYear(year: number, event: MouseEvent): void;
+    prevMonth(event: MouseEvent): void;
+    nextMonth(event: MouseEvent): void;
+    isSelectedMonth(index: number): boolean;
+    isSelectedYear(year: number): boolean;
     static ɵfac: i0.ɵɵFactoryDeclaration<CustomCalendarComponent, never>;
-    static ɵcmp: i0.ɵɵComponentDeclaration<CustomCalendarComponent, "custom-calendar", never, { "label": { "alias": "label"; "required": false; }; "placeholder": { "alias": "placeholder"; "required": false; }; "labelClass": { "alias": "labelClass"; "required": false; }; "calendarPopUpClass": { "alias": "calendarPopUpClass"; "required": false; }; "calendarInputClass": { "alias": "calendarInputClass"; "required": false; }; "calendarContainerClass": { "alias": "calendarContainerClass"; "required": false; }; "minDate": { "alias": "minDate"; "required": false; }; "maxDate": { "alias": "maxDate"; "required": false; }; "value": { "alias": "value"; "required": true; }; "height": { "alias": "height"; "required": false; }; }, { "valueChange": "valueChange"; }, never, never, true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CustomCalendarComponent, "custom-calendar", never, { "label": { "alias": "label"; "required": false; }; "placeholder": { "alias": "placeholder"; "required": false; }; "labelClass": { "alias": "labelClass"; "required": false; }; "calendarPopUpClass": { "alias": "calendarPopUpClass"; "required": false; }; "calendarInputClass": { "alias": "calendarInputClass"; "required": false; }; "calendarContainerClass": { "alias": "calendarContainerClass"; "required": false; }; "minDate": { "alias": "minDate"; "required": false; }; "maxDate": { "alias": "maxDate"; "required": false; }; "height": { "alias": "height"; "required": false; }; "value": { "alias": "value"; "required": false; }; "rangeMode": { "alias": "rangeMode"; "required": false; }; "showCalendar": { "alias": "showCalendar"; "required": false; }; "startDate": { "alias": "startDate"; "required": false; }; "endDate": { "alias": "endDate"; "required": false; }; }, { "valueChange": "valueChange"; "rangeChange": "rangeChange"; }, never, never, true, never>;
 }

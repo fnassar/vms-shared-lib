@@ -5,6 +5,8 @@ export interface IDropdownOption {
     serialNumber?: string;
     status?: string;
     enumValue?: string;
+    color?: string;
+    background?: string;
     employeeId?: string;
     email?: string;
 }
