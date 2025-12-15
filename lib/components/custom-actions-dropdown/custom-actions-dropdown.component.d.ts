@@ -5,6 +5,8 @@ import * as i0 from "@angular/core";
 export interface IActions {
     label: string;
     icon?: string;
+    class?: string;
+    isDisabled?: boolean;
     callback: (ctx: any) => void;
 }
 export declare class CustomActionsDropdownComponent {
