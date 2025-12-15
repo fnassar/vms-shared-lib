@@ -58,6 +58,8 @@ export declare class CustomCalenderOpenFormComponent {
     isSelected(date: Date): boolean;
     isCurrentMonth(date: Date): boolean;
     isDisabled(date: Date): boolean;
+    isSameOrBefore(date1: Date, date2: Date): boolean;
+    isSameOrAfter(date1: Date, date2: Date): boolean;
     getMonthName(): string;
     getYear(): number;
     formatDisplayDate(): string;
