@@ -8256,7 +8256,7 @@ const ErrorInterceptor = (req, next) => {
                     toastService.toast(error.error.errorMessage, 'top-center', 'error', 2000);
                     break;
                 }
-                else if (error.error.errors.length > 0) {
+                else if (error.error.errors && error.error.errors.length > 0) {
                     error.error.errors.forEach((err) => {
                         const msg = err[`message${suffix}`] ||
                             err.message ||
