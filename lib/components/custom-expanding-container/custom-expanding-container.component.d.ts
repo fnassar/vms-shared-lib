@@ -1,3 +1,4 @@
+import { EventEmitter } from '@angular/core';
 import * as i0 from "@angular/core";
 export declare class CustomExpandingContainerComponent {
     expanded: boolean;
@@ -6,11 +7,14 @@ export declare class CustomExpandingContainerComponent {
     borderRadius: string;
     backgroundColor: string;
     showBorderBottom: boolean;
+    minMaxHeight: string;
+    toggled: EventEmitter<boolean>;
     isExpanded: import("@angular/core").WritableSignal<boolean>;
+    minMaxHeightCss: string;
     ngOnInit(): void;
     toggle(): void;
     open(): void;
     close(): void;
     static ɵfac: i0.ɵɵFactoryDeclaration<CustomExpandingContainerComponent, never>;
-    static ɵcmp: i0.ɵɵComponentDeclaration<CustomExpandingContainerComponent, "custom-expanding-container", never, { "expanded": { "alias": "expanded"; "required": false; }; "showIcon1": { "alias": "showIcon1"; "required": false; }; "padding": { "alias": "padding"; "required": false; }; "borderRadius": { "alias": "borderRadius"; "required": false; }; "backgroundColor": { "alias": "backgroundColor"; "required": false; }; "showBorderBottom": { "alias": "showBorderBottom"; "required": false; }; }, {}, never, ["[target]", "[content]"], true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CustomExpandingContainerComponent, "custom-expanding-container", never, { "expanded": { "alias": "expanded"; "required": false; }; "showIcon1": { "alias": "showIcon1"; "required": false; }; "padding": { "alias": "padding"; "required": false; }; "borderRadius": { "alias": "borderRadius"; "required": false; }; "backgroundColor": { "alias": "backgroundColor"; "required": false; }; "showBorderBottom": { "alias": "showBorderBottom"; "required": false; }; "minMaxHeight": { "alias": "minMaxHeight"; "required": false; }; }, { "toggled": "toggled"; }, never, ["[target]", "[content]"], true, never>;
 }

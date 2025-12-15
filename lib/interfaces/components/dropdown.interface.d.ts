@@ -5,6 +5,8 @@ export interface IDropdownOption {
     serialNumber?: string;
     status?: string;
     enumValue?: string;
+    employeeId?: string;
+    email?: string;
 }
 export interface IFunctionDropdown extends IDropdownOption {
     iconPath?: string;

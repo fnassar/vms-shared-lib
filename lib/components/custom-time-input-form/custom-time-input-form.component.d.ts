@@ -24,6 +24,7 @@ export declare class CustomTimeInputFormComponent {
     selectedMinute: number | string;
     selectedPeriod: 'AM' | 'PM';
     ngOnInit(): void;
+    containRequiredError(): boolean;
     toggleDropdown(): void;
     setExcistValue(): void;
     setFormValue(): void;
