@@ -1,6 +1,6 @@
 {
   "name": "vms-shared-lib",
-  "version": "0.0.0-watch+1765840866393",
+  "version": "0.0.0-watch+1765876129441",
   "peerDependencies": {
     "@angular/common": "^19.2.0",
     "@angular/core": "^19.2.0",
