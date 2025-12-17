@@ -5,9 +5,10 @@ import { TranslationService } from '../../services';
 import * as i0 from "@angular/core";
 export interface IPhoneCountryOption extends IDropdownOption {
     dialCode: string;
-    pattern?: RegExp;
-    patternMessage?: string;
+    iso2: string;
     countryIcon?: string;
+    patternMessage?: string;
+    pattern?: RegExp;
 }
 export interface IPhoneValue {
     countryCode: string;
@@ -17,6 +18,7 @@ export type PhoneRule = {
     pattern: RegExp;
     message?: string;
 };
+export declare function toE164OrNull(dialCode: string, nationalDigits: string): string | null;
 export declare class CustomPhoneFormComponent {
     parentForm: FormGroup | any;
     controlName: string;

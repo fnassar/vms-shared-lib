@@ -27,6 +27,7 @@ export declare class CustomFilterDynamicFormComponent {
     filters: import("@angular/core").WritableSignal<IDynamicFilterConfig[]>;
     private destroy$;
     constructor(fb: FormBuilder);
+    update: number;
     ngOnInit(): void;
     toggleCollapse(id: string): void;
     private buildForm;

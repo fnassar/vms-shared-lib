@@ -1,53 +1,54 @@
 export interface IDropdownOption {
-    id: number | string;
-    nameAr: string;
-    nameEn: string;
-    serialNumber?: string;
-    status?: string;
-    enumValue?: string;
-    color?: string;
-    background?: string;
-    employeeId?: string;
-    email?: string;
+  id: number | string;
+  nameAr: string;
+  nameEn: string;
+  serialNumber?: string;
+  status?: string;
+  enumValue?: string;
+  color?: string;
+  background?: string;
+  employeeId?: string;
+  email?: string;
+  needsRoom?: boolean;
 }
 export interface IFunctionDropdown extends IDropdownOption {
-    iconPath?: string;
-    callBack: () => void;
+  iconPath?: string;
+  callBack: () => void;
 }
 export interface IUserLookup {
-    id: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-    phoneNumber: string;
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNumber: string;
 }
-export type StatusType = 'ACTIVE' | 'INACTIVE';
+export type StatusType = "ACTIVE" | "INACTIVE";
 export interface ITabDropdownOption extends IDropdownOption {
-    disabled: boolean;
+  disabled: boolean;
 }
 export interface ListData {
-    content: any;
-    pageable: Pageable;
-    last: boolean;
-    first: boolean;
-    size: number;
-    number: number;
-    numberOfElements: number;
-    sort: SortObj;
-    totalElements: number;
-    totalPages: number;
-    empty: boolean;
+  content: any;
+  pageable: Pageable;
+  last: boolean;
+  first: boolean;
+  size: number;
+  number: number;
+  numberOfElements: number;
+  sort: SortObj;
+  totalElements: number;
+  totalPages: number;
+  empty: boolean;
 }
 export interface Pageable {
-    sort: SortObj;
-    offset: number;
-    pageNumber: number;
-    pageSize: number;
-    paged: boolean;
-    unpaged: boolean;
+  sort: SortObj;
+  offset: number;
+  pageNumber: number;
+  pageSize: number;
+  paged: boolean;
+  unpaged: boolean;
 }
 export interface SortObj {
-    empty: boolean;
-    sorted: boolean;
-    unsorted: boolean;
+  empty: boolean;
+  sorted: boolean;
+  unsorted: boolean;
 }
