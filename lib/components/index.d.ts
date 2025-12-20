@@ -61,3 +61,4 @@ export * from './custom-place-holder/custom-place-holder.component';
 export * from './custom-expanding-container/custom-expanding-container.component';
 export * from './custom-calender-open-form/custom-calender-open-form.component';
 export * from './custom-single-file-upload/custom-single-file-upload.component';
+export * from './custom-input/custom-input.component';
