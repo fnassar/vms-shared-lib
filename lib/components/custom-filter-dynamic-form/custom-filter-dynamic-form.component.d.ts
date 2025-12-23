@@ -28,6 +28,7 @@ export declare class CustomFilterDynamicFormComponent {
     filterForm: FormGroup;
     filters: import("@angular/core").WritableSignal<IDynamicFilterConfig[]>;
     private destroy$;
+    private initialized;
     private fb;
     update: number;
     constructor(sanitizer: DomSanitizer);

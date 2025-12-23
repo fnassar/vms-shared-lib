@@ -21,8 +21,7 @@ export declare class CustomMultiSelectExpandedFormComponent {
     validation: IComponentFormError[];
     height: string;
     maxTagsToShow: number;
-    expanded: boolean;
-    isOpen: boolean;
+    expanded: import("@angular/core").WritableSignal<boolean>;
     filteredOptions: IDropdownOption[];
     customSelectedItems: IDropdownOption[];
     filterText: string;
@@ -44,8 +43,6 @@ export declare class CustomMultiSelectExpandedFormComponent {
     getSelectedLabel(option: IDropdownOption): string;
     getSelectedLabels(): string[];
     isSelected(id: any): boolean;
-    toggleDropdown(): void;
-    closeDropdown(): void;
     toggleOptionSelection(option: IDropdownOption): void;
     clearSelection(event: Event): void;
     filterOptions(): void;
