@@ -1,5 +1,5 @@
 import * as i0 from '@angular/core';
-import { Injectable, signal, InjectionToken, Inject, computed, Optional, input, Input, Component, HostListener, Directive, EventEmitter, PLATFORM_ID, Output, effect, HostBinding, Pipe, inject, ContentChild, Injector, ViewContainerRef, ViewChild, ViewEncapsulation, ElementRef, model, output, ViewChildren, ApplicationRef, EnvironmentInjector, createComponent } from '@angular/core';
+import { Injectable, signal, InjectionToken, Inject, computed, Optional, input, Input, Component, HostListener, Directive, EventEmitter, PLATFORM_ID, Output, effect, HostBinding, Pipe, inject, ElementRef, ContentChild, ViewChild, ChangeDetectionStrategy, Injector, ViewContainerRef, ViewEncapsulation, model, output, ViewChildren, ApplicationRef, EnvironmentInjector, createComponent } from '@angular/core';
 import { retry, catchError, BehaviorSubject, Subscription, fromEvent, filter, Subject, takeUntil, ReplaySubject, debounceTime, distinctUntilChanged, take, firstValueFrom, Observable, map, throwError, finalize, tap } from 'rxjs';
 import * as i1 from '@angular/common/http';
 import { HttpContextToken, HttpContext, HttpResponse } from '@angular/common/http';
@@ -10,12 +10,12 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import * as i1$3 from '@angular/forms';
 import { FormsModule, ReactiveFormsModule, FormArray, FormGroup, Validators, FormControl, FormBuilder } from '@angular/forms';
 import * as i1$2 from '@angular/common';
-import { isPlatformBrowser, CommonModule, registerLocaleData, NgStyle, NgClass, NgComponentOutlet, NgTemplateOutlet } from '@angular/common';
+import { isPlatformBrowser, CommonModule, registerLocaleData, NgStyle, NgClass, NgTemplateOutlet, NgComponentOutlet } from '@angular/common';
 import { trigger, transition, style, animate, state, keyframes, group, query } from '@angular/animations';
 import localeAr from '@angular/common/locales/ar';
 import localeEn from '@angular/common/locales/en';
-import * as i1$4 from '@angular/platform-browser';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import * as i1$4 from '@angular/platform-browser';
 import parsePhoneNumber from 'libphonenumber-js/max';
 
 const ModuleRoutes = {
@@ -3120,37 +3120,224 @@ const actionViewSvg$2 = '<svg width="auto" height="inherit" viewBox="0 0 20 18" 
 const actionEditSvg$2 = '<svg width="auto" height="inherit" viewBox="0 0 20 18" fill="none" xmlns="http://www.w3.org/2000/svg"><g opacity="0.7"><path d="M13.6745 12.0231L14.7622 10.9354C14.9321 10.7654 15.2278 10.8844 15.2278 11.1291V16.0713C15.2278 16.9721 14.497 17.7029 13.5963 17.7029H1.63155C0.7308 17.7029 0 16.9721 0 16.0713V4.10663C0 3.20587 0.7308 2.47507 1.63155 2.47507H10.928C11.1693 2.47507 11.2917 2.76739 11.1218 2.94074L10.0341 4.02845C9.98307 4.07943 9.91508 4.10663 9.8403 4.10663H1.63155V16.0713H13.5963V12.2134C13.5963 12.142 13.6235 12.074 13.6745 12.0231ZM18.9974 5.16374L10.0714 14.0897L6.99868 14.4296C6.10813 14.5282 5.35013 13.777 5.44871 12.8796L5.78861 9.80686L14.7146 0.880909C15.493 0.102522 16.7506 0.102522 17.5256 0.880909L18.994 2.34931C19.7724 3.12769 19.7724 4.38875 18.9974 5.16374ZM15.6391 6.21405L13.6643 4.23919L7.34879 10.5581L7.10065 12.7777L9.32025 12.5295L15.6391 6.21405ZM17.8417 3.50499L16.3733 2.03659C16.234 1.89723 16.0062 1.89723 15.8703 2.03659L14.8199 3.0869L16.7948 5.06176L17.8451 4.01145C17.9811 3.86869 17.9811 3.64435 17.8417 3.50499Z" fill="#444A6D"/></g></svg>';
 const actionDeleteSvg$2 = '<svg width="auto" height="inherit" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_8955_16606)"><path d="M15.0485 1.32129L1.69141 14.6784" stroke="#F43F5E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M1.69141 1.32129L15.0485 14.6784" stroke="#F43F5E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g><defs><clipPath id="clip0_8955_16606"><rect width="15.5833" height="15.5833" fill="white" transform="translate(0.578125 0.208252)"/></clipPath></defs></svg>';
 
+class CustomActionsDropdownComponent {
+    sanitizer;
+    renderer;
+    elRef;
+    translate;
+    actions = [];
+    context;
+    horizontalDots = false;
+    hasActionTemplate = false;
+    injectedTrigger = false;
+    expandSide = 'RIGHT';
+    expandDirection = 'BOTTOM';
+    actionsPopup;
+    triggerWrapper;
+    actionDropdownContainer;
+    triggerTemplate = null;
+    isAppendedToBody = false;
+    isOpen = signal(false);
+    showAnimation = signal(false);
+    constructor(sanitizer, renderer, elRef, translate) {
+        this.sanitizer = sanitizer;
+        this.renderer = renderer;
+        this.elRef = elRef;
+        this.translate = translate;
+        this.translate.onLangChange.pipe(takeUntilDestroyed()).subscribe(() => {
+            // If dropdown is open, reposition
+            if (this.isOpen()) {
+                this.updatePosition();
+            }
+        });
+    }
+    sanitizeSvg(svg) {
+        return this.sanitizer.bypassSecurityTrustHtml(svg);
+    }
+    openDropdown() {
+        this.isOpen.set(true);
+        this.showAnimation.set(false);
+        setTimeout(() => this.portalToBody(), 0);
+    }
+    closeDropdown() {
+        this.showAnimation.set(false);
+        setTimeout(() => {
+            this.isOpen.set(false);
+            this.detachFromBody();
+        }, 150); // Match CSS transition duration
+    }
+    portalToBody() {
+        if (!this.actionsPopup || this.isAppendedToBody)
+            return;
+        const dropdownEl = this.actionsPopup.nativeElement;
+        this.renderer.setStyle(dropdownEl, 'position', 'fixed');
+        this.renderer.setStyle(dropdownEl, 'top', '-9999px');
+        this.renderer.setStyle(dropdownEl, 'left', '-9999px');
+        this.renderer.setStyle(dropdownEl, 'visibility', 'hidden');
+        this.renderer.appendChild(document.body, dropdownEl);
+        this.isAppendedToBody = true;
+        requestAnimationFrame(() => {
+            this.updatePosition();
+            requestAnimationFrame(() => {
+                this.renderer.removeStyle(dropdownEl, 'visibility');
+                this.showAnimation.set(true);
+            });
+        });
+    }
+    updatePosition() {
+        if (!this.actionsPopup ||
+            !this.triggerWrapper ||
+            !this.actionDropdownContainer)
+            return;
+        const dropdownEl = this.actionsPopup.nativeElement;
+        const triggerEl = this.triggerWrapper.nativeElement;
+        const containerEl = this.actionDropdownContainer.nativeElement;
+        const triggerRect = triggerEl.getBoundingClientRect();
+        const containerRect = containerEl.getBoundingClientRect();
+        const dropdownHeight = dropdownEl.offsetHeight;
+        const viewportHeight = window.innerHeight;
+        // Detect document direction
+        const isRTL = document.dir === 'rtl';
+        let top;
+        let left;
+        let transformOrigin;
+        let actualDirection = this.expandDirection;
+        /** ------------------------
+         *  Vertical positioning
+         * ------------------------ */
+        if (this.expandDirection === 'BOTTOM') {
+            const spaceBelow = viewportHeight - containerRect.bottom;
+            if (spaceBelow >= dropdownHeight + 16) {
+                top = containerRect.bottom + 8;
+                transformOrigin = 'top';
+            }
+            else {
+                top = containerRect.top - dropdownHeight - 8;
+                transformOrigin = 'bottom';
+                actualDirection = 'TOP';
+            }
+        }
+        else {
+            const spaceAbove = containerRect.top;
+            if (spaceAbove >= dropdownHeight + 16) {
+                top = containerRect.top - dropdownHeight - 8;
+                transformOrigin = 'bottom';
+            }
+            else {
+                top = containerRect.bottom + 8;
+                transformOrigin = 'top';
+                actualDirection = 'BOTTOM';
+            }
+        }
+        /** ------------------------
+         *  Horizontal positioning (RTL-aware)
+         * ------------------------ */
+        const expandToRight = (this.expandSide === 'RIGHT' && !isRTL) ||
+            (this.expandSide === 'LEFT' && isRTL);
+        if (expandToRight) {
+            left = triggerRect.right;
+            transformOrigin += ' right';
+            this.renderer.setStyle(dropdownEl, 'translate', '-100% 0');
+        }
+        else {
+            left = triggerRect.left;
+            transformOrigin += ' left';
+            this.renderer.removeStyle(dropdownEl, 'translate');
+        }
+        /** ------------------------
+         *  Apply computed styles
+         * ------------------------ */
+        this.renderer.setStyle(dropdownEl, 'position', 'fixed');
+        this.renderer.setStyle(dropdownEl, 'top', `${top}px`);
+        this.renderer.setStyle(dropdownEl, 'left', `${left}px`);
+        this.renderer.setStyle(dropdownEl, 'z-index', '9999999');
+        this.renderer.setStyle(dropdownEl, 'transform-origin', transformOrigin);
+        // console.log('Direction:', this.expandDirection, '→ Actual:', actualDirection, '| RTL:', isRTL);
+    }
+    detachFromBody() {
+        if (!this.actionsPopup || !this.isAppendedToBody)
+            return;
+        const dropdownEl = this.actionsPopup.nativeElement;
+        this.renderer.removeChild(document.body, dropdownEl);
+        this.isAppendedToBody = false;
+    }
+    onClickAction(action, event) {
+        event.stopPropagation();
+        action.callback(this.context);
+        this.closeDropdown();
+    }
+    isActionDisabled(action) {
+        if (!action.isDisabledCallable) {
+            return action.isDisabled || false;
+        }
+        return action.isDisabledCallable(this.context);
+    }
+    ngOnDestroy() {
+        this.detachFromBody();
+    }
+    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.17", ngImport: i0, type: CustomActionsDropdownComponent, deps: [{ token: i1$4.DomSanitizer }, { token: i0.Renderer2 }, { token: i0.ElementRef }, { token: i1$1.TranslateService }], target: i0.ɵɵFactoryTarget.Component });
+    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "17.0.0", version: "19.2.17", type: CustomActionsDropdownComponent, isStandalone: true, selector: "custom-actions-dropdown", inputs: { actions: "actions", context: "context", horizontalDots: "horizontalDots", hasActionTemplate: "hasActionTemplate", injectedTrigger: "injectedTrigger", expandSide: "expandSide", expandDirection: "expandDirection" }, queries: [{ propertyName: "triggerTemplate", first: true, predicate: ["customTrigger"], descendants: true }], viewQueries: [{ propertyName: "actionsPopup", first: true, predicate: ["actionsPopup"], descendants: true }, { propertyName: "triggerWrapper", first: true, predicate: ["triggerWrapper"], descendants: true }, { propertyName: "actionDropdownContainer", first: true, predicate: ["actionDropdownContainer"], descendants: true, read: ElementRef }], ngImport: i0, template: "<div class=\"action-dropdown\" #actionDropdownContainer>\n  @if(horizontalDots){\n  <div class=\"horizontal-dots\" (click)=\"openDropdown()\" #triggerWrapper>\n    <svg\n      width=\"20\"\n      height=\"5\"\n      viewBox=\"0 0 20 5\"\n      fill=\"none\"\n      xmlns=\"http://www.w3.org/2000/svg\"\n    >\n      <path\n        d=\"M19.1616 2.70166C19.1616 1.60166 18.2455 0.70166 17.1257 0.70166C16.0059 0.70166 15.0898 1.60166 15.0898 2.70166C15.0898 3.80166 16.0059 4.70166 17.1257 4.70166C18.2455 4.70166 19.1616 3.80166 19.1616 2.70166ZM4.91012 2.70166C4.91012 1.60166 3.99396 0.701661 2.8742 0.701661C1.75444 0.701661 0.838268 1.60166 0.838268 2.70166C0.838268 3.80166 1.75444 4.70166 2.8742 4.70166C3.99396 4.70166 4.91012 3.80166 4.91012 2.70166ZM12.0359 2.70166C12.0359 1.60166 11.1197 0.701661 9.99994 0.701661C8.88018 0.701661 7.96402 1.60166 7.96402 2.70166C7.96402 3.80166 8.88018 4.70166 9.99994 4.70166C11.1197 4.70166 12.0359 3.80166 12.0359 2.70166Z\"\n        fill=\"#06213D\"\n      />\n    </svg>\n  </div>\n  }@else{\n\n  <div\n    class=\"mutlti-action-icon icon-wrapper\"\n    (click)=\"openDropdown()\"\n    #triggerWrapper\n  >\n    @if(injectedTrigger){\n    <div>\n      <ng-container [ngTemplateOutlet]=\"triggerTemplate\"></ng-container>\n    </div>\n\n    }@else {\n\n    <svg\n      width=\"auto\"\n      height=\"16\"\n      viewBox=\"0 0 4 16\"\n      fill=\"none\"\n      xmlns=\"http://www.w3.org/2000/svg\"\n    >\n      <path\n        d=\"M1.99292 12.75C2.68328 12.75 3.24292 13.3096 3.24292 14C3.24292 14.6904 2.68328 15.25 1.99292 15.25H1.98413C1.29377 15.25 0.734131 14.6904 0.734131 14C0.734131 13.3096 1.29377 12.75 1.98413 12.75H1.99292ZM2.00073 6.75C2.69109 6.75 3.25073 7.30964 3.25073 8C3.25073 8.69036 2.69109 9.25 2.00073 9.25H1.99194C1.30159 9.25 0.741943 8.69036 0.741943 8C0.741943 7.30964 1.30159 6.75 1.99194 6.75H2.00073ZM2.00854 0.75C2.6989 0.75 3.25854 1.30964 3.25854 2C3.25854 2.69036 2.6989 3.25 2.00854 3.25H1.99976C1.3094 3.25 0.749756 2.69036 0.749756 2C0.749756 1.30964 1.3094 0.75 1.99976 0.75H2.00854Z\"\n        fill=\"#4B4F55\"\n      />\n    </svg>\n    }\n  </div>\n  } @if( isOpen() && actions.length>0){\n\n  <div\n    #actionsPopup\n    [clickOutside]=\"actionsPopup\"\n    (clickOutsideEmitter)=\"closeDropdown()\"\n    class=\"dropdown-menu\"\n    [class.show]=\"showAnimation()\"\n  >\n    <ul>\n      @for(action of actions ;track $index){\n      <!--  -->\n      @if(!isActionDisabled(action)){\n      <li class=\"dropdown-item\" (click)=\"onClickAction(action, $event)\">\n        @if(action.icon){\n        <span\n          [class]=\"'action-icon-inline ' + action.class\"\n          [innerHTML]=\"sanitizeSvg(action.icon)\"\n        ></span>\n        }\n        <p [class]=\"'action-label ' + action.class\">{{ action.label }}</p>\n      </li>\n      }\n      <!--  -->\n      }\n    </ul>\n  </div>\n  } @if( isOpen() && hasActionTemplate){\n  <div\n    #actionsPopup\n    [clickOutside]=\"actionsPopup\"\n    (clickOutsideEmitter)=\"closeDropdown()\"\n    class=\"dropdown-menu\"\n    (click)=\"closeDropdown()\"\n    [class.show]=\"showAnimation()\"\n  >\n    <ng-content />\n  </div>\n  }\n</div>\n", styles: [".action-dropdown{position:relative}.mutlti-action-icon{width:1.25em;height:1.25em;cursor:pointer;opacity:85%}.dropdown-menu{background-color:#fff;border-radius:.2em;z-index:9999999;padding:.25em 0;box-shadow:0 4px 12px #00000026;opacity:0;visibility:hidden;scale:.95 .3;transition:opacity .18s ease,scale .18s cubic-bezier(.16,1,.3,1),visibility 0s .18s;pointer-events:none;position:fixed;top:-9999px;left:-9999px}.dropdown-menu.show{opacity:1;visibility:visible;scale:1 1;transition:opacity .18s ease,scale .18s cubic-bezier(.16,1,.3,1),visibility 0s 0s;pointer-events:auto}.dropdown-item{display:flex;align-items:center;padding:.5em .8em;font-size:.8em;cursor:pointer;transition:background-color .2s ease;color:#06213d;background-color:#fff;gap:.3em}.dropdown-item:hover{background-color:#f3f4f6}.action-icon-inline{display:inline-flex;align-items:center;justify-content:center;margin-inline-end:.5em;width:1.2em;height:1.2em}.icon-wrapper{width:.3em;height:auto}.icon-wrapper svg{width:100%!important;height:auto;display:block}.action-label{text-wrap:nowrap}.horizontal-dots{width:1.25em;height:.9375em;opacity:70%}.action-icon-inline svg{width:100%;height:100%;fill:currentColor}\n"], dependencies: [{ kind: "directive", type: ClickOutsideDirective, selector: "[clickOutside]", inputs: ["clickOutside"], outputs: ["clickOutsideEmitter"] }, { kind: "directive", type: NgTemplateOutlet, selector: "[ngTemplateOutlet]", inputs: ["ngTemplateOutletContext", "ngTemplateOutlet", "ngTemplateOutletInjector"] }], changeDetection: i0.ChangeDetectionStrategy.OnPush });
+}
+i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.17", ngImport: i0, type: CustomActionsDropdownComponent, decorators: [{
+            type: Component,
+            args: [{ selector: 'custom-actions-dropdown', imports: [ClickOutsideDirective, NgTemplateOutlet], changeDetection: ChangeDetectionStrategy.OnPush, template: "<div class=\"action-dropdown\" #actionDropdownContainer>\n  @if(horizontalDots){\n  <div class=\"horizontal-dots\" (click)=\"openDropdown()\" #triggerWrapper>\n    <svg\n      width=\"20\"\n      height=\"5\"\n      viewBox=\"0 0 20 5\"\n      fill=\"none\"\n      xmlns=\"http://www.w3.org/2000/svg\"\n    >\n      <path\n        d=\"M19.1616 2.70166C19.1616 1.60166 18.2455 0.70166 17.1257 0.70166C16.0059 0.70166 15.0898 1.60166 15.0898 2.70166C15.0898 3.80166 16.0059 4.70166 17.1257 4.70166C18.2455 4.70166 19.1616 3.80166 19.1616 2.70166ZM4.91012 2.70166C4.91012 1.60166 3.99396 0.701661 2.8742 0.701661C1.75444 0.701661 0.838268 1.60166 0.838268 2.70166C0.838268 3.80166 1.75444 4.70166 2.8742 4.70166C3.99396 4.70166 4.91012 3.80166 4.91012 2.70166ZM12.0359 2.70166C12.0359 1.60166 11.1197 0.701661 9.99994 0.701661C8.88018 0.701661 7.96402 1.60166 7.96402 2.70166C7.96402 3.80166 8.88018 4.70166 9.99994 4.70166C11.1197 4.70166 12.0359 3.80166 12.0359 2.70166Z\"\n        fill=\"#06213D\"\n      />\n    </svg>\n  </div>\n  }@else{\n\n  <div\n    class=\"mutlti-action-icon icon-wrapper\"\n    (click)=\"openDropdown()\"\n    #triggerWrapper\n  >\n    @if(injectedTrigger){\n    <div>\n      <ng-container [ngTemplateOutlet]=\"triggerTemplate\"></ng-container>\n    </div>\n\n    }@else {\n\n    <svg\n      width=\"auto\"\n      height=\"16\"\n      viewBox=\"0 0 4 16\"\n      fill=\"none\"\n      xmlns=\"http://www.w3.org/2000/svg\"\n    >\n      <path\n        d=\"M1.99292 12.75C2.68328 12.75 3.24292 13.3096 3.24292 14C3.24292 14.6904 2.68328 15.25 1.99292 15.25H1.98413C1.29377 15.25 0.734131 14.6904 0.734131 14C0.734131 13.3096 1.29377 12.75 1.98413 12.75H1.99292ZM2.00073 6.75C2.69109 6.75 3.25073 7.30964 3.25073 8C3.25073 8.69036 2.69109 9.25 2.00073 9.25H1.99194C1.30159 9.25 0.741943 8.69036 0.741943 8C0.741943 7.30964 1.30159 6.75 1.99194 6.75H2.00073ZM2.00854 0.75C2.6989 0.75 3.25854 1.30964 3.25854 2C3.25854 2.69036 2.6989 3.25 2.00854 3.25H1.99976C1.3094 3.25 0.749756 2.69036 0.749756 2C0.749756 1.30964 1.3094 0.75 1.99976 0.75H2.00854Z\"\n        fill=\"#4B4F55\"\n      />\n    </svg>\n    }\n  </div>\n  } @if( isOpen() && actions.length>0){\n\n  <div\n    #actionsPopup\n    [clickOutside]=\"actionsPopup\"\n    (clickOutsideEmitter)=\"closeDropdown()\"\n    class=\"dropdown-menu\"\n    [class.show]=\"showAnimation()\"\n  >\n    <ul>\n      @for(action of actions ;track $index){\n      <!--  -->\n      @if(!isActionDisabled(action)){\n      <li class=\"dropdown-item\" (click)=\"onClickAction(action, $event)\">\n        @if(action.icon){\n        <span\n          [class]=\"'action-icon-inline ' + action.class\"\n          [innerHTML]=\"sanitizeSvg(action.icon)\"\n        ></span>\n        }\n        <p [class]=\"'action-label ' + action.class\">{{ action.label }}</p>\n      </li>\n      }\n      <!--  -->\n      }\n    </ul>\n  </div>\n  } @if( isOpen() && hasActionTemplate){\n  <div\n    #actionsPopup\n    [clickOutside]=\"actionsPopup\"\n    (clickOutsideEmitter)=\"closeDropdown()\"\n    class=\"dropdown-menu\"\n    (click)=\"closeDropdown()\"\n    [class.show]=\"showAnimation()\"\n  >\n    <ng-content />\n  </div>\n  }\n</div>\n", styles: [".action-dropdown{position:relative}.mutlti-action-icon{width:1.25em;height:1.25em;cursor:pointer;opacity:85%}.dropdown-menu{background-color:#fff;border-radius:.2em;z-index:9999999;padding:.25em 0;box-shadow:0 4px 12px #00000026;opacity:0;visibility:hidden;scale:.95 .3;transition:opacity .18s ease,scale .18s cubic-bezier(.16,1,.3,1),visibility 0s .18s;pointer-events:none;position:fixed;top:-9999px;left:-9999px}.dropdown-menu.show{opacity:1;visibility:visible;scale:1 1;transition:opacity .18s ease,scale .18s cubic-bezier(.16,1,.3,1),visibility 0s 0s;pointer-events:auto}.dropdown-item{display:flex;align-items:center;padding:.5em .8em;font-size:.8em;cursor:pointer;transition:background-color .2s ease;color:#06213d;background-color:#fff;gap:.3em}.dropdown-item:hover{background-color:#f3f4f6}.action-icon-inline{display:inline-flex;align-items:center;justify-content:center;margin-inline-end:.5em;width:1.2em;height:1.2em}.icon-wrapper{width:.3em;height:auto}.icon-wrapper svg{width:100%!important;height:auto;display:block}.action-label{text-wrap:nowrap}.horizontal-dots{width:1.25em;height:.9375em;opacity:70%}.action-icon-inline svg{width:100%;height:100%;fill:currentColor}\n"] }]
+        }], ctorParameters: () => [{ type: i1$4.DomSanitizer }, { type: i0.Renderer2 }, { type: i0.ElementRef }, { type: i1$1.TranslateService }], propDecorators: { actions: [{
+                type: Input
+            }], context: [{
+                type: Input
+            }], horizontalDots: [{
+                type: Input
+            }], hasActionTemplate: [{
+                type: Input
+            }], injectedTrigger: [{
+                type: Input
+            }], expandSide: [{
+                type: Input
+            }], expandDirection: [{
+                type: Input
+            }], actionsPopup: [{
+                type: ViewChild,
+                args: ['actionsPopup']
+            }], triggerWrapper: [{
+                type: ViewChild,
+                args: ['triggerWrapper']
+            }], actionDropdownContainer: [{
+                type: ViewChild,
+                args: ['actionDropdownContainer', { read: ElementRef }]
+            }], triggerTemplate: [{
+                type: ContentChild,
+                args: ['customTrigger']
+            }] } });
+
 class CustomTableComponent {
     sanitizer;
     path = '../../../../src/public/gear-icon.png';
-    tableData;
-    tableCategories;
-    cellTemplates = {};
+    // MAIN INPUTS
     tableHeader;
-    showStatusColumn;
-    showActionColumn;
+    tableData;
+    // Actions Inputs
+    showActionColumn = false;
+    actionsItems;
+    // @Output() actionClicked = new EventEmitter<{
+    //   action: IActions;
+    //   rowData: T;
+    // }>();
+    // Categories Inputs
+    tableCategories;
+    // Cell Templates
+    cellTemplates = {};
+    templates = {};
+    // Pagination Inputs
     showNumberCol = false;
     pagination = {
         pageNum: 0,
         pageSize: 10,
         totalCount: 0,
     };
-    statusCol = {
-        header: 'status',
-        trueValue: true,
-        trueText: 'Active',
-        falseText: 'InActive',
-        sort: false,
-    };
+    // Style Inputs
     rowClass = '';
     headerClass = '';
-    templates = {};
-    enableEdit = true;
-    enableDelete = true;
-    enableView = true;
-    onEdit = new EventEmitter();
-    onView = new EventEmitter();
-    onDelete = new EventEmitter();
+    // Outputs
     onRowClick = new EventEmitter();
     sortColumn = new EventEmitter();
     checkedSortIcon;
@@ -3180,55 +3367,35 @@ class CustomTableComponent {
         }
     }
     static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.17", ngImport: i0, type: CustomTableComponent, deps: [{ token: i1$4.DomSanitizer }], target: i0.ɵɵFactoryTarget.Component });
-    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "17.0.0", version: "19.2.17", type: CustomTableComponent, isStandalone: true, selector: "custom-table", inputs: { tableData: "tableData", tableCategories: "tableCategories", cellTemplates: "cellTemplates", tableHeader: "tableHeader", showStatusColumn: "showStatusColumn", showActionColumn: "showActionColumn", showNumberCol: "showNumberCol", pagination: "pagination", statusCol: "statusCol", rowClass: "rowClass", headerClass: "headerClass", templates: "templates", enableEdit: "enableEdit", enableDelete: "enableDelete", enableView: "enableView" }, outputs: { onEdit: "onEdit", onView: "onView", onDelete: "onDelete", onRowClick: "onRowClick", sortColumn: "sortColumn" }, ngImport: i0, template: "<div class=\"table-container\">\n  <table [class]=\"'striped-table'\">\n    <thead [class]=\"headerClass\">\n      <tr>\n        @if(showNumberCol){\n        <th class=\"number-col\">\n          <div class=\"table-header-cell\">#</div>\n        </th>\n        } @for(item of tableHeader; track $index) {\n        <th>\n          <div class=\"table-header-cell\">\n            {{ item.header }} @if(item.sort){\n\n            <div\n              [innerHTML]=\"checkedSortIcon\"\n              class=\"sort-icon\"\n              (click)=\"sortColumn.emit(item.body)\"\n            ></div>\n            }\n          </div>\n        </th>\n        } @if(showStatusColumn) {\n        <th>\n          <div class=\"table-header-cell\">\n            Status @if(statusCol.sort){\n            <div\n              [innerHTML]=\"checkedSortIcon\"\n              class=\"sort-icon step-completed steppers-container__step--circle\"\n              (click)=\"sortColumn.emit('status')\"\n            ></div>\n\n            }\n          </div>\n        </th>\n        } @if(showActionColumn) {\n        <th style=\"max-width: 60px\">Actions</th>\n        }\n      </tr>\n    </thead>\n    <tbody>\n      @for(item of tableData; track $index) {\n      <tr (click)=\"onRowClick.emit(item)\" [class]=\"rowClass\">\n        <!-- @if(showNumberCol){\n        <td class=\"table-td-number\">\n          <div class=\"table-data-cell\">\n            {{ $index + 1 + (pagination.pageNum - 1) * pagination.pageSize }}\n          </div>\n        </td>\n        }  -->\n\n        @for(col of tableHeader; track $index) { @if(col.htmlRef) {\n        <td class=\"table-td\" style=\"padding: 0.2em 1em\">\n          <ng-template\n            *ngTemplateOutlet=\"\n              cellTemplates[col.htmlRef];\n              context: { $implicit: item }\n            \"\n          ></ng-template>\n          <!-- <ng-template\n            *ngTemplateOutlet=\"col.htmlRef; context: { $implicit: item }\"\n          ></ng-template> -->\n        </td>\n        } @else if (col.inputTransform) {\n        <td class=\"table-td\">{{ col.inputTransform(item) }}</td>\n        } @else if(col.body) {\n        <td class=\"table-td\">{{ item[col.body] }}</td>\n        } } @if(showStatusColumn) {\n        <td class=\"table-td status-td\" data-label=\"Status\">\n          <div class=\"status\">\n            @if(item[statusCol.header] === statusCol.trueValue) {\n            <div class=\"true\">{{ statusCol.trueText }}</div>\n            } @else {\n            <div class=\"false\">{{ statusCol.falseText }}</div>\n            }\n          </div>\n        </td>\n        } @if(showActionColumn) {\n        <td class=\"table-td\" style=\"max-width: 60px\">\n          <div\n            style=\"\n              display: flex;\n              justify-content: center;\n              align-items: center;\n              gap: 0.5em;\n              height: 1.2em;\n              width: 100%;\n              padding: 0 0.1em;\n            \"\n          >\n            @if(enableView){\n            <div\n              [class]=\"'actions-icon-wrapper'\"\n              style=\"cursor: pointer\"\n              (click)=\"$event.stopPropagation(); onView.emit(item)\"\n              [innerHTML]=\"checkedActionViewSvg\"\n            ></div>\n            } @if(enableEdit){\n            <div\n              [class]=\"'actions-icon-wrapper'\"\n              style=\"cursor: pointer\"\n              (click)=\"$event.stopPropagation(); onEdit.emit(item)\"\n              [innerHTML]=\"checkedActionEditSvg\"\n            ></div>\n\n            } @if(enableDelete){\n            <div\n              [class]=\"'actions-icon-wrapper'\"\n              style=\"cursor: pointer; transform: scale(0.9)\"\n              (click)=\"$event.stopPropagation(); onDelete.emit(item)\"\n              [innerHTML]=\"checkedActionDeleteSvg\"\n            ></div>\n            }\n          </div>\n        </td>\n        }\n      </tr>\n      }\n    </tbody>\n  </table>\n</div>\n", styles: [".table-container{overflow-x:auto;overflow-y:hidden;width:100%;max-width:100%}.striped-table{width:100%;min-width:900px;background-color:var(--vms-white)}.striped-table thead{color:var(--vms-text-gray);text-align:left;background-color:var(--vms-gray-50)}.striped-table th{padding:.5em 1.2em;height:4em}.table-header-cell{display:flex;flex-direction:row;justify-content:center;gap:.5em;align-items:center;font-size:var(--vms-font-size-pm);line-height:var(--vms-line-height-pm);font-weight:500}.sort-icon{width:1.3em;height:1.4em;cursor:pointer}.sort-icon svg{width:100%!important;height:auto;display:block}.striped-table tbody tr{font-weight:500}.striped-table td{padding:1.2em 1em;color:var(--vms-text-gray);border-bottom:1px solid var(--vms-gray-100)}.table-td{font-weight:500;font-size:var(--vms-font-size-pm);text-align:center}.status-td{padding:.1em .4em!important}.status{height:100%;display:flex;justify-content:center;align-items:center}.status div{display:flex;justify-content:center;align-items:center;padding:.25em 0;border:0px solid transparent;border-radius:1em;width:6em;font-weight:700}.true{color:#0d7d0b;background-color:#c8ffc7}.false{color:#d2344f;background-color:#ffe0e5}.active{background-color:#c8ffc7;width:85px;height:28px;border-radius:100px;display:flex;justify-self:center;align-items:center;font-size:.67em;font-weight:500;color:#0d7d0b;text-align:center}.inactive{background-color:#ffe0e5;width:85px;height:28px;border-radius:100px;display:flex;justify-content:center;align-items:center;font-size:.67em;font-weight:500;color:#d2344f;text-align:center}.actions-icon-wrapper{width:2em;height:1.4em}.actions-icon-wrapper svg{width:100%;height:auto;display:block}.actions{display:flex;justify-content:start;align-items:center;gap:10px;cursor:pointer}.toggle-button{background:none;border:none;color:#25c7bc;cursor:pointer;font-weight:600}\n"], dependencies: [{ kind: "ngmodule", type: CommonModule }, { kind: "directive", type: i1$2.NgTemplateOutlet, selector: "[ngTemplateOutlet]", inputs: ["ngTemplateOutletContext", "ngTemplateOutlet", "ngTemplateOutletInjector"] }] });
+    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "17.0.0", version: "19.2.17", type: CustomTableComponent, isStandalone: true, selector: "custom-table", inputs: { tableHeader: "tableHeader", tableData: "tableData", showActionColumn: "showActionColumn", actionsItems: "actionsItems", tableCategories: "tableCategories", cellTemplates: "cellTemplates", templates: "templates", showNumberCol: "showNumberCol", pagination: "pagination", rowClass: "rowClass", headerClass: "headerClass" }, outputs: { onRowClick: "onRowClick", sortColumn: "sortColumn" }, ngImport: i0, template: "<div class=\"table-container\">\n  <table [class]=\"'striped-table'\">\n    <thead [class]=\"headerClass\">\n      <tr>\n        @if(showNumberCol){\n        <th class=\"number-col\">\n          <div class=\"table-header-cell\">#</div>\n        </th>\n        } @for(item of tableHeader; track $index) {\n        <th>\n          <div class=\"table-header-cell\">\n            {{ item.header }} @if(item.sort){\n\n            <div\n              [innerHTML]=\"checkedSortIcon\"\n              class=\"sort-icon\"\n              (click)=\"sortColumn.emit(item.body)\"\n            ></div>\n            }\n          </div>\n        </th>\n        } @if(showActionColumn) {\n        <th style=\"max-width: 1.7em\"></th>\n        }\n      </tr>\n    </thead>\n    <tbody>\n      @for(item of tableData; track $index) {\n      <tr (click)=\"onRowClick.emit(item)\" [class]=\"rowClass\">\n        <!-- @if(showNumberCol){\n        <td class=\"table-td-number\">\n          <div class=\"table-data-cell\">\n            {{ $index + 1 + (pagination.pageNum - 1) * pagination.pageSize }}\n          </div>\n        </td>\n        }  -->\n\n        @for(col of tableHeader; track $index) { @if(col.htmlRef) {\n        <td class=\"table-td\" style=\"padding: 0.2em 1em\">\n          <ng-template\n            *ngTemplateOutlet=\"\n              cellTemplates[col.htmlRef];\n              context: { $implicit: item }\n            \"\n          ></ng-template>\n          <!-- <ng-template\n            *ngTemplateOutlet=\"col.htmlRef; context: { $implicit: item }\"\n          ></ng-template> -->\n        </td>\n        } @else if (col.inputTransform) {\n        <td class=\"table-td\">{{ col.inputTransform(item) }}</td>\n        } @else if(col.body) {\n        <td class=\"table-td\">{{ item[col.body] }}</td>\n        }\n        <!--  -->\n        } @if(showActionColumn) {\n        <td\n          class=\"table-td\"\n          style=\"\n            max-width: 2.46em;\n            padding-inline-end: 0.86em;\n            padding-inline-start: 0.1em;\n          \"\n        >\n          <div class=\"actions-wrapper\">\n            <custom-actions-dropdown\n              [actions]=\"actionsItems\"\n              [context]=\"item\"\n            ></custom-actions-dropdown>\n          </div>\n        </td>\n        }\n      </tr>\n      }\n    </tbody>\n  </table>\n</div>\n", styles: [".table-container{overflow-x:auto;overflow-y:hidden;width:100%;max-width:100%}.striped-table{width:100%;min-width:900px;background-color:var(--vms-white)}.striped-table thead{color:var(--vms-text-gray);text-align:left;background-color:var(--vms-gray-50)}.striped-table th{padding:.5em 1.2em;height:4em}.table-header-cell{display:flex;flex-direction:row;justify-content:center;gap:.5em;align-items:center;font-size:var(--vms-font-size-pm);line-height:var(--vms-line-height-pm);font-weight:500}.sort-icon{width:1.3em;height:1.4em;cursor:pointer}.sort-icon svg{width:100%!important;height:auto;display:block}.striped-table tbody tr{font-weight:500}.striped-table td{padding:1.2em 1em;color:var(--vms-text-gray);border-bottom:1px solid var(--vms-gray-100)}.table-td{font-weight:500;font-size:var(--vms-font-size-pm);text-align:center}.status-td{padding:.1em .4em!important}.status{height:100%;display:flex;justify-content:center;align-items:center}.status div{display:flex;justify-content:center;align-items:center;padding:.25em 0;border:0px solid transparent;border-radius:1em;width:6em;font-weight:700}.true{color:#0d7d0b;background-color:#c8ffc7}.false{color:#d2344f;background-color:#ffe0e5}.active{background-color:#c8ffc7;width:85px;height:28px;border-radius:100px;display:flex;justify-self:center;align-items:center;font-size:.67em;font-weight:500;color:#0d7d0b;text-align:center}.inactive{background-color:#ffe0e5;width:85px;height:28px;border-radius:100px;display:flex;justify-content:center;align-items:center;font-size:.67em;font-weight:500;color:#d2344f;text-align:center}.actions-wrapper{display:flex;justify-content:center;align-items:center;width:1.7em}\n"], dependencies: [{ kind: "ngmodule", type: CommonModule }, { kind: "directive", type: i1$2.NgTemplateOutlet, selector: "[ngTemplateOutlet]", inputs: ["ngTemplateOutletContext", "ngTemplateOutlet", "ngTemplateOutletInjector"] }, { kind: "component", type: CustomActionsDropdownComponent, selector: "custom-actions-dropdown", inputs: ["actions", "context", "horizontalDots", "hasActionTemplate", "injectedTrigger", "expandSide", "expandDirection"] }] });
 }
 i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.17", ngImport: i0, type: CustomTableComponent, decorators: [{
             type: Component,
-            args: [{ selector: 'custom-table', standalone: true, imports: [CommonModule], template: "<div class=\"table-container\">\n  <table [class]=\"'striped-table'\">\n    <thead [class]=\"headerClass\">\n      <tr>\n        @if(showNumberCol){\n        <th class=\"number-col\">\n          <div class=\"table-header-cell\">#</div>\n        </th>\n        } @for(item of tableHeader; track $index) {\n        <th>\n          <div class=\"table-header-cell\">\n            {{ item.header }} @if(item.sort){\n\n            <div\n              [innerHTML]=\"checkedSortIcon\"\n              class=\"sort-icon\"\n              (click)=\"sortColumn.emit(item.body)\"\n            ></div>\n            }\n          </div>\n        </th>\n        } @if(showStatusColumn) {\n        <th>\n          <div class=\"table-header-cell\">\n            Status @if(statusCol.sort){\n            <div\n              [innerHTML]=\"checkedSortIcon\"\n              class=\"sort-icon step-completed steppers-container__step--circle\"\n              (click)=\"sortColumn.emit('status')\"\n            ></div>\n\n            }\n          </div>\n        </th>\n        } @if(showActionColumn) {\n        <th style=\"max-width: 60px\">Actions</th>\n        }\n      </tr>\n    </thead>\n    <tbody>\n      @for(item of tableData; track $index) {\n      <tr (click)=\"onRowClick.emit(item)\" [class]=\"rowClass\">\n        <!-- @if(showNumberCol){\n        <td class=\"table-td-number\">\n          <div class=\"table-data-cell\">\n            {{ $index + 1 + (pagination.pageNum - 1) * pagination.pageSize }}\n          </div>\n        </td>\n        }  -->\n\n        @for(col of tableHeader; track $index) { @if(col.htmlRef) {\n        <td class=\"table-td\" style=\"padding: 0.2em 1em\">\n          <ng-template\n            *ngTemplateOutlet=\"\n              cellTemplates[col.htmlRef];\n              context: { $implicit: item }\n            \"\n          ></ng-template>\n          <!-- <ng-template\n            *ngTemplateOutlet=\"col.htmlRef; context: { $implicit: item }\"\n          ></ng-template> -->\n        </td>\n        } @else if (col.inputTransform) {\n        <td class=\"table-td\">{{ col.inputTransform(item) }}</td>\n        } @else if(col.body) {\n        <td class=\"table-td\">{{ item[col.body] }}</td>\n        } } @if(showStatusColumn) {\n        <td class=\"table-td status-td\" data-label=\"Status\">\n          <div class=\"status\">\n            @if(item[statusCol.header] === statusCol.trueValue) {\n            <div class=\"true\">{{ statusCol.trueText }}</div>\n            } @else {\n            <div class=\"false\">{{ statusCol.falseText }}</div>\n            }\n          </div>\n        </td>\n        } @if(showActionColumn) {\n        <td class=\"table-td\" style=\"max-width: 60px\">\n          <div\n            style=\"\n              display: flex;\n              justify-content: center;\n              align-items: center;\n              gap: 0.5em;\n              height: 1.2em;\n              width: 100%;\n              padding: 0 0.1em;\n            \"\n          >\n            @if(enableView){\n            <div\n              [class]=\"'actions-icon-wrapper'\"\n              style=\"cursor: pointer\"\n              (click)=\"$event.stopPropagation(); onView.emit(item)\"\n              [innerHTML]=\"checkedActionViewSvg\"\n            ></div>\n            } @if(enableEdit){\n            <div\n              [class]=\"'actions-icon-wrapper'\"\n              style=\"cursor: pointer\"\n              (click)=\"$event.stopPropagation(); onEdit.emit(item)\"\n              [innerHTML]=\"checkedActionEditSvg\"\n            ></div>\n\n            } @if(enableDelete){\n            <div\n              [class]=\"'actions-icon-wrapper'\"\n              style=\"cursor: pointer; transform: scale(0.9)\"\n              (click)=\"$event.stopPropagation(); onDelete.emit(item)\"\n              [innerHTML]=\"checkedActionDeleteSvg\"\n            ></div>\n            }\n          </div>\n        </td>\n        }\n      </tr>\n      }\n    </tbody>\n  </table>\n</div>\n", styles: [".table-container{overflow-x:auto;overflow-y:hidden;width:100%;max-width:100%}.striped-table{width:100%;min-width:900px;background-color:var(--vms-white)}.striped-table thead{color:var(--vms-text-gray);text-align:left;background-color:var(--vms-gray-50)}.striped-table th{padding:.5em 1.2em;height:4em}.table-header-cell{display:flex;flex-direction:row;justify-content:center;gap:.5em;align-items:center;font-size:var(--vms-font-size-pm);line-height:var(--vms-line-height-pm);font-weight:500}.sort-icon{width:1.3em;height:1.4em;cursor:pointer}.sort-icon svg{width:100%!important;height:auto;display:block}.striped-table tbody tr{font-weight:500}.striped-table td{padding:1.2em 1em;color:var(--vms-text-gray);border-bottom:1px solid var(--vms-gray-100)}.table-td{font-weight:500;font-size:var(--vms-font-size-pm);text-align:center}.status-td{padding:.1em .4em!important}.status{height:100%;display:flex;justify-content:center;align-items:center}.status div{display:flex;justify-content:center;align-items:center;padding:.25em 0;border:0px solid transparent;border-radius:1em;width:6em;font-weight:700}.true{color:#0d7d0b;background-color:#c8ffc7}.false{color:#d2344f;background-color:#ffe0e5}.active{background-color:#c8ffc7;width:85px;height:28px;border-radius:100px;display:flex;justify-self:center;align-items:center;font-size:.67em;font-weight:500;color:#0d7d0b;text-align:center}.inactive{background-color:#ffe0e5;width:85px;height:28px;border-radius:100px;display:flex;justify-content:center;align-items:center;font-size:.67em;font-weight:500;color:#d2344f;text-align:center}.actions-icon-wrapper{width:2em;height:1.4em}.actions-icon-wrapper svg{width:100%;height:auto;display:block}.actions{display:flex;justify-content:start;align-items:center;gap:10px;cursor:pointer}.toggle-button{background:none;border:none;color:#25c7bc;cursor:pointer;font-weight:600}\n"] }]
-        }], ctorParameters: () => [{ type: i1$4.DomSanitizer }], propDecorators: { tableData: [{
-                type: Input,
-                args: [{ required: false }]
-            }], tableCategories: [{
-                type: Input,
-                args: [{ required: false }]
-            }], cellTemplates: [{
-                type: Input,
-                args: [{ required: false }]
-            }], tableHeader: [{
+            args: [{ selector: 'custom-table', standalone: true, imports: [CommonModule, CustomActionsDropdownComponent], template: "<div class=\"table-container\">\n  <table [class]=\"'striped-table'\">\n    <thead [class]=\"headerClass\">\n      <tr>\n        @if(showNumberCol){\n        <th class=\"number-col\">\n          <div class=\"table-header-cell\">#</div>\n        </th>\n        } @for(item of tableHeader; track $index) {\n        <th>\n          <div class=\"table-header-cell\">\n            {{ item.header }} @if(item.sort){\n\n            <div\n              [innerHTML]=\"checkedSortIcon\"\n              class=\"sort-icon\"\n              (click)=\"sortColumn.emit(item.body)\"\n            ></div>\n            }\n          </div>\n        </th>\n        } @if(showActionColumn) {\n        <th style=\"max-width: 1.7em\"></th>\n        }\n      </tr>\n    </thead>\n    <tbody>\n      @for(item of tableData; track $index) {\n      <tr (click)=\"onRowClick.emit(item)\" [class]=\"rowClass\">\n        <!-- @if(showNumberCol){\n        <td class=\"table-td-number\">\n          <div class=\"table-data-cell\">\n            {{ $index + 1 + (pagination.pageNum - 1) * pagination.pageSize }}\n          </div>\n        </td>\n        }  -->\n\n        @for(col of tableHeader; track $index) { @if(col.htmlRef) {\n        <td class=\"table-td\" style=\"padding: 0.2em 1em\">\n          <ng-template\n            *ngTemplateOutlet=\"\n              cellTemplates[col.htmlRef];\n              context: { $implicit: item }\n            \"\n          ></ng-template>\n          <!-- <ng-template\n            *ngTemplateOutlet=\"col.htmlRef; context: { $implicit: item }\"\n          ></ng-template> -->\n        </td>\n        } @else if (col.inputTransform) {\n        <td class=\"table-td\">{{ col.inputTransform(item) }}</td>\n        } @else if(col.body) {\n        <td class=\"table-td\">{{ item[col.body] }}</td>\n        }\n        <!--  -->\n        } @if(showActionColumn) {\n        <td\n          class=\"table-td\"\n          style=\"\n            max-width: 2.46em;\n            padding-inline-end: 0.86em;\n            padding-inline-start: 0.1em;\n          \"\n        >\n          <div class=\"actions-wrapper\">\n            <custom-actions-dropdown\n              [actions]=\"actionsItems\"\n              [context]=\"item\"\n            ></custom-actions-dropdown>\n          </div>\n        </td>\n        }\n      </tr>\n      }\n    </tbody>\n  </table>\n</div>\n", styles: [".table-container{overflow-x:auto;overflow-y:hidden;width:100%;max-width:100%}.striped-table{width:100%;min-width:900px;background-color:var(--vms-white)}.striped-table thead{color:var(--vms-text-gray);text-align:left;background-color:var(--vms-gray-50)}.striped-table th{padding:.5em 1.2em;height:4em}.table-header-cell{display:flex;flex-direction:row;justify-content:center;gap:.5em;align-items:center;font-size:var(--vms-font-size-pm);line-height:var(--vms-line-height-pm);font-weight:500}.sort-icon{width:1.3em;height:1.4em;cursor:pointer}.sort-icon svg{width:100%!important;height:auto;display:block}.striped-table tbody tr{font-weight:500}.striped-table td{padding:1.2em 1em;color:var(--vms-text-gray);border-bottom:1px solid var(--vms-gray-100)}.table-td{font-weight:500;font-size:var(--vms-font-size-pm);text-align:center}.status-td{padding:.1em .4em!important}.status{height:100%;display:flex;justify-content:center;align-items:center}.status div{display:flex;justify-content:center;align-items:center;padding:.25em 0;border:0px solid transparent;border-radius:1em;width:6em;font-weight:700}.true{color:#0d7d0b;background-color:#c8ffc7}.false{color:#d2344f;background-color:#ffe0e5}.active{background-color:#c8ffc7;width:85px;height:28px;border-radius:100px;display:flex;justify-self:center;align-items:center;font-size:.67em;font-weight:500;color:#0d7d0b;text-align:center}.inactive{background-color:#ffe0e5;width:85px;height:28px;border-radius:100px;display:flex;justify-content:center;align-items:center;font-size:.67em;font-weight:500;color:#d2344f;text-align:center}.actions-wrapper{display:flex;justify-content:center;align-items:center;width:1.7em}\n"] }]
+        }], ctorParameters: () => [{ type: i1$4.DomSanitizer }], propDecorators: { tableHeader: [{
                 type: Input,
                 args: [{ required: true }]
-            }], showStatusColumn: [{
+            }], tableData: [{
                 type: Input,
                 args: [{ required: true }]
             }], showActionColumn: [{
-                type: Input,
-                args: [{ required: true }]
+                type: Input
+            }], actionsItems: [{
+                type: Input
+            }], tableCategories: [{
+                type: Input
+            }], cellTemplates: [{
+                type: Input
+            }], templates: [{
+                type: Input
             }], showNumberCol: [{
-                type: Input,
-                args: [{ required: false }]
+                type: Input
             }], pagination: [{
-                type: Input,
-                args: [{ required: false }]
-            }], statusCol: [{
                 type: Input
             }], rowClass: [{
                 type: Input
             }], headerClass: [{
                 type: Input
-            }], templates: [{
-                type: Input
-            }], enableEdit: [{
-                type: Input
-            }], enableDelete: [{
-                type: Input
-            }], enableView: [{
-                type: Input
-            }], onEdit: [{
-                type: Output
-            }], onView: [{
-                type: Output
-            }], onDelete: [{
-                type: Output
             }], onRowClick: [{
                 type: Output
             }], sortColumn: [{
@@ -5499,186 +5666,6 @@ i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.17", ngImpo
                 type: Output
             }] } });
 
-class CustomActionsDropdownComponent {
-    sanitizer;
-    renderer;
-    elRef;
-    translate;
-    actions = [];
-    context;
-    horizontalDots = false;
-    hasActionTemplate = false;
-    injectedTrigger = false;
-    expandSide = 'RIGHT';
-    expandDirection = 'BOTTOM';
-    actionsPopup;
-    triggerWrapper;
-    actionDropdownContainer;
-    triggerTemplate = null;
-    isAppendedToBody = false;
-    isOpen = signal(false);
-    showAnimation = signal(false);
-    constructor(sanitizer, renderer, elRef, translate) {
-        this.sanitizer = sanitizer;
-        this.renderer = renderer;
-        this.elRef = elRef;
-        this.translate = translate;
-        this.translate.onLangChange.pipe(takeUntilDestroyed()).subscribe(() => {
-            // If dropdown is open, reposition
-            if (this.isOpen()) {
-                this.updatePosition();
-            }
-        });
-    }
-    sanitizeSvg(svg) {
-        return this.sanitizer.bypassSecurityTrustHtml(svg);
-    }
-    openDropdown() {
-        this.isOpen.set(true);
-        this.showAnimation.set(false);
-        setTimeout(() => this.portalToBody(), 0);
-    }
-    closeDropdown() {
-        this.showAnimation.set(false);
-        setTimeout(() => {
-            this.isOpen.set(false);
-            this.detachFromBody();
-        }, 150); // Match CSS transition duration
-    }
-    portalToBody() {
-        if (!this.actionsPopup || this.isAppendedToBody)
-            return;
-        const dropdownEl = this.actionsPopup.nativeElement;
-        this.renderer.setStyle(dropdownEl, 'position', 'fixed');
-        this.renderer.setStyle(dropdownEl, 'top', '-9999px');
-        this.renderer.setStyle(dropdownEl, 'left', '-9999px');
-        this.renderer.setStyle(dropdownEl, 'visibility', 'hidden');
-        this.renderer.appendChild(document.body, dropdownEl);
-        this.isAppendedToBody = true;
-        requestAnimationFrame(() => {
-            this.updatePosition();
-            requestAnimationFrame(() => {
-                this.renderer.removeStyle(dropdownEl, 'visibility');
-                this.showAnimation.set(true);
-            });
-        });
-    }
-    updatePosition() {
-        if (!this.actionsPopup || !this.triggerWrapper || !this.actionDropdownContainer)
-            return;
-        const dropdownEl = this.actionsPopup.nativeElement;
-        const triggerEl = this.triggerWrapper.nativeElement;
-        const containerEl = this.actionDropdownContainer.nativeElement;
-        const triggerRect = triggerEl.getBoundingClientRect();
-        const containerRect = containerEl.getBoundingClientRect();
-        const dropdownHeight = dropdownEl.offsetHeight;
-        const viewportHeight = window.innerHeight;
-        // Detect document direction
-        const isRTL = document.dir === 'rtl';
-        let top;
-        let left;
-        let transformOrigin;
-        let actualDirection = this.expandDirection;
-        /** ------------------------
-         *  Vertical positioning
-         * ------------------------ */
-        if (this.expandDirection === 'BOTTOM') {
-            const spaceBelow = viewportHeight - containerRect.bottom;
-            if (spaceBelow >= dropdownHeight + 16) {
-                top = containerRect.bottom + 8;
-                transformOrigin = 'top';
-            }
-            else {
-                top = containerRect.top - dropdownHeight - 8;
-                transformOrigin = 'bottom';
-                actualDirection = 'TOP';
-            }
-        }
-        else {
-            const spaceAbove = containerRect.top;
-            if (spaceAbove >= dropdownHeight + 16) {
-                top = containerRect.top - dropdownHeight - 8;
-                transformOrigin = 'bottom';
-            }
-            else {
-                top = containerRect.bottom + 8;
-                transformOrigin = 'top';
-                actualDirection = 'BOTTOM';
-            }
-        }
-        /** ------------------------
-         *  Horizontal positioning (RTL-aware)
-         * ------------------------ */
-        const expandToRight = (this.expandSide === 'RIGHT' && !isRTL) || (this.expandSide === 'LEFT' && isRTL);
-        if (expandToRight) {
-            left = triggerRect.right;
-            transformOrigin += ' right';
-            this.renderer.setStyle(dropdownEl, 'translate', '-100% 0');
-        }
-        else {
-            left = triggerRect.left;
-            transformOrigin += ' left';
-            this.renderer.removeStyle(dropdownEl, 'translate');
-        }
-        /** ------------------------
-         *  Apply computed styles
-         * ------------------------ */
-        this.renderer.setStyle(dropdownEl, 'position', 'fixed');
-        this.renderer.setStyle(dropdownEl, 'top', `${top}px`);
-        this.renderer.setStyle(dropdownEl, 'left', `${left}px`);
-        this.renderer.setStyle(dropdownEl, 'z-index', '9999999');
-        this.renderer.setStyle(dropdownEl, 'transform-origin', transformOrigin);
-        // console.log('Direction:', this.expandDirection, '→ Actual:', actualDirection, '| RTL:', isRTL);
-    }
-    detachFromBody() {
-        if (!this.actionsPopup || !this.isAppendedToBody)
-            return;
-        const dropdownEl = this.actionsPopup.nativeElement;
-        this.renderer.removeChild(document.body, dropdownEl);
-        this.isAppendedToBody = false;
-    }
-    onClickAction(action, event) {
-        event.stopPropagation();
-        action.callback(this.context);
-        this.closeDropdown();
-    }
-    ngOnDestroy() {
-        this.detachFromBody();
-    }
-    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.17", ngImport: i0, type: CustomActionsDropdownComponent, deps: [{ token: i1$4.DomSanitizer }, { token: i0.Renderer2 }, { token: i0.ElementRef }, { token: i1$1.TranslateService }], target: i0.ɵɵFactoryTarget.Component });
-    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "17.0.0", version: "19.2.17", type: CustomActionsDropdownComponent, isStandalone: true, selector: "custom-actions-dropdown", inputs: { actions: "actions", context: "context", horizontalDots: "horizontalDots", hasActionTemplate: "hasActionTemplate", injectedTrigger: "injectedTrigger", expandSide: "expandSide", expandDirection: "expandDirection" }, queries: [{ propertyName: "triggerTemplate", first: true, predicate: ["customTrigger"], descendants: true }], viewQueries: [{ propertyName: "actionsPopup", first: true, predicate: ["actionsPopup"], descendants: true }, { propertyName: "triggerWrapper", first: true, predicate: ["triggerWrapper"], descendants: true }, { propertyName: "actionDropdownContainer", first: true, predicate: ["actionDropdownContainer"], descendants: true, read: ElementRef }], ngImport: i0, template: "<div class=\"action-dropdown\" #actionDropdownContainer>\n  @if(horizontalDots){\n  <div class=\"horizontal-dots\" (click)=\"openDropdown()\" #triggerWrapper>\n    <svg width=\"20\" height=\"5\" viewBox=\"0 0 20 5\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n      <path\n        d=\"M19.1616 2.70166C19.1616 1.60166 18.2455 0.70166 17.1257 0.70166C16.0059 0.70166 15.0898 1.60166 15.0898 2.70166C15.0898 3.80166 16.0059 4.70166 17.1257 4.70166C18.2455 4.70166 19.1616 3.80166 19.1616 2.70166ZM4.91012 2.70166C4.91012 1.60166 3.99396 0.701661 2.8742 0.701661C1.75444 0.701661 0.838268 1.60166 0.838268 2.70166C0.838268 3.80166 1.75444 4.70166 2.8742 4.70166C3.99396 4.70166 4.91012 3.80166 4.91012 2.70166ZM12.0359 2.70166C12.0359 1.60166 11.1197 0.701661 9.99994 0.701661C8.88018 0.701661 7.96402 1.60166 7.96402 2.70166C7.96402 3.80166 8.88018 4.70166 9.99994 4.70166C11.1197 4.70166 12.0359 3.80166 12.0359 2.70166Z\"\n        fill=\"#06213D\" />\n    </svg>\n  </div>\n  }@else{\n\n  <div class=\"mutlti-action-icon icon-wrapper\" (click)=\"openDropdown()\" #triggerWrapper>\n    @if(injectedTrigger){\n    <div>\n      <ng-container [ngTemplateOutlet]=\"triggerTemplate\"></ng-container>\n    </div>\n\n    }@else {\n\n    <svg width=\"auto\" height=\"16\" viewBox=\"0 0 4 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n      <path\n        d=\"M1.99292 12.75C2.68328 12.75 3.24292 13.3096 3.24292 14C3.24292 14.6904 2.68328 15.25 1.99292 15.25H1.98413C1.29377 15.25 0.734131 14.6904 0.734131 14C0.734131 13.3096 1.29377 12.75 1.98413 12.75H1.99292ZM2.00073 6.75C2.69109 6.75 3.25073 7.30964 3.25073 8C3.25073 8.69036 2.69109 9.25 2.00073 9.25H1.99194C1.30159 9.25 0.741943 8.69036 0.741943 8C0.741943 7.30964 1.30159 6.75 1.99194 6.75H2.00073ZM2.00854 0.75C2.6989 0.75 3.25854 1.30964 3.25854 2C3.25854 2.69036 2.6989 3.25 2.00854 3.25H1.99976C1.3094 3.25 0.749756 2.69036 0.749756 2C0.749756 1.30964 1.3094 0.75 1.99976 0.75H2.00854Z\"\n        fill=\"#4B4F55\" />\n    </svg>\n    }\n  </div>\n  } @if( isOpen() && actions.length>0){\n\n  <div #actionsPopup [clickOutside]=\"actionsPopup\" (clickOutsideEmitter)=\"closeDropdown()\" class=\"dropdown-menu\"\n    [class.show]=\"showAnimation()\">\n    <ul>\n      @for(action of actions ;track $index){\n      @if(!action.isDisabled){\n      <li class=\"dropdown-item\" (click)=\"onClickAction(action, $event)\">\n        @if(action.icon){\n\n        <span [class]=\"'action-icon-inline '+action.class\" [innerHTML]=\"sanitizeSvg(action.icon)\"></span>\n        }\n        <p [class]=\"'action-label '+action.class\">{{ action.label }}</p>\n      </li>\n      }\n\n      }\n    </ul>\n  </div>\n  } @if( isOpen() && hasActionTemplate){\n  <div #actionsPopup [clickOutside]=\"actionsPopup\" (clickOutsideEmitter)=\"closeDropdown()\" class=\"dropdown-menu\"\n    (click)=\"closeDropdown()\" [class.show]=\"showAnimation()\">\n    <ng-content />\n  </div>\n  }\n</div>", styles: [".action-dropdown{position:relative}.mutlti-action-icon{width:1.25em;height:1.25em;cursor:pointer;opacity:85%}.dropdown-menu{background-color:#fff;border-radius:.2em;z-index:9999999;padding:.25em 0;box-shadow:0 4px 12px #00000026;opacity:0;visibility:hidden;scale:.95 .3;transition:opacity .18s ease,scale .18s cubic-bezier(.16,1,.3,1),visibility 0s .18s;pointer-events:none;position:fixed;top:-9999px;left:-9999px}.dropdown-menu.show{opacity:1;visibility:visible;scale:1 1;transition:opacity .18s ease,scale .18s cubic-bezier(.16,1,.3,1),visibility 0s 0s;pointer-events:auto}.dropdown-item{display:flex;align-items:center;padding:.5em .8em;font-size:.8em;cursor:pointer;transition:background-color .2s ease;color:#06213d;background-color:#fff;gap:.3em}.dropdown-item:hover{background-color:#f3f4f6}.action-icon-inline{display:inline-flex;align-items:center;justify-content:center;margin-inline-end:.5em;width:1.2em;height:1.2em}.icon-wrapper{width:.3em;height:auto}.icon-wrapper svg{width:100%!important;height:auto;display:block}.action-label{text-wrap:nowrap}.horizontal-dots{width:1.25em;height:.9375em;opacity:70%}.action-icon-inline svg{width:100%;height:100%;fill:currentColor}\n"], dependencies: [{ kind: "directive", type: ClickOutsideDirective, selector: "[clickOutside]", inputs: ["clickOutside"], outputs: ["clickOutsideEmitter"] }, { kind: "directive", type: NgTemplateOutlet, selector: "[ngTemplateOutlet]", inputs: ["ngTemplateOutletContext", "ngTemplateOutlet", "ngTemplateOutletInjector"] }] });
-}
-i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.17", ngImport: i0, type: CustomActionsDropdownComponent, decorators: [{
-            type: Component,
-            args: [{ selector: 'custom-actions-dropdown', imports: [ClickOutsideDirective, NgTemplateOutlet], template: "<div class=\"action-dropdown\" #actionDropdownContainer>\n  @if(horizontalDots){\n  <div class=\"horizontal-dots\" (click)=\"openDropdown()\" #triggerWrapper>\n    <svg width=\"20\" height=\"5\" viewBox=\"0 0 20 5\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n      <path\n        d=\"M19.1616 2.70166C19.1616 1.60166 18.2455 0.70166 17.1257 0.70166C16.0059 0.70166 15.0898 1.60166 15.0898 2.70166C15.0898 3.80166 16.0059 4.70166 17.1257 4.70166C18.2455 4.70166 19.1616 3.80166 19.1616 2.70166ZM4.91012 2.70166C4.91012 1.60166 3.99396 0.701661 2.8742 0.701661C1.75444 0.701661 0.838268 1.60166 0.838268 2.70166C0.838268 3.80166 1.75444 4.70166 2.8742 4.70166C3.99396 4.70166 4.91012 3.80166 4.91012 2.70166ZM12.0359 2.70166C12.0359 1.60166 11.1197 0.701661 9.99994 0.701661C8.88018 0.701661 7.96402 1.60166 7.96402 2.70166C7.96402 3.80166 8.88018 4.70166 9.99994 4.70166C11.1197 4.70166 12.0359 3.80166 12.0359 2.70166Z\"\n        fill=\"#06213D\" />\n    </svg>\n  </div>\n  }@else{\n\n  <div class=\"mutlti-action-icon icon-wrapper\" (click)=\"openDropdown()\" #triggerWrapper>\n    @if(injectedTrigger){\n    <div>\n      <ng-container [ngTemplateOutlet]=\"triggerTemplate\"></ng-container>\n    </div>\n\n    }@else {\n\n    <svg width=\"auto\" height=\"16\" viewBox=\"0 0 4 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n      <path\n        d=\"M1.99292 12.75C2.68328 12.75 3.24292 13.3096 3.24292 14C3.24292 14.6904 2.68328 15.25 1.99292 15.25H1.98413C1.29377 15.25 0.734131 14.6904 0.734131 14C0.734131 13.3096 1.29377 12.75 1.98413 12.75H1.99292ZM2.00073 6.75C2.69109 6.75 3.25073 7.30964 3.25073 8C3.25073 8.69036 2.69109 9.25 2.00073 9.25H1.99194C1.30159 9.25 0.741943 8.69036 0.741943 8C0.741943 7.30964 1.30159 6.75 1.99194 6.75H2.00073ZM2.00854 0.75C2.6989 0.75 3.25854 1.30964 3.25854 2C3.25854 2.69036 2.6989 3.25 2.00854 3.25H1.99976C1.3094 3.25 0.749756 2.69036 0.749756 2C0.749756 1.30964 1.3094 0.75 1.99976 0.75H2.00854Z\"\n        fill=\"#4B4F55\" />\n    </svg>\n    }\n  </div>\n  } @if( isOpen() && actions.length>0){\n\n  <div #actionsPopup [clickOutside]=\"actionsPopup\" (clickOutsideEmitter)=\"closeDropdown()\" class=\"dropdown-menu\"\n    [class.show]=\"showAnimation()\">\n    <ul>\n      @for(action of actions ;track $index){\n      @if(!action.isDisabled){\n      <li class=\"dropdown-item\" (click)=\"onClickAction(action, $event)\">\n        @if(action.icon){\n\n        <span [class]=\"'action-icon-inline '+action.class\" [innerHTML]=\"sanitizeSvg(action.icon)\"></span>\n        }\n        <p [class]=\"'action-label '+action.class\">{{ action.label }}</p>\n      </li>\n      }\n\n      }\n    </ul>\n  </div>\n  } @if( isOpen() && hasActionTemplate){\n  <div #actionsPopup [clickOutside]=\"actionsPopup\" (clickOutsideEmitter)=\"closeDropdown()\" class=\"dropdown-menu\"\n    (click)=\"closeDropdown()\" [class.show]=\"showAnimation()\">\n    <ng-content />\n  </div>\n  }\n</div>", styles: [".action-dropdown{position:relative}.mutlti-action-icon{width:1.25em;height:1.25em;cursor:pointer;opacity:85%}.dropdown-menu{background-color:#fff;border-radius:.2em;z-index:9999999;padding:.25em 0;box-shadow:0 4px 12px #00000026;opacity:0;visibility:hidden;scale:.95 .3;transition:opacity .18s ease,scale .18s cubic-bezier(.16,1,.3,1),visibility 0s .18s;pointer-events:none;position:fixed;top:-9999px;left:-9999px}.dropdown-menu.show{opacity:1;visibility:visible;scale:1 1;transition:opacity .18s ease,scale .18s cubic-bezier(.16,1,.3,1),visibility 0s 0s;pointer-events:auto}.dropdown-item{display:flex;align-items:center;padding:.5em .8em;font-size:.8em;cursor:pointer;transition:background-color .2s ease;color:#06213d;background-color:#fff;gap:.3em}.dropdown-item:hover{background-color:#f3f4f6}.action-icon-inline{display:inline-flex;align-items:center;justify-content:center;margin-inline-end:.5em;width:1.2em;height:1.2em}.icon-wrapper{width:.3em;height:auto}.icon-wrapper svg{width:100%!important;height:auto;display:block}.action-label{text-wrap:nowrap}.horizontal-dots{width:1.25em;height:.9375em;opacity:70%}.action-icon-inline svg{width:100%;height:100%;fill:currentColor}\n"] }]
-        }], ctorParameters: () => [{ type: i1$4.DomSanitizer }, { type: i0.Renderer2 }, { type: i0.ElementRef }, { type: i1$1.TranslateService }], propDecorators: { actions: [{
-                type: Input
-            }], context: [{
-                type: Input
-            }], horizontalDots: [{
-                type: Input
-            }], hasActionTemplate: [{
-                type: Input
-            }], injectedTrigger: [{
-                type: Input
-            }], expandSide: [{
-                type: Input
-            }], expandDirection: [{
-                type: Input
-            }], actionsPopup: [{
-                type: ViewChild,
-                args: ['actionsPopup']
-            }], triggerWrapper: [{
-                type: ViewChild,
-                args: ['triggerWrapper']
-            }], actionDropdownContainer: [{
-                type: ViewChild,
-                args: ['actionDropdownContainer', { read: ElementRef }]
-            }], triggerTemplate: [{
-                type: ContentChild,
-                args: ['customTrigger']
-            }] } });
-
 class CustomReactiveSearchInputComponent {
     model = '';
     modelChange = new EventEmitter();
@@ -7419,11 +7406,11 @@ class CustomPlaceHolderComponent {
     title = 'No Data Available'; // No Visits Requested Yet
     description = 'There is no data to display at the moment.'; //  You haven’t created any visitor requests. Start by creating your first visit and adding your visitors’ details.
     static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.17", ngImport: i0, type: CustomPlaceHolderComponent, deps: [], target: i0.ɵɵFactoryTarget.Component });
-    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "14.0.0", version: "19.2.17", type: CustomPlaceHolderComponent, isStandalone: true, selector: "custom-place-holder", inputs: { title: "title", description: "description" }, ngImport: i0, template: "<div class=\"empty-data\">\n  <div class=\"placeholder-img\">\n    <svg\n      width=\"inherit\"\n      height=\"inherit\"\n      viewBox=\"0 0 500 309\"\n      fill=\"none\"\n      xmlns=\"http://www.w3.org/2000/svg\"\n    >\n      <path\n        d=\"M380.829 183.59H322.539V91.795H380.829C386.552 91.795 391.192 96.4257 391.192 102.138V173.247C391.192 178.959 386.552 183.59 380.829 183.59Z\"\n        fill=\"#455360\"\n      />\n      <path\n        d=\"M391.192 107.31H322.539V91.795H380.829C386.552 91.795 391.192 96.4257 391.192 102.138V107.31Z\"\n        fill=\"#313F4C\"\n      />\n      <path d=\"M24.6114 27.1506H77.7202V309H24.6114V27.1506Z\" fill=\"#94B3C7\" />\n      <path d=\"M422.28 27.1506H475.389V309H422.28V27.1506Z\" fill=\"#94B3C7\" />\n      <path\n        d=\"M24.6114 46.5439H77.7202V27.1506H24.6114V46.5439Z\"\n        fill=\"#809FB3\"\n      />\n      <path\n        d=\"M422.28 46.5439H475.389V27.1506H422.28V46.5439Z\"\n        fill=\"#809FB3\"\n      />\n      <path\n        d=\"M0 14.2218C0 6.3673 6.37936 0 14.2487 0H485.751C493.621 0 500 6.3673 500 14.2218C500 22.0762 493.621 28.4435 485.751 28.4435H14.2487C6.37936 28.4435 0 22.0762 0 14.2218Z\"\n        fill=\"#94B3C7\"\n      />\n      <path\n        d=\"M332.902 68.523H422.28V309H322.539V183.59H380.829C386.552 183.59 391.192 178.959 391.192 173.247V102.138C391.192 96.4257 386.552 91.795 380.829 91.795H322.539V78.8661C322.539 73.1538 327.178 68.523 332.902 68.523Z\"\n        fill=\"#809FB3\"\n      />\n      <path d=\"M409.326 68.523H422.28V309H409.326V68.523Z\" fill=\"#6D8CA0\" />\n      <path\n        d=\"M313.472 192.64C313.472 189.784 315.791 187.469 318.653 187.469H322.539V221.084H318.653C315.791 221.084 313.472 218.768 313.472 215.912V192.64Z\"\n        fill=\"#6C8BA0\"\n      />\n      <path\n        d=\"M121.762 204.276C121.762 198.564 126.401 193.933 132.124 193.933H313.472V214.619H132.124C126.401 214.619 121.762 209.988 121.762 204.276Z\"\n        fill=\"#F9A809\"\n      />\n      <path\n        d=\"M139.896 193.933H160.622L155.44 214.619H134.715L139.896 193.933Z\"\n        fill=\"#BA3B02\"\n      />\n      <path\n        d=\"M176.166 193.933H196.891L191.71 214.619H170.984L176.166 193.933Z\"\n        fill=\"#BA3B02\"\n      />\n      <path\n        d=\"M212.435 193.933H233.161L227.979 214.619H207.254L212.435 193.933Z\"\n        fill=\"#BA3B02\"\n      />\n      <path\n        d=\"M248.705 193.933H269.43L264.249 214.619H243.523L248.705 193.933Z\"\n        fill=\"#BA3B02\"\n      />\n      <path\n        d=\"M284.974 193.933H305.699L300.518 214.619H279.793L284.974 193.933Z\"\n        fill=\"#BA3B02\"\n      />\n    </svg>\n  </div>\n  <div class=\"placeholder-content\">\n    <span class=\"placeholder-text\">\n      <h2 class=\"title\">{{ title | translate }}</h2>\n      <p class=\"desc\">\n        {{ description | translate }}\n      </p>\n    </span>\n    <ng-content select=\"[button]\"></ng-content>\n  </div>\n</div>\n", styles: [".empty-data{padding:8.875em 0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4em}.placeholder-img{width:50em;height:30.9em}.placeholder-content{display:flex;flex-direction:column;align-items:center;gap:2.4em}.placeholder-text{display:flex;flex-direction:column;align-items:center;gap:.4em;width:51.2em}h2.title{color:#120710;font-size:var(--vms-font-size-h2);font-family:var(--FM-Bold);text-transform:capitalize;text-align:center}p.desc{color:#9e9595;font-size:var(--vms-font-size-pl);font-style:normal;text-transform:capitalize;text-align:center}\n"], dependencies: [{ kind: "ngmodule", type: TranslateModule }, { kind: "pipe", type: i1$1.TranslatePipe, name: "translate" }] });
+    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "14.0.0", version: "19.2.17", type: CustomPlaceHolderComponent, isStandalone: true, selector: "custom-place-holder", inputs: { title: "title", description: "description" }, ngImport: i0, template: "<div class=\"empty-data\">\n  <div class=\"placeholder-img\">\n    <svg\n      width=\"auto\"\n      height=\"auto\"\n      viewBox=\"0 0 369 399\"\n      fill=\"none\"\n      xmlns=\"http://www.w3.org/2000/svg\"\n    >\n      <path\n        d=\"M26.4222 39.2609H158.533V385.304H26.4222V39.2609Z\"\n        fill=\"#D3D3D1\"\n      />\n      <path\n        d=\"M9.11111 39.2609H26.4222V385.304H9.11111V39.2609Z\"\n        fill=\"#B7B6B4\"\n      />\n      <path\n        d=\"M9.11111 29.2174H26.4222V39.2609H9.11111V29.2174Z\"\n        fill=\"#9C9899\"\n      />\n      <path\n        d=\"M26.4222 29.2174H158.533V39.2609H26.4222V29.2174Z\"\n        fill=\"#B7B6B4\"\n      />\n      <path d=\"M15.4889 29.2174H16.4V385.304H15.4889V29.2174Z\" fill=\"#79858D\" />\n      <path\n        d=\"M34.6222 29.2174H38.2667V385.304H34.6222V29.2174Z\"\n        fill=\"#FEFCFD\"\n      />\n      <path d=\"M26.4222 385.304H276.978V399H26.4222V385.304Z\" fill=\"#4E5464\" />\n      <path\n        d=\"M222.311 37.4348H266.044V385.304H222.311V37.4348Z\"\n        fill=\"#586576\"\n      />\n      <path\n        d=\"M222.311 31.9565H266.044V37.4348H222.311V31.9565Z\"\n        fill=\"#4B5464\"\n      />\n      <path\n        d=\"M217.756 28.3043H266.044V31.9565H217.756V28.3043Z\"\n        fill=\"#1B1A1D\"\n      />\n      <path\n        d=\"M217.756 31.9565H222.311V385.304H217.756V31.9565Z\"\n        fill=\"#343A3F\"\n      />\n      <path d=\"M0 385.304H26.4222V399H0V385.304Z\" fill=\"#293133\" />\n      <path\n        d=\"M226.867 37.4348H231.422V385.304H226.867V37.4348Z\"\n        fill=\"#788490\"\n      />\n      <path\n        d=\"M256.022 37.4348H260.578V385.304H256.022V37.4348Z\"\n        fill=\"#788490\"\n      />\n      <path\n        d=\"M256.022 31.9565H260.578V37.4348H256.022V31.9565Z\"\n        fill=\"#576475\"\n      />\n      <path\n        d=\"M226.867 31.9565H231.422V37.4348H226.867V31.9565Z\"\n        fill=\"#576475\"\n      />\n      <path\n        d=\"M226.867 28.3043H231.422V31.9565H226.867V28.3043Z\"\n        fill=\"#2B3236\"\n      />\n      <path\n        d=\"M256.022 28.3043H260.578V31.9565H256.022V28.3043Z\"\n        fill=\"#2B3236\"\n      />\n      <path d=\"M5.46667 17.3478H24.6V29.2174H5.46667V17.3478Z\" fill=\"#085B85\" />\n      <path\n        d=\"M24.6 0H252.378C261.938 0 269.689 7.76689 269.689 17.3478H24.6V0Z\"\n        fill=\"#62C5EE\"\n      />\n      <path\n        d=\"M5.46667 17.3478C5.46667 7.76689 13.2171 0 22.7778 0H24.6V17.3478H5.46667Z\"\n        fill=\"#2181C5\"\n      />\n      <path\n        d=\"M217.756 31.9565V98.6087L158.533 44.7391V31.9565H217.756Z\"\n        fill=\"#064E76\"\n      />\n      <path\n        d=\"M217.756 28.3043V31.9565H158.533V28.3043H217.756Z\"\n        fill=\"#0A5B82\"\n      />\n      <path\n        d=\"M234.611 99.5219C239.271 106.266 250.1 113.674 250.1 113.674L251.922 110.478L254.2 108.196C254.2 108.196 249.525 104.244 246.456 101.805C244.866 100.541 243.598 100.216 242.356 98.6089C241.381 97.3484 240.736 96.5383 240.533 94.9567C240.324 93.3264 240.356 92.0775 241.444 90.848C242.565 89.5829 243.886 89.7916 245.544 89.4784C247.817 89.0493 249.372 88.4967 251.467 89.4784C252.725 90.0683 253.374 90.6412 254.2 91.761C255.905 94.0729 254.928 96.1965 255.111 99.0654C255.304 102.09 255.111 106.826 255.111 106.826C255.111 106.826 256.516 106.657 257.389 106.826C259.037 107.146 261.033 109.109 261.033 109.109C261.033 109.109 261.985 100.951 261.033 95.8697C260.555 93.3184 260.421 91.7739 259.211 89.4784C258.612 88.3416 258.21 87.7274 257.389 86.7393C255.084 83.9649 253.175 82.4346 249.644 81.7176C247.726 81.328 244.633 81.7176 244.633 81.7176L243.722 82.1741C241.229 83.4788 239.789 84.2895 237.8 86.2828C235.811 88.276 234.457 89.5025 233.7 92.2176C233.078 94.4498 232.666 96.0793 233.7 98.1523C233.987 98.7273 234.246 98.9934 234.611 99.5219Z\"\n        fill=\"#191A1C\"\n      />\n      <path\n        d=\"M240.533 88.5652H363.078C366.349 88.5652 369 91.2223 369 94.5C369 97.7777 366.349 100.435 363.078 100.435H245.533C242.772 100.435 240.533 98.1962 240.533 95.4348V88.5652Z\"\n        fill=\"#353942\"\n      />\n      <path\n        d=\"M240.533 88.5652H362.622C363.125 88.5652 363.533 88.974 363.533 89.4783H241.446C240.942 89.4783 240.533 89.0695 240.533 88.5652Z\"\n        fill=\"#9C9998\"\n      />\n      <path\n        d=\"M240.533 90.3913H360.8C362.31 90.3913 363.533 91.6177 363.533 93.1304H240.533V90.3913Z\"\n        fill=\"#9C9998\"\n      />\n      <path\n        d=\"M250.789 108.15C253.47 104.609 258.461 103.817 262.103 106.353L362.705 176.392C366.459 179.005 367.339 184.198 364.658 187.907C362.054 191.509 357.055 192.365 353.405 189.834L252.672 119.984C248.796 117.296 247.94 111.912 250.789 108.15Z\"\n        fill=\"#F7BE81\"\n      />\n      <path\n        d=\"M249.206 110.488L362.639 189.923L362.225 190.213C359.734 191.96 356.423 191.975 353.917 190.249L252.85 120.644C249.584 118.395 248.117 114.306 249.206 110.488Z\"\n        fill=\"#E4874D\"\n      />\n      <path\n        d=\"M33.7111 64.8261C33.7111 59.7835 37.7903 55.6957 42.8222 55.6957H51.0222V215.478C41.4616 215.478 33.7111 207.711 33.7111 198.13V64.8261Z\"\n        fill=\"#4D5464\"\n      />\n      <path\n        d=\"M40.0889 64.8261C40.0889 59.7835 44.1681 55.6957 49.2 55.6957H129.378C134.41 55.6957 138.489 59.7835 138.489 64.8261V206.348C138.489 211.39 134.41 215.478 129.378 215.478H49.2C44.1681 215.478 40.0889 211.39 40.0889 206.348V64.8261Z\"\n        fill=\"#586576\"\n      />\n      <path\n        d=\"M60.1333 70.3044C60.1333 69.2958 60.9492 68.4783 61.9556 68.4783H109.333C110.34 68.4783 111.156 69.2958 111.156 70.3044V74.8696C111.156 75.8781 110.34 76.6957 109.333 76.6957H61.9556C60.9492 76.6957 60.1333 75.8781 60.1333 74.8696V70.3044Z\"\n        fill=\"#26C7BC\"\n      />\n      <path\n        d=\"M46.4667 84.913H125.733V144.261H46.4667V84.913Z\"\n        fill=\"#62C5EE\"\n      />\n      <path\n        d=\"M54.6667 140.609H66.5111L119.811 88.5652H109.333L54.6667 140.609Z\"\n        fill=\"#9CE3F8\"\n      />\n      <path\n        d=\"M101.589 88.5652L51.0222 135.587V124.174L88.8333 88.5652H101.589Z\"\n        fill=\"#9CE3F8\"\n      />\n      <path d=\"M52.8444 156.13H67.4222V168H52.8444V156.13Z\" fill=\"#F6BE82\" />\n      <path\n        d=\"M52.8444 181.696H67.4222V193.565H52.8444V181.696Z\"\n        fill=\"#F1C32F\"\n      />\n      <path d=\"M79.2667 156.13H93.8444V168H79.2667V156.13Z\" fill=\"#F5BF81\" />\n      <path\n        d=\"M79.2667 181.696H93.8444V193.565H79.2667V181.696Z\"\n        fill=\"#06BD47\"\n      />\n      <path d=\"M105.689 156.13H120.267V168H105.689V156.13Z\" fill=\"#03C040\" />\n      <path\n        d=\"M105.689 181.696H120.267V193.565H105.689V181.696Z\"\n        fill=\"#09BC46\"\n      />\n      <path d=\"M24.6 17.3478H269.689V29.2174H24.6V17.3478Z\" fill=\"#1D86C0\" />\n    </svg>\n  </div>\n  <div class=\"placeholder-content\">\n    <span class=\"placeholder-text\">\n      <h2 class=\"title\">{{ title | translate }}</h2>\n      <p class=\"desc\">\n        {{ description | translate }}\n      </p>\n    </span>\n    <ng-content select=\"[button]\"></ng-content>\n  </div>\n</div>\n", styles: [".empty-data{padding:8.875em 0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4em}.placeholder-img{width:36.9em;height:39.9em}.placeholder-content{display:flex;flex-direction:column;align-items:center;gap:2.4em}.placeholder-text{display:flex;flex-direction:column;align-items:center;gap:.4em;width:51.2em}h2.title{color:#120710;font-size:var(--vms-font-size-h2);font-family:var(--FM-Bold);text-transform:capitalize;text-align:center}p.desc{color:#9e9595;font-size:var(--vms-font-size-pl);font-style:normal;text-transform:capitalize;text-align:center}\n"], dependencies: [{ kind: "ngmodule", type: TranslateModule }, { kind: "pipe", type: i1$1.TranslatePipe, name: "translate" }] });
 }
 i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.17", ngImport: i0, type: CustomPlaceHolderComponent, decorators: [{
             type: Component,
-            args: [{ selector: 'custom-place-holder', imports: [TranslateModule], template: "<div class=\"empty-data\">\n  <div class=\"placeholder-img\">\n    <svg\n      width=\"inherit\"\n      height=\"inherit\"\n      viewBox=\"0 0 500 309\"\n      fill=\"none\"\n      xmlns=\"http://www.w3.org/2000/svg\"\n    >\n      <path\n        d=\"M380.829 183.59H322.539V91.795H380.829C386.552 91.795 391.192 96.4257 391.192 102.138V173.247C391.192 178.959 386.552 183.59 380.829 183.59Z\"\n        fill=\"#455360\"\n      />\n      <path\n        d=\"M391.192 107.31H322.539V91.795H380.829C386.552 91.795 391.192 96.4257 391.192 102.138V107.31Z\"\n        fill=\"#313F4C\"\n      />\n      <path d=\"M24.6114 27.1506H77.7202V309H24.6114V27.1506Z\" fill=\"#94B3C7\" />\n      <path d=\"M422.28 27.1506H475.389V309H422.28V27.1506Z\" fill=\"#94B3C7\" />\n      <path\n        d=\"M24.6114 46.5439H77.7202V27.1506H24.6114V46.5439Z\"\n        fill=\"#809FB3\"\n      />\n      <path\n        d=\"M422.28 46.5439H475.389V27.1506H422.28V46.5439Z\"\n        fill=\"#809FB3\"\n      />\n      <path\n        d=\"M0 14.2218C0 6.3673 6.37936 0 14.2487 0H485.751C493.621 0 500 6.3673 500 14.2218C500 22.0762 493.621 28.4435 485.751 28.4435H14.2487C6.37936 28.4435 0 22.0762 0 14.2218Z\"\n        fill=\"#94B3C7\"\n      />\n      <path\n        d=\"M332.902 68.523H422.28V309H322.539V183.59H380.829C386.552 183.59 391.192 178.959 391.192 173.247V102.138C391.192 96.4257 386.552 91.795 380.829 91.795H322.539V78.8661C322.539 73.1538 327.178 68.523 332.902 68.523Z\"\n        fill=\"#809FB3\"\n      />\n      <path d=\"M409.326 68.523H422.28V309H409.326V68.523Z\" fill=\"#6D8CA0\" />\n      <path\n        d=\"M313.472 192.64C313.472 189.784 315.791 187.469 318.653 187.469H322.539V221.084H318.653C315.791 221.084 313.472 218.768 313.472 215.912V192.64Z\"\n        fill=\"#6C8BA0\"\n      />\n      <path\n        d=\"M121.762 204.276C121.762 198.564 126.401 193.933 132.124 193.933H313.472V214.619H132.124C126.401 214.619 121.762 209.988 121.762 204.276Z\"\n        fill=\"#F9A809\"\n      />\n      <path\n        d=\"M139.896 193.933H160.622L155.44 214.619H134.715L139.896 193.933Z\"\n        fill=\"#BA3B02\"\n      />\n      <path\n        d=\"M176.166 193.933H196.891L191.71 214.619H170.984L176.166 193.933Z\"\n        fill=\"#BA3B02\"\n      />\n      <path\n        d=\"M212.435 193.933H233.161L227.979 214.619H207.254L212.435 193.933Z\"\n        fill=\"#BA3B02\"\n      />\n      <path\n        d=\"M248.705 193.933H269.43L264.249 214.619H243.523L248.705 193.933Z\"\n        fill=\"#BA3B02\"\n      />\n      <path\n        d=\"M284.974 193.933H305.699L300.518 214.619H279.793L284.974 193.933Z\"\n        fill=\"#BA3B02\"\n      />\n    </svg>\n  </div>\n  <div class=\"placeholder-content\">\n    <span class=\"placeholder-text\">\n      <h2 class=\"title\">{{ title | translate }}</h2>\n      <p class=\"desc\">\n        {{ description | translate }}\n      </p>\n    </span>\n    <ng-content select=\"[button]\"></ng-content>\n  </div>\n</div>\n", styles: [".empty-data{padding:8.875em 0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4em}.placeholder-img{width:50em;height:30.9em}.placeholder-content{display:flex;flex-direction:column;align-items:center;gap:2.4em}.placeholder-text{display:flex;flex-direction:column;align-items:center;gap:.4em;width:51.2em}h2.title{color:#120710;font-size:var(--vms-font-size-h2);font-family:var(--FM-Bold);text-transform:capitalize;text-align:center}p.desc{color:#9e9595;font-size:var(--vms-font-size-pl);font-style:normal;text-transform:capitalize;text-align:center}\n"] }]
+            args: [{ selector: 'custom-place-holder', imports: [TranslateModule], template: "<div class=\"empty-data\">\n  <div class=\"placeholder-img\">\n    <svg\n      width=\"auto\"\n      height=\"auto\"\n      viewBox=\"0 0 369 399\"\n      fill=\"none\"\n      xmlns=\"http://www.w3.org/2000/svg\"\n    >\n      <path\n        d=\"M26.4222 39.2609H158.533V385.304H26.4222V39.2609Z\"\n        fill=\"#D3D3D1\"\n      />\n      <path\n        d=\"M9.11111 39.2609H26.4222V385.304H9.11111V39.2609Z\"\n        fill=\"#B7B6B4\"\n      />\n      <path\n        d=\"M9.11111 29.2174H26.4222V39.2609H9.11111V29.2174Z\"\n        fill=\"#9C9899\"\n      />\n      <path\n        d=\"M26.4222 29.2174H158.533V39.2609H26.4222V29.2174Z\"\n        fill=\"#B7B6B4\"\n      />\n      <path d=\"M15.4889 29.2174H16.4V385.304H15.4889V29.2174Z\" fill=\"#79858D\" />\n      <path\n        d=\"M34.6222 29.2174H38.2667V385.304H34.6222V29.2174Z\"\n        fill=\"#FEFCFD\"\n      />\n      <path d=\"M26.4222 385.304H276.978V399H26.4222V385.304Z\" fill=\"#4E5464\" />\n      <path\n        d=\"M222.311 37.4348H266.044V385.304H222.311V37.4348Z\"\n        fill=\"#586576\"\n      />\n      <path\n        d=\"M222.311 31.9565H266.044V37.4348H222.311V31.9565Z\"\n        fill=\"#4B5464\"\n      />\n      <path\n        d=\"M217.756 28.3043H266.044V31.9565H217.756V28.3043Z\"\n        fill=\"#1B1A1D\"\n      />\n      <path\n        d=\"M217.756 31.9565H222.311V385.304H217.756V31.9565Z\"\n        fill=\"#343A3F\"\n      />\n      <path d=\"M0 385.304H26.4222V399H0V385.304Z\" fill=\"#293133\" />\n      <path\n        d=\"M226.867 37.4348H231.422V385.304H226.867V37.4348Z\"\n        fill=\"#788490\"\n      />\n      <path\n        d=\"M256.022 37.4348H260.578V385.304H256.022V37.4348Z\"\n        fill=\"#788490\"\n      />\n      <path\n        d=\"M256.022 31.9565H260.578V37.4348H256.022V31.9565Z\"\n        fill=\"#576475\"\n      />\n      <path\n        d=\"M226.867 31.9565H231.422V37.4348H226.867V31.9565Z\"\n        fill=\"#576475\"\n      />\n      <path\n        d=\"M226.867 28.3043H231.422V31.9565H226.867V28.3043Z\"\n        fill=\"#2B3236\"\n      />\n      <path\n        d=\"M256.022 28.3043H260.578V31.9565H256.022V28.3043Z\"\n        fill=\"#2B3236\"\n      />\n      <path d=\"M5.46667 17.3478H24.6V29.2174H5.46667V17.3478Z\" fill=\"#085B85\" />\n      <path\n        d=\"M24.6 0H252.378C261.938 0 269.689 7.76689 269.689 17.3478H24.6V0Z\"\n        fill=\"#62C5EE\"\n      />\n      <path\n        d=\"M5.46667 17.3478C5.46667 7.76689 13.2171 0 22.7778 0H24.6V17.3478H5.46667Z\"\n        fill=\"#2181C5\"\n      />\n      <path\n        d=\"M217.756 31.9565V98.6087L158.533 44.7391V31.9565H217.756Z\"\n        fill=\"#064E76\"\n      />\n      <path\n        d=\"M217.756 28.3043V31.9565H158.533V28.3043H217.756Z\"\n        fill=\"#0A5B82\"\n      />\n      <path\n        d=\"M234.611 99.5219C239.271 106.266 250.1 113.674 250.1 113.674L251.922 110.478L254.2 108.196C254.2 108.196 249.525 104.244 246.456 101.805C244.866 100.541 243.598 100.216 242.356 98.6089C241.381 97.3484 240.736 96.5383 240.533 94.9567C240.324 93.3264 240.356 92.0775 241.444 90.848C242.565 89.5829 243.886 89.7916 245.544 89.4784C247.817 89.0493 249.372 88.4967 251.467 89.4784C252.725 90.0683 253.374 90.6412 254.2 91.761C255.905 94.0729 254.928 96.1965 255.111 99.0654C255.304 102.09 255.111 106.826 255.111 106.826C255.111 106.826 256.516 106.657 257.389 106.826C259.037 107.146 261.033 109.109 261.033 109.109C261.033 109.109 261.985 100.951 261.033 95.8697C260.555 93.3184 260.421 91.7739 259.211 89.4784C258.612 88.3416 258.21 87.7274 257.389 86.7393C255.084 83.9649 253.175 82.4346 249.644 81.7176C247.726 81.328 244.633 81.7176 244.633 81.7176L243.722 82.1741C241.229 83.4788 239.789 84.2895 237.8 86.2828C235.811 88.276 234.457 89.5025 233.7 92.2176C233.078 94.4498 232.666 96.0793 233.7 98.1523C233.987 98.7273 234.246 98.9934 234.611 99.5219Z\"\n        fill=\"#191A1C\"\n      />\n      <path\n        d=\"M240.533 88.5652H363.078C366.349 88.5652 369 91.2223 369 94.5C369 97.7777 366.349 100.435 363.078 100.435H245.533C242.772 100.435 240.533 98.1962 240.533 95.4348V88.5652Z\"\n        fill=\"#353942\"\n      />\n      <path\n        d=\"M240.533 88.5652H362.622C363.125 88.5652 363.533 88.974 363.533 89.4783H241.446C240.942 89.4783 240.533 89.0695 240.533 88.5652Z\"\n        fill=\"#9C9998\"\n      />\n      <path\n        d=\"M240.533 90.3913H360.8C362.31 90.3913 363.533 91.6177 363.533 93.1304H240.533V90.3913Z\"\n        fill=\"#9C9998\"\n      />\n      <path\n        d=\"M250.789 108.15C253.47 104.609 258.461 103.817 262.103 106.353L362.705 176.392C366.459 179.005 367.339 184.198 364.658 187.907C362.054 191.509 357.055 192.365 353.405 189.834L252.672 119.984C248.796 117.296 247.94 111.912 250.789 108.15Z\"\n        fill=\"#F7BE81\"\n      />\n      <path\n        d=\"M249.206 110.488L362.639 189.923L362.225 190.213C359.734 191.96 356.423 191.975 353.917 190.249L252.85 120.644C249.584 118.395 248.117 114.306 249.206 110.488Z\"\n        fill=\"#E4874D\"\n      />\n      <path\n        d=\"M33.7111 64.8261C33.7111 59.7835 37.7903 55.6957 42.8222 55.6957H51.0222V215.478C41.4616 215.478 33.7111 207.711 33.7111 198.13V64.8261Z\"\n        fill=\"#4D5464\"\n      />\n      <path\n        d=\"M40.0889 64.8261C40.0889 59.7835 44.1681 55.6957 49.2 55.6957H129.378C134.41 55.6957 138.489 59.7835 138.489 64.8261V206.348C138.489 211.39 134.41 215.478 129.378 215.478H49.2C44.1681 215.478 40.0889 211.39 40.0889 206.348V64.8261Z\"\n        fill=\"#586576\"\n      />\n      <path\n        d=\"M60.1333 70.3044C60.1333 69.2958 60.9492 68.4783 61.9556 68.4783H109.333C110.34 68.4783 111.156 69.2958 111.156 70.3044V74.8696C111.156 75.8781 110.34 76.6957 109.333 76.6957H61.9556C60.9492 76.6957 60.1333 75.8781 60.1333 74.8696V70.3044Z\"\n        fill=\"#26C7BC\"\n      />\n      <path\n        d=\"M46.4667 84.913H125.733V144.261H46.4667V84.913Z\"\n        fill=\"#62C5EE\"\n      />\n      <path\n        d=\"M54.6667 140.609H66.5111L119.811 88.5652H109.333L54.6667 140.609Z\"\n        fill=\"#9CE3F8\"\n      />\n      <path\n        d=\"M101.589 88.5652L51.0222 135.587V124.174L88.8333 88.5652H101.589Z\"\n        fill=\"#9CE3F8\"\n      />\n      <path d=\"M52.8444 156.13H67.4222V168H52.8444V156.13Z\" fill=\"#F6BE82\" />\n      <path\n        d=\"M52.8444 181.696H67.4222V193.565H52.8444V181.696Z\"\n        fill=\"#F1C32F\"\n      />\n      <path d=\"M79.2667 156.13H93.8444V168H79.2667V156.13Z\" fill=\"#F5BF81\" />\n      <path\n        d=\"M79.2667 181.696H93.8444V193.565H79.2667V181.696Z\"\n        fill=\"#06BD47\"\n      />\n      <path d=\"M105.689 156.13H120.267V168H105.689V156.13Z\" fill=\"#03C040\" />\n      <path\n        d=\"M105.689 181.696H120.267V193.565H105.689V181.696Z\"\n        fill=\"#09BC46\"\n      />\n      <path d=\"M24.6 17.3478H269.689V29.2174H24.6V17.3478Z\" fill=\"#1D86C0\" />\n    </svg>\n  </div>\n  <div class=\"placeholder-content\">\n    <span class=\"placeholder-text\">\n      <h2 class=\"title\">{{ title | translate }}</h2>\n      <p class=\"desc\">\n        {{ description | translate }}\n      </p>\n    </span>\n    <ng-content select=\"[button]\"></ng-content>\n  </div>\n</div>\n", styles: [".empty-data{padding:8.875em 0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4em}.placeholder-img{width:36.9em;height:39.9em}.placeholder-content{display:flex;flex-direction:column;align-items:center;gap:2.4em}.placeholder-text{display:flex;flex-direction:column;align-items:center;gap:.4em;width:51.2em}h2.title{color:#120710;font-size:var(--vms-font-size-h2);font-family:var(--FM-Bold);text-transform:capitalize;text-align:center}p.desc{color:#9e9595;font-size:var(--vms-font-size-pl);font-style:normal;text-transform:capitalize;text-align:center}\n"] }]
         }], propDecorators: { title: [{
                 type: Input,
                 args: [{ required: true }]
