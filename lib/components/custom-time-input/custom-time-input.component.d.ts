@@ -1,0 +1,34 @@
+import { EventEmitter } from '@angular/core';
+import * as i0 from "@angular/core";
+export declare class CustomTimeInputComponent {
+    value: string | null;
+    valueChange: EventEmitter<string | null>;
+    label: string;
+    labelClass: string;
+    inputClass: string;
+    height: string;
+    rangeMin: string;
+    rangeMax: string;
+    required: boolean;
+    dropdownOpen: import("@angular/core").WritableSignal<boolean>;
+    hours: number[];
+    minutes: number[];
+    selectedHour?: number;
+    selectedMinute?: number;
+    selectedPeriod: 'AM' | 'PM';
+    ngOnInit(): void;
+    toggleDropdown(): void;
+    onHourSelect(event: Event): void;
+    onMinuteSelect(event: Event): void;
+    onPeriodSelect(event: Event): void;
+    get filteredHours(): number[];
+    get filteredMinutes(): number[];
+    onHourChange(): void;
+    confirmTime(): void;
+    displayTime(): string;
+    private setFromValue;
+    private to24Hour;
+    private isTimeInRange;
+    static ɵfac: i0.ɵɵFactoryDeclaration<CustomTimeInputComponent, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CustomTimeInputComponent, "lib-custom-time-input", never, { "value": { "alias": "value"; "required": false; }; "label": { "alias": "label"; "required": false; }; "labelClass": { "alias": "labelClass"; "required": false; }; "inputClass": { "alias": "inputClass"; "required": false; }; "height": { "alias": "height"; "required": false; }; "rangeMin": { "alias": "rangeMin"; "required": false; }; "rangeMax": { "alias": "rangeMax"; "required": false; }; "required": { "alias": "required"; "required": false; }; }, { "valueChange": "valueChange"; }, never, never, true, never>;
+}

@@ -8129,6 +8129,193 @@ i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.17", ngImpo
                 type: Output
             }] } });
 
+class CustomTimeInputComponent {
+    value = null;
+    valueChange = new EventEmitter();
+    label = '';
+    labelClass = '';
+    inputClass = '';
+    height = '4.8em';
+    rangeMin = '';
+    rangeMax = '';
+    required = false;
+    dropdownOpen = signal(false);
+    hours = Array.from({ length: 12 }, (_, i) => i + 1);
+    minutes = Array.from({ length: 60 }, (_, i) => i);
+    selectedHour;
+    selectedMinute;
+    selectedPeriod = 'AM';
+    ngOnInit() {
+        if (this.value) {
+            this.setFromValue(this.value);
+        }
+    }
+    toggleDropdown() {
+        this.dropdownOpen.set(!this.dropdownOpen());
+        if (!this.dropdownOpen()) {
+            this.confirmTime();
+        }
+    }
+    onHourSelect(event) {
+        const el = event.target;
+        if (!el)
+            return;
+        this.selectedHour = Number(el.value);
+        this.onHourChange();
+    }
+    onMinuteSelect(event) {
+        const el = event.target;
+        if (!el)
+            return;
+        this.selectedMinute = Number(el.value);
+    }
+    onPeriodSelect(event) {
+        const el = event.target;
+        if (!el)
+            return;
+        this.selectedPeriod = el.value;
+        this.onHourChange();
+    }
+    get filteredHours() {
+        if (!this.rangeMin && !this.rangeMax) {
+            return this.hours;
+        }
+        return this.hours.filter((h) => {
+            const hour24 = this.to24Hour(h, this.selectedPeriod);
+            if (this.rangeMin) {
+                const [minH] = this.rangeMin.split(':').map(Number);
+                if (hour24 < minH)
+                    return false;
+            }
+            if (this.rangeMax) {
+                const [maxH] = this.rangeMax.split(':').map(Number);
+                if (hour24 > maxH)
+                    return false;
+            }
+            return true;
+        });
+    }
+    get filteredMinutes() {
+        if (this.selectedHour == null ||
+            (!this.rangeMin && !this.rangeMax)) {
+            return this.minutes;
+        }
+        const hour24 = this.to24Hour(this.selectedHour, this.selectedPeriod);
+        return this.minutes.filter((m) => {
+            if (this.rangeMin) {
+                const [minH, minM] = this.rangeMin.split(':').map(Number);
+                if (hour24 === minH && m < minM)
+                    return false;
+            }
+            if (this.rangeMax) {
+                const [maxH, maxM] = this.rangeMax.split(':').map(Number);
+                if (hour24 === maxH && m > maxM)
+                    return false;
+            }
+            return true;
+        });
+    }
+    onHourChange() {
+        const mins = this.filteredMinutes;
+        if (mins.length === 1) {
+            this.selectedMinute = mins[0];
+        }
+        if (this.selectedMinute != null &&
+            !mins.includes(this.selectedMinute)) {
+            this.selectedMinute = undefined;
+        }
+    }
+    confirmTime() {
+        if (this.selectedHour == null ||
+            this.selectedMinute == null ||
+            !this.isTimeInRange()) {
+            this.valueChange.emit(null);
+            return;
+        }
+        let hour24 = this.selectedHour;
+        if (this.selectedPeriod === 'PM' && hour24 !== 12) {
+            hour24 += 12;
+        }
+        if (this.selectedPeriod === 'AM' && hour24 === 12) {
+            hour24 = 0;
+        }
+        const h = hour24.toString().padStart(2, '0');
+        const m = this.selectedMinute.toString().padStart(2, '0');
+        this.valueChange.emit(`${h}:${m}:00`);
+        this.dropdownOpen.set(false);
+    }
+    displayTime() {
+        if (this.selectedHour == null || this.selectedMinute == null) {
+            return '--:--';
+        }
+        return `${this.selectedHour
+            .toString()
+            .padStart(2, '0')}:${this.selectedMinute
+            .toString()
+            .padStart(2, '0')}`;
+    }
+    setFromValue(value) {
+        const [h, m] = value.split(':').map(Number);
+        if (h >= 12) {
+            this.selectedPeriod = 'PM';
+            this.selectedHour = h === 12 ? 12 : h - 12;
+        }
+        else {
+            this.selectedPeriod = 'AM';
+            this.selectedHour = h === 0 ? 12 : h;
+        }
+        this.selectedMinute = m;
+    }
+    to24Hour(hour, period) {
+        if (period === 'PM' && hour !== 12)
+            return hour + 12;
+        if (period === 'AM' && hour === 12)
+            return 0;
+        return hour;
+    }
+    isTimeInRange() {
+        if (!this.rangeMin && !this.rangeMax)
+            return true;
+        const hour24 = this.to24Hour(this.selectedHour, this.selectedPeriod);
+        const selected = hour24 * 60 + this.selectedMinute;
+        if (this.rangeMin) {
+            const [h, m] = this.rangeMin.split(':').map(Number);
+            if (selected < h * 60 + m)
+                return false;
+        }
+        if (this.rangeMax) {
+            const [h, m] = this.rangeMax.split(':').map(Number);
+            if (selected > h * 60 + m)
+                return false;
+        }
+        return true;
+    }
+    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.17", ngImport: i0, type: CustomTimeInputComponent, deps: [], target: i0.ɵɵFactoryTarget.Component });
+    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "17.0.0", version: "19.2.17", type: CustomTimeInputComponent, isStandalone: true, selector: "lib-custom-time-input", inputs: { value: "value", label: "label", labelClass: "labelClass", inputClass: "inputClass", height: "height", rangeMin: "rangeMin", rangeMax: "rangeMax", required: "required" }, outputs: { valueChange: "valueChange" }, ngImport: i0, template: "<div class=\"time-picker-container\">\n  @if (label) {\n    <label class=\"custom-label {{ labelClass }}\">\n      {{ label }}\n      @if (required) { <span class=\"required\">*</span> }\n    </label>\n  }\n\n  <div class=\"time-picker__input\">\n    <input\n      type=\"text\"\n      readonly\n      class=\"custom-input {{ inputClass }}\"\n      [value]=\"displayTime()\"\n      (click)=\"toggleDropdown()\"\n      [ngStyle]=\"{ '--height': height }\"\n    />\n\n    <span class=\"time-picker__input--time-icon\" (click)=\"toggleDropdown()\">\n      \u2304\n    </span>\n  </div>\n\n@if (dropdownOpen()) {\n  <div\n    #dropdownOptions\n    [clickOutside]=\"dropdownOptions\"\n    (clickOutsideEmitter)=\"toggleDropdown()\"\n    class=\"time-dropdown-container\"\n  >\n    <select\n      class=\"time-select\"\n      [value]=\"selectedHour\"\n      (change)=\"onHourSelect($event)\"\n    >\n      @for (h of filteredHours; track h) {\n        <option [value]=\"h\">\n          {{ h < 10 ? '0' + h : h }}\n        </option>\n      }\n    </select>\n\n    <span>:</span>\n\n    <select\n      class=\"time-select\"\n      [value]=\"selectedMinute\"\n      (change)=\"onMinuteSelect($event)\"\n    >\n      @for (m of filteredMinutes; track m) {\n        <option [value]=\"m\">\n          {{ m < 10 ? '0' + m : m }}\n        </option>\n      }\n    </select>\n\n    <select\n      class=\"time-select time-period\"\n      [value]=\"selectedPeriod\"\n      (change)=\"onPeriodSelect($event)\"\n    >\n      <option value=\"AM\">AM</option>\n      <option value=\"PM\">PM</option>\n    </select>\n\n    <button type=\"button\" (click)=\"confirmTime()\" class=\"confirm-btn\">\n      \u2714\n    </button>\n  </div>\n}\n\n</div>\n", styles: [".time-picker-container{position:relative;width:100%;cursor:pointer;min-width:15em}.custom-label{font-size:1.6em;font-weight:500;display:block;color:var(--vms-color-form-label);margin-bottom:.3em}.time-picker__input{position:relative}.custom-input{height:3em;width:100%;border-radius:.75em;border:1px solid #82828233;padding:0 1em;outline:none!important;box-shadow:none;font-size:1.6em;font-weight:400;cursor:pointer}.time-picker__input--time-icon{position:absolute;right:.5em;top:50%;transform:translateY(-50%);pointer-events:none}.time-dropdown-container{position:absolute;top:100%;inset-inline-start:0;width:100%;min-width:15em;display:flex;justify-content:space-between;align-items:center;gap:.3em;margin-top:4px;background:#fff;border-radius:var(--vms-radius-md);border:1px solid #82828233;padding:.5em;z-index:100;box-shadow:0 4px 10px #0000000d}.time-select{width:25%;padding:.21em .8em;font-size:1.4em;border-radius:.71em;border:1px solid #82828233;background:#f9f9f9;height:calc(3.8em / 1.4)}.time-period{padding:.25em .93em;font-size:1.2em;border-radius:.83em;height:calc(3.8em / 1.2)}.confirm-btn{background:#1db3a9;border:none;color:#fff;font-size:.8em;border-radius:var(--vms-radius-sm);padding:.7em;cursor:pointer}.time-error-container{position:absolute;top:100%;left:1.15em;width:100%}.time-error-container custom-app-error{pointer-events:none}\n"], dependencies: [{ kind: "ngmodule", type: CommonModule }, { kind: "directive", type: i1$2.NgStyle, selector: "[ngStyle]", inputs: ["ngStyle"] }, { kind: "directive", type: ClickOutsideDirective, selector: "[clickOutside]", inputs: ["clickOutside"], outputs: ["clickOutsideEmitter"] }] });
+}
+i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.17", ngImport: i0, type: CustomTimeInputComponent, decorators: [{
+            type: Component,
+            args: [{ selector: 'lib-custom-time-input', imports: [CommonModule, ClickOutsideDirective], template: "<div class=\"time-picker-container\">\n  @if (label) {\n    <label class=\"custom-label {{ labelClass }}\">\n      {{ label }}\n      @if (required) { <span class=\"required\">*</span> }\n    </label>\n  }\n\n  <div class=\"time-picker__input\">\n    <input\n      type=\"text\"\n      readonly\n      class=\"custom-input {{ inputClass }}\"\n      [value]=\"displayTime()\"\n      (click)=\"toggleDropdown()\"\n      [ngStyle]=\"{ '--height': height }\"\n    />\n\n    <span class=\"time-picker__input--time-icon\" (click)=\"toggleDropdown()\">\n      \u2304\n    </span>\n  </div>\n\n@if (dropdownOpen()) {\n  <div\n    #dropdownOptions\n    [clickOutside]=\"dropdownOptions\"\n    (clickOutsideEmitter)=\"toggleDropdown()\"\n    class=\"time-dropdown-container\"\n  >\n    <select\n      class=\"time-select\"\n      [value]=\"selectedHour\"\n      (change)=\"onHourSelect($event)\"\n    >\n      @for (h of filteredHours; track h) {\n        <option [value]=\"h\">\n          {{ h < 10 ? '0' + h : h }}\n        </option>\n      }\n    </select>\n\n    <span>:</span>\n\n    <select\n      class=\"time-select\"\n      [value]=\"selectedMinute\"\n      (change)=\"onMinuteSelect($event)\"\n    >\n      @for (m of filteredMinutes; track m) {\n        <option [value]=\"m\">\n          {{ m < 10 ? '0' + m : m }}\n        </option>\n      }\n    </select>\n\n    <select\n      class=\"time-select time-period\"\n      [value]=\"selectedPeriod\"\n      (change)=\"onPeriodSelect($event)\"\n    >\n      <option value=\"AM\">AM</option>\n      <option value=\"PM\">PM</option>\n    </select>\n\n    <button type=\"button\" (click)=\"confirmTime()\" class=\"confirm-btn\">\n      \u2714\n    </button>\n  </div>\n}\n\n</div>\n", styles: [".time-picker-container{position:relative;width:100%;cursor:pointer;min-width:15em}.custom-label{font-size:1.6em;font-weight:500;display:block;color:var(--vms-color-form-label);margin-bottom:.3em}.time-picker__input{position:relative}.custom-input{height:3em;width:100%;border-radius:.75em;border:1px solid #82828233;padding:0 1em;outline:none!important;box-shadow:none;font-size:1.6em;font-weight:400;cursor:pointer}.time-picker__input--time-icon{position:absolute;right:.5em;top:50%;transform:translateY(-50%);pointer-events:none}.time-dropdown-container{position:absolute;top:100%;inset-inline-start:0;width:100%;min-width:15em;display:flex;justify-content:space-between;align-items:center;gap:.3em;margin-top:4px;background:#fff;border-radius:var(--vms-radius-md);border:1px solid #82828233;padding:.5em;z-index:100;box-shadow:0 4px 10px #0000000d}.time-select{width:25%;padding:.21em .8em;font-size:1.4em;border-radius:.71em;border:1px solid #82828233;background:#f9f9f9;height:calc(3.8em / 1.4)}.time-period{padding:.25em .93em;font-size:1.2em;border-radius:.83em;height:calc(3.8em / 1.2)}.confirm-btn{background:#1db3a9;border:none;color:#fff;font-size:.8em;border-radius:var(--vms-radius-sm);padding:.7em;cursor:pointer}.time-error-container{position:absolute;top:100%;left:1.15em;width:100%}.time-error-container custom-app-error{pointer-events:none}\n"] }]
+        }], propDecorators: { value: [{
+                type: Input
+            }], valueChange: [{
+                type: Output
+            }], label: [{
+                type: Input
+            }], labelClass: [{
+                type: Input
+            }], inputClass: [{
+                type: Input
+            }], height: [{
+                type: Input
+            }], rangeMin: [{
+                type: Input
+            }], rangeMax: [{
+                type: Input
+            }], required: [{
+                type: Input
+            }] } });
+
 // confirm-dialog.service.ts
 class ConfirmDialogService {
     applicationRef = inject(ApplicationRef);
@@ -9074,5 +9261,5 @@ i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.17", ngImpo
  * Generated bundle index. Do not edit.
  */
 
-export { API_BASE_URL, ActivityTimePipe, AllowNumberOnlyDirective, ArabicOnlyDirective, AuthBeService, AuthConstant, AuthContextService, AuthDirective, AuthInterceptor, AuthService, BlurBackdropDirective, ClickOutsideDirective, CommonHttpService, ComponentFormErrorConstant, ConfirmDialogService, CustomActionsDropdownComponent, CustomAppErrorComponent, CustomAvatarsComponent, CustomBreadcrumbComponent, CustomButtonComponent, CustomCalendarComponent, CustomCalenderFormComponent, CustomCalenderOpenFormComponent, CustomCategoryTableComponent, CustomCheckBoxFormComponent, CustomColorComponent, CustomConfirmPopupComponent, CustomCounterInputComponent, CustomDetailsHeaderComponent, CustomDetailsModalComponent, CustomDetailsNavComponent, CustomDropdownButtonComponent, CustomDropdownComponent, CustomDropdownFormComponent, CustomDynamicTableWithCategoriesComponent, CustomExpandingContainerComponent, CustomFieldsFormComponent, CustomFileUploadComponent, CustomFileViewerComponent, CustomFilterDropdownComponent, CustomFilterDynamicFormComponent, CustomInputComponent, CustomInputFormComponent, CustomLoadingSpinnerComponent, CustomMainPagesFilterComponent, CustomModalComponent, CustomModalService, CustomMultiSelectComponent, CustomMultiSelectExpandedFormComponent, CustomMultiSelectFormComponent, CustomOtpInputFormComponent, CustomPagesHeaderComponent, CustomPaginationComponent, CustomPhoneFormComponent, CustomPlaceHolderComponent, CustomPlateNumberInputFormComponent, CustomPopUpComponent, CustomProgressBarComponent, CustomRadioComponentComponent, CustomRadioGroupFormComponent, CustomReactiveSearchInputComponent, CustomSearchInputComponent, CustomSingleFileUploadComponent, CustomSmDynamicTableComponent, CustomStatusLabelComponent, CustomSteppersContainerComponent, CustomSteppersControllersComponent, CustomSvgIconComponent, CustomTableComponent, CustomTabsComponent, CustomTextareaComponent, CustomTextareaFormComponent, CustomTimeInputFormComponent, CustomTitleContentComponent, CustomToastComponent, CustomToastViewportComponent, CustomToggleSwitchComponent, CustomToggleSwitchFormComponent, CustomTooltipComponent, DispatchingFeComponentsService, DropdownsAnimationDirective, EnglishOnlyDirective, ErrorInterceptor, GeoLocationService, I18nConstant, Lang, LoadingService, LocalizePipe, MODAL_REF, ModuleRoutes, NetworkConnectionInterceptor, OverlayPanelComponent, PERMISSIONS, PermissionGuard, Roles, SHOW_SUCCESS_TOASTER, SKIP_LOADER, SKIP_TOKEN, SidenavService, StepperService, StorageService, ToastService, ToggleElementDirective, TranslationService, USE_TOKEN, UserDataService, UserStatus, authGuard, b64toBlob, blobToB64, convertDateFormat, convertFileToBase64, convertFormGroupToFormData, diffTime, downloadBlob, dropdownAnimation$1 as dropdownAnimation, excelDateToJSDate, flattenTree, formatDate, formatDateWithTime, formatTimestamp, formatinitialTakeTime, generateRandomColor, generateUniqueNumber, getErrorValidation, getFormValidationErrors, injectModalRef, isDocumentPath, isImagePath, isVedioPath, loadingInterceptor, logger, noAuthGuard, someFieldsContainData, timeAgo, toE164OrNull };
+export { API_BASE_URL, ActivityTimePipe, AllowNumberOnlyDirective, ArabicOnlyDirective, AuthBeService, AuthConstant, AuthContextService, AuthDirective, AuthInterceptor, AuthService, BlurBackdropDirective, ClickOutsideDirective, CommonHttpService, ComponentFormErrorConstant, ConfirmDialogService, CustomActionsDropdownComponent, CustomAppErrorComponent, CustomAvatarsComponent, CustomBreadcrumbComponent, CustomButtonComponent, CustomCalendarComponent, CustomCalenderFormComponent, CustomCalenderOpenFormComponent, CustomCategoryTableComponent, CustomCheckBoxFormComponent, CustomColorComponent, CustomConfirmPopupComponent, CustomCounterInputComponent, CustomDetailsHeaderComponent, CustomDetailsModalComponent, CustomDetailsNavComponent, CustomDropdownButtonComponent, CustomDropdownComponent, CustomDropdownFormComponent, CustomDynamicTableWithCategoriesComponent, CustomExpandingContainerComponent, CustomFieldsFormComponent, CustomFileUploadComponent, CustomFileViewerComponent, CustomFilterDropdownComponent, CustomFilterDynamicFormComponent, CustomInputComponent, CustomInputFormComponent, CustomLoadingSpinnerComponent, CustomMainPagesFilterComponent, CustomModalComponent, CustomModalService, CustomMultiSelectComponent, CustomMultiSelectExpandedFormComponent, CustomMultiSelectFormComponent, CustomOtpInputFormComponent, CustomPagesHeaderComponent, CustomPaginationComponent, CustomPhoneFormComponent, CustomPlaceHolderComponent, CustomPlateNumberInputFormComponent, CustomPopUpComponent, CustomProgressBarComponent, CustomRadioComponentComponent, CustomRadioGroupFormComponent, CustomReactiveSearchInputComponent, CustomSearchInputComponent, CustomSingleFileUploadComponent, CustomSmDynamicTableComponent, CustomStatusLabelComponent, CustomSteppersContainerComponent, CustomSteppersControllersComponent, CustomSvgIconComponent, CustomTableComponent, CustomTabsComponent, CustomTextareaComponent, CustomTextareaFormComponent, CustomTimeInputComponent, CustomTimeInputFormComponent, CustomTitleContentComponent, CustomToastComponent, CustomToastViewportComponent, CustomToggleSwitchComponent, CustomToggleSwitchFormComponent, CustomTooltipComponent, DispatchingFeComponentsService, DropdownsAnimationDirective, EnglishOnlyDirective, ErrorInterceptor, GeoLocationService, I18nConstant, Lang, LoadingService, LocalizePipe, MODAL_REF, ModuleRoutes, NetworkConnectionInterceptor, OverlayPanelComponent, PERMISSIONS, PermissionGuard, Roles, SHOW_SUCCESS_TOASTER, SKIP_LOADER, SKIP_TOKEN, SidenavService, StepperService, StorageService, ToastService, ToggleElementDirective, TranslationService, USE_TOKEN, UserDataService, UserStatus, authGuard, b64toBlob, blobToB64, convertDateFormat, convertFileToBase64, convertFormGroupToFormData, diffTime, downloadBlob, dropdownAnimation$1 as dropdownAnimation, excelDateToJSDate, flattenTree, formatDate, formatDateWithTime, formatTimestamp, formatinitialTakeTime, generateRandomColor, generateUniqueNumber, getErrorValidation, getFormValidationErrors, injectModalRef, isDocumentPath, isImagePath, isVedioPath, loadingInterceptor, logger, noAuthGuard, someFieldsContainData, timeAgo, toE164OrNull };
 //# sourceMappingURL=vms-shared-lib.mjs.map
