@@ -5515,6 +5515,77 @@ i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.17", ngImpo
                 type: Input
             }] } });
 
+class CustomPillTabsComponent {
+    tabsList;
+    color = '#120710'; // text color when not selected
+    colorSelected = '#120710'; // text color when selected
+    backgroundColor = '#F5F5F5'; // background color of the pill tabs
+    backgroundColorSelected = '#FFFFFF'; // background color when selected
+    tabTemplates = {};
+    selectedTab;
+    tabClass = '';
+    tabSelected = new EventEmitter();
+    tabContainer;
+    translationService = inject(TranslationService);
+    ngOnInit() {
+        if (!this.selectedTab)
+            this.selectedTab = this.tabsList[0];
+    }
+    ngAfterViewInit() {
+        this.updatePillPosition();
+    }
+    selectTab(tab) {
+        this.selectedTab = tab;
+        this.tabSelected.emit(tab);
+        setTimeout(() => this.updatePillPosition(), 0);
+    }
+    updatePillPosition() {
+        if (!this.tabContainer)
+            return;
+        const buttons = this.tabContainer.nativeElement.querySelectorAll('.tab-button');
+        const selectedIndex = this.tabsList.findIndex((tab) => tab.id === this.selectedTab.id);
+        if (selectedIndex !== -1 && buttons[selectedIndex]) {
+            const button = buttons[selectedIndex];
+            const containerRect = this.tabContainer.nativeElement.getBoundingClientRect();
+            const buttonRect = button.getBoundingClientRect();
+            // Calculate the translate distance and pill width
+            const translateX = buttonRect.left - containerRect.left - 0.4;
+            const pillWidth = buttonRect.width;
+            const container = this.tabContainer.nativeElement;
+            container.style.setProperty('--pill-translate', `${translateX}px`);
+            container.style.setProperty('--pill-width', `${pillWidth}px`);
+        }
+    }
+    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.17", ngImport: i0, type: CustomPillTabsComponent, deps: [], target: i0.ɵɵFactoryTarget.Component });
+    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "17.0.0", version: "19.2.17", type: CustomPillTabsComponent, isStandalone: true, selector: "custom-pill-tabs", inputs: { tabsList: "tabsList", color: "color", colorSelected: "colorSelected", backgroundColor: "backgroundColor", backgroundColorSelected: "backgroundColorSelected", tabTemplates: "tabTemplates", selectedTab: "selectedTab", tabClass: "tabClass" }, outputs: { tabSelected: "tabSelected" }, viewQueries: [{ propertyName: "tabContainer", first: true, predicate: ["tabContainer"], descendants: true }], ngImport: i0, template: "<!-- tab-selector.component.html -->\n<div\n  #tabContainer\n  class=\"tab-container\"\n  [style]=\"{\n    '--background-color': backgroundColor,\n    '--background-color-selected': backgroundColorSelected,\n    '--text-color': color,\n    '--text-color-selected': colorSelected\n  }\"\n>\n  @for (tab of tabsList; track tab) {\n  <button\n    class=\"tab-button\"\n    [class]=\"tabClass ? tabClass : ''\"\n    [class.selected]=\"selectedTab.id === tab.id\"\n    (click)=\"selectTab(tab)\"\n  >\n    @if(tabTemplates[tab.id]) {\n    <ng-template *ngTemplateOutlet=\"tabTemplates[tab.id]\"></ng-template>\n    } @else{\n    <span class=\"title\">\n      {{ tab | localize : \"name\" : translationService.currentLang() }}\n    </span>\n    }\n  </button>\n  }\n</div>\n", styles: [".tab-container{display:flex;width:max-content;border-radius:.8em;background:var(--background-color, #f5f5f5);padding:.4em;gap:.4em;position:relative}.tab-container:before{content:\"\";position:absolute;top:.4em;left:0;height:calc(100% - .8em);width:var(--pill-width, 8em);background-color:var(--background-color-selected, #fff);border-radius:.8em;z-index:0;transition:transform .5s cubic-bezier(.4,0,.2,1);transform:translate(var(--pill-translate, 0))}.tab-button{position:relative;display:flex;align-items:center;justify-content:center;z-index:1;padding:.8em 1.6em;border-radius:.8em;color:var(--text-color, #120710);font-style:normal;line-height:1.6em;text-align:center;text-transform:capitalize;cursor:pointer;transition:color .5s ease;border:none;background:transparent}.tab-button .title{font-size:1.2em}.tab-button.selected{cursor:default;color:var(--text-color-selected, var(--vms-color-tabs-text))}\n"], dependencies: [{ kind: "ngmodule", type: CommonModule }, { kind: "directive", type: i1$2.NgTemplateOutlet, selector: "[ngTemplateOutlet]", inputs: ["ngTemplateOutletContext", "ngTemplateOutlet", "ngTemplateOutletInjector"] }, { kind: "pipe", type: LocalizePipe, name: "localize" }] });
+}
+i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.17", ngImport: i0, type: CustomPillTabsComponent, decorators: [{
+            type: Component,
+            args: [{ selector: 'custom-pill-tabs', imports: [CommonModule, LocalizePipe], template: "<!-- tab-selector.component.html -->\n<div\n  #tabContainer\n  class=\"tab-container\"\n  [style]=\"{\n    '--background-color': backgroundColor,\n    '--background-color-selected': backgroundColorSelected,\n    '--text-color': color,\n    '--text-color-selected': colorSelected\n  }\"\n>\n  @for (tab of tabsList; track tab) {\n  <button\n    class=\"tab-button\"\n    [class]=\"tabClass ? tabClass : ''\"\n    [class.selected]=\"selectedTab.id === tab.id\"\n    (click)=\"selectTab(tab)\"\n  >\n    @if(tabTemplates[tab.id]) {\n    <ng-template *ngTemplateOutlet=\"tabTemplates[tab.id]\"></ng-template>\n    } @else{\n    <span class=\"title\">\n      {{ tab | localize : \"name\" : translationService.currentLang() }}\n    </span>\n    }\n  </button>\n  }\n</div>\n", styles: [".tab-container{display:flex;width:max-content;border-radius:.8em;background:var(--background-color, #f5f5f5);padding:.4em;gap:.4em;position:relative}.tab-container:before{content:\"\";position:absolute;top:.4em;left:0;height:calc(100% - .8em);width:var(--pill-width, 8em);background-color:var(--background-color-selected, #fff);border-radius:.8em;z-index:0;transition:transform .5s cubic-bezier(.4,0,.2,1);transform:translate(var(--pill-translate, 0))}.tab-button{position:relative;display:flex;align-items:center;justify-content:center;z-index:1;padding:.8em 1.6em;border-radius:.8em;color:var(--text-color, #120710);font-style:normal;line-height:1.6em;text-align:center;text-transform:capitalize;cursor:pointer;transition:color .5s ease;border:none;background:transparent}.tab-button .title{font-size:1.2em}.tab-button.selected{cursor:default;color:var(--text-color-selected, var(--vms-color-tabs-text))}\n"] }]
+        }], propDecorators: { tabsList: [{
+                type: Input,
+                args: [{ required: true }]
+            }], color: [{
+                type: Input
+            }], colorSelected: [{
+                type: Input
+            }], backgroundColor: [{
+                type: Input
+            }], backgroundColorSelected: [{
+                type: Input
+            }], tabTemplates: [{
+                type: Input
+            }], selectedTab: [{
+                type: Input
+            }], tabClass: [{
+                type: Input
+            }], tabSelected: [{
+                type: Output
+            }], tabContainer: [{
+                type: ViewChild,
+                args: ['tabContainer']
+            }] } });
+
 class CustomColorComponent {
     colorsArray = [
         '#9747FF',
@@ -9262,5 +9333,5 @@ i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.17", ngImpo
  * Generated bundle index. Do not edit.
  */
 
-export { API_BASE_URL, ActivityTimePipe, AllowNumberOnlyDirective, ArabicOnlyDirective, AuthBeService, AuthConstant, AuthContextService, AuthDirective, AuthInterceptor, AuthService, BlurBackdropDirective, ClickOutsideDirective, CommonHttpService, ComponentFormErrorConstant, ConfirmDialogService, CustomActionsDropdownComponent, CustomAppErrorComponent, CustomAvatarsComponent, CustomBreadcrumbComponent, CustomButtonComponent, CustomCalendarComponent, CustomCalenderFormComponent, CustomCalenderOpenFormComponent, CustomCategoryTableComponent, CustomCheckBoxFormComponent, CustomColorComponent, CustomConfirmPopupComponent, CustomCounterInputComponent, CustomDetailsHeaderComponent, CustomDetailsModalComponent, CustomDetailsNavComponent, CustomDropdownButtonComponent, CustomDropdownComponent, CustomDropdownFormComponent, CustomDynamicTableWithCategoriesComponent, CustomExpandingContainerComponent, CustomFieldsFormComponent, CustomFileUploadComponent, CustomFileViewerComponent, CustomFilterDropdownComponent, CustomFilterDynamicFormComponent, CustomInputComponent, CustomInputFormComponent, CustomLoadingSpinnerComponent, CustomMainPagesFilterComponent, CustomModalComponent, CustomModalService, CustomMultiSelectComponent, CustomMultiSelectExpandedFormComponent, CustomMultiSelectFormComponent, CustomOtpInputFormComponent, CustomPagesHeaderComponent, CustomPaginationComponent, CustomPhoneFormComponent, CustomPlaceHolderComponent, CustomPlateNumberInputFormComponent, CustomPopUpComponent, CustomProgressBarComponent, CustomRadioComponentComponent, CustomRadioGroupFormComponent, CustomReactiveSearchInputComponent, CustomSearchInputComponent, CustomSingleFileUploadComponent, CustomSmDynamicTableComponent, CustomStatusLabelComponent, CustomSteppersContainerComponent, CustomSteppersControllersComponent, CustomSvgIconComponent, CustomTableComponent, CustomTabsComponent, CustomTextareaComponent, CustomTextareaFormComponent, CustomTimeInputComponent, CustomTimeInputFormComponent, CustomTitleContentComponent, CustomToastComponent, CustomToastViewportComponent, CustomToggleSwitchComponent, CustomToggleSwitchFormComponent, CustomTooltipComponent, DispatchingFeComponentsService, DropdownsAnimationDirective, EnglishOnlyDirective, ErrorInterceptor, GeoLocationService, I18nConstant, Lang, LoadingService, LocalizePipe, MODAL_REF, ModuleRoutes, NetworkConnectionInterceptor, OverlayPanelComponent, PERMISSIONS, PermissionGuard, Roles, SHOW_SUCCESS_TOASTER, SKIP_LOADER, SKIP_TOKEN, SidenavService, StepperService, StorageService, ToastService, ToggleElementDirective, TranslationService, USE_TOKEN, UserDataService, UserStatus, authGuard, b64toBlob, blobToB64, convertDateFormat, convertFileToBase64, convertFormGroupToFormData, diffTime, downloadBlob, dropdownAnimation$1 as dropdownAnimation, excelDateToJSDate, flattenTree, formatDate, formatDateWithTime, formatTimestamp, formatinitialTakeTime, generateRandomColor, generateUniqueNumber, getErrorValidation, getFormValidationErrors, injectModalRef, isDocumentPath, isImagePath, isVedioPath, loadingInterceptor, logger, noAuthGuard, someFieldsContainData, timeAgo, toE164OrNull };
+export { API_BASE_URL, ActivityTimePipe, AllowNumberOnlyDirective, ArabicOnlyDirective, AuthBeService, AuthConstant, AuthContextService, AuthDirective, AuthInterceptor, AuthService, BlurBackdropDirective, ClickOutsideDirective, CommonHttpService, ComponentFormErrorConstant, ConfirmDialogService, CustomActionsDropdownComponent, CustomAppErrorComponent, CustomAvatarsComponent, CustomBreadcrumbComponent, CustomButtonComponent, CustomCalendarComponent, CustomCalenderFormComponent, CustomCalenderOpenFormComponent, CustomCategoryTableComponent, CustomCheckBoxFormComponent, CustomColorComponent, CustomConfirmPopupComponent, CustomCounterInputComponent, CustomDetailsHeaderComponent, CustomDetailsModalComponent, CustomDetailsNavComponent, CustomDropdownButtonComponent, CustomDropdownComponent, CustomDropdownFormComponent, CustomDynamicTableWithCategoriesComponent, CustomExpandingContainerComponent, CustomFieldsFormComponent, CustomFileUploadComponent, CustomFileViewerComponent, CustomFilterDropdownComponent, CustomFilterDynamicFormComponent, CustomInputComponent, CustomInputFormComponent, CustomLoadingSpinnerComponent, CustomMainPagesFilterComponent, CustomModalComponent, CustomModalService, CustomMultiSelectComponent, CustomMultiSelectExpandedFormComponent, CustomMultiSelectFormComponent, CustomOtpInputFormComponent, CustomPagesHeaderComponent, CustomPaginationComponent, CustomPhoneFormComponent, CustomPillTabsComponent, CustomPlaceHolderComponent, CustomPlateNumberInputFormComponent, CustomPopUpComponent, CustomProgressBarComponent, CustomRadioComponentComponent, CustomRadioGroupFormComponent, CustomReactiveSearchInputComponent, CustomSearchInputComponent, CustomSingleFileUploadComponent, CustomSmDynamicTableComponent, CustomStatusLabelComponent, CustomSteppersContainerComponent, CustomSteppersControllersComponent, CustomSvgIconComponent, CustomTableComponent, CustomTabsComponent, CustomTextareaComponent, CustomTextareaFormComponent, CustomTimeInputComponent, CustomTimeInputFormComponent, CustomTitleContentComponent, CustomToastComponent, CustomToastViewportComponent, CustomToggleSwitchComponent, CustomToggleSwitchFormComponent, CustomTooltipComponent, DispatchingFeComponentsService, DropdownsAnimationDirective, EnglishOnlyDirective, ErrorInterceptor, GeoLocationService, I18nConstant, Lang, LoadingService, LocalizePipe, MODAL_REF, ModuleRoutes, NetworkConnectionInterceptor, OverlayPanelComponent, PERMISSIONS, PermissionGuard, Roles, SHOW_SUCCESS_TOASTER, SKIP_LOADER, SKIP_TOKEN, SidenavService, StepperService, StorageService, ToastService, ToggleElementDirective, TranslationService, USE_TOKEN, UserDataService, UserStatus, authGuard, b64toBlob, blobToB64, convertDateFormat, convertFileToBase64, convertFormGroupToFormData, diffTime, downloadBlob, dropdownAnimation$1 as dropdownAnimation, excelDateToJSDate, flattenTree, formatDate, formatDateWithTime, formatTimestamp, formatinitialTakeTime, generateRandomColor, generateUniqueNumber, getErrorValidation, getFormValidationErrors, injectModalRef, isDocumentPath, isImagePath, isVedioPath, loadingInterceptor, logger, noAuthGuard, someFieldsContainData, timeAgo, toE164OrNull };
 //# sourceMappingURL=vms-shared-lib.mjs.map
