@@ -7,7 +7,6 @@ export interface IActions {
     icon?: string;
     class?: string;
     isDisabled?: boolean;
-    isDisabledCallable?: (row: any) => boolean;
     callback: (ctx: any) => void;
 }
 export declare class CustomActionsDropdownComponent {
@@ -39,7 +38,6 @@ export declare class CustomActionsDropdownComponent {
     onClickAction(action: {
         callback: (ctx: any) => void;
     }, event: MouseEvent): void;
-    isActionDisabled(action: IActions): boolean;
     ngOnDestroy(): void;
     static ɵfac: i0.ɵɵFactoryDeclaration<CustomActionsDropdownComponent, never>;
     static ɵcmp: i0.ɵɵComponentDeclaration<CustomActionsDropdownComponent, "custom-actions-dropdown", never, { "actions": { "alias": "actions"; "required": false; }; "context": { "alias": "context"; "required": false; }; "horizontalDots": { "alias": "horizontalDots"; "required": false; }; "hasActionTemplate": { "alias": "hasActionTemplate"; "required": false; }; "injectedTrigger": { "alias": "injectedTrigger"; "required": false; }; "expandSide": { "alias": "expandSide"; "required": false; }; "expandDirection": { "alias": "expandDirection"; "required": false; }; }, {}, ["triggerTemplate"], ["*"], true, never>;
