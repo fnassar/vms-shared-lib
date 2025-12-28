@@ -29,6 +29,7 @@ export declare class AuthService {
     getCurrentRolesDetails(): any[];
     hasAnyCurrentRole(targetRoles: Roles[]): boolean;
     hasCategory(route: ActivatedRouteSnapshot): boolean;
+    hasRoles(route: ActivatedRouteSnapshot): boolean;
     canDoAction(action: string[]): boolean;
     static ɵfac: i0.ɵɵFactoryDeclaration<AuthService, never>;
     static ɵprov: i0.ɵɵInjectableDeclaration<AuthService>;

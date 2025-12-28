@@ -15,7 +15,9 @@ export declare enum UserStatus {
 export declare enum Roles {
     ADMIN = "ADMIN",
     HSSE_OPERATOR = "HSSE-OPERATOR",
-    HSSE_MANAGER = "HSSE-MANAGER"
+    HSSE_MANAGER = "HSSE-MANAGER",
+    REQUESTER_REGULAR = "REQUESTER-REGULAR",
+    REQUESTER_VIP = "REQUESTER-VIP"
 }
 export declare enum PERMISSIONS {
     all = "all",

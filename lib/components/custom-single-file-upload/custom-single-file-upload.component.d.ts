@@ -19,6 +19,7 @@ export declare class CustomSingleFileUploadComponent {
     disabled: boolean;
     maxFileCount: number;
     fileInput: ElementRef<HTMLInputElement>;
+    uniqueFileInputId: string;
     private clearFileInput;
     checkedRemoveFileIcon: SafeHtml;
     private _toast;
