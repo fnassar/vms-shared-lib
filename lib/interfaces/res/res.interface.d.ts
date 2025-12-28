@@ -17,10 +17,10 @@ export interface IPaginationParam {
     size: number;
 }
 export interface IError {
-    statusCode: string;
-    error: {
-        errorMessageEn: string;
-        errorMessageAr: string;
-    };
-    timestamp: string;
+    errorCode: string | 'BAD_REQUEST';
+    errorMessageEn: string;
+    errorMessageAr: string;
+    errorTime: string;
+    customErrorCode: string;
+    extraData: string;
 }
