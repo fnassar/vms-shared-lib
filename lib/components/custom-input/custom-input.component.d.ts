@@ -8,7 +8,9 @@ export declare class CustomInputComponent {
     name: string;
     type: 'text' | 'email' | 'password' | 'number';
     value: any;
+    required: boolean;
+    customId?: string;
     valueChange: EventEmitter<any>;
     static ɵfac: i0.ɵɵFactoryDeclaration<CustomInputComponent, never>;
-    static ɵcmp: i0.ɵɵComponentDeclaration<CustomInputComponent, "custom-input", never, { "class": { "alias": "class"; "required": false; }; "labelClass": { "alias": "labelClass"; "required": false; }; "label": { "alias": "label"; "required": false; }; "placeholder": { "alias": "placeholder"; "required": false; }; "name": { "alias": "name"; "required": false; }; "type": { "alias": "type"; "required": false; }; "value": { "alias": "value"; "required": true; }; }, { "valueChange": "valueChange"; }, never, never, true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CustomInputComponent, "custom-input", never, { "class": { "alias": "class"; "required": false; }; "labelClass": { "alias": "labelClass"; "required": false; }; "label": { "alias": "label"; "required": false; }; "placeholder": { "alias": "placeholder"; "required": false; }; "name": { "alias": "name"; "required": false; }; "type": { "alias": "type"; "required": false; }; "value": { "alias": "value"; "required": true; }; "required": { "alias": "required"; "required": false; }; "customId": { "alias": "customId"; "required": false; }; }, { "valueChange": "valueChange"; }, never, never, true, never>;
 }
