@@ -10,7 +10,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import * as i1$3 from '@angular/forms';
 import { FormsModule, ReactiveFormsModule, FormArray, FormGroup, Validators, FormControl, FormBuilder } from '@angular/forms';
 import * as i1$2 from '@angular/common';
-import { isPlatformBrowser, CommonModule, registerLocaleData, NgStyle, NgClass, NgTemplateOutlet, NgComponentOutlet } from '@angular/common';
+import { isPlatformBrowser, CommonModule, registerLocaleData, NgStyle, NgClass, NgTemplateOutlet, NgComponentOutlet, JsonPipe } from '@angular/common';
 import { trigger, transition, style, animate } from '@angular/animations';
 import localeAr from '@angular/common/locales/ar';
 import localeEn from '@angular/common/locales/en';
@@ -539,7 +539,7 @@ class AuthService {
         //   permissions: [
         //     PERMISSIONS.PARKING_ZONE_VIEW,
         //     PERMISSIONS.PARKING_ZONE_CREATE,
-        //     //  PERMISSIONS.PARKING_ZONE_UPDATE,
+        //     PERMISSIONS.PARKING_ZONE_UPDATE,
         //     PERMISSIONS.PARKING_ZONE_DELETE,
         //   ],
         // };
@@ -4680,12 +4680,6 @@ class CustomTimeInputFormComponent {
             }, 0);
         }
         if (!this.dropdownOpen()) {
-            if (!control?.value) {
-                // Set default to current time or 09:00 AM
-                this.selectedHour = this.filteredHours[0] || 9;
-                this.selectedMinute = this.filteredMinutes[0] || 0;
-                this.selectedPeriod = 'AM';
-            }
             this.parentForm.get(this.controlName)?.markAsTouched();
             this.confirmTime();
         }
@@ -4886,22 +4880,28 @@ class CustomTimeInputFormComponent {
         }
     }
     confirmTime() {
-        console.log('confirmTime called');
-        this.dropdownOpen.set(false);
-        let h = Number(this.selectedHour);
-        const m = Number(this.selectedMinute);
-        // if (this.selectedPeriod == 'PM' && this.selectedHour != 12) {
-        //   this.selectedHour = Number(this.selectedHour) + 12;
-        // }
-        // if (this.selectedPeriod == 'AM' && this.selectedHour == 12) {
-        //   this.selectedHour = '00';
-        // }
-        if (!this.isTimeInRange()) {
-            this.parentForm.get(this.controlName)?.setErrors({ timeRange: true });
-            this.parentForm.get(this.controlName)?.markAsTouched();
-            return;
-        }
-        this.timeChange.emit({ hour: Number(this.selectedHour), minute: m });
+        setTimeout(() => {
+            this.dropdownOpen.set(false);
+            if (this.selectedPeriod == 'PM' && this.selectedHour != 12) {
+                this.selectedHour = Number(this.selectedHour) + 12;
+            }
+            if (this.selectedPeriod == 'AM' && this.selectedHour == 12) {
+                this.selectedHour = '00';
+            }
+            this.selectedHour = this.selectedHour ?? (this.filteredHours[0] || 9);
+            this.selectedMinute =
+                this.selectedMinute ?? (this.filteredMinutes[0] || 0);
+            this.selectedPeriod = this.selectedPeriod ?? 'AM';
+            // if (!this.isTimeInRange()) {
+            //   this.parentForm.get(this.controlName)?.setErrors({ timeRange: true });
+            //   this.parentForm.get(this.controlName)?.markAsTouched();
+            //   return;
+            // }
+            this.timeChange.emit({
+                hour: Number(this.selectedHour),
+                minute: Number(this.selectedMinute),
+            });
+        }, 0);
         this.setFormValue();
     }
     setFormValue() {
@@ -4946,34 +4946,39 @@ class CustomTimeInputFormComponent {
         }
     }
     displayTime() {
-        const hour = this.selectedHour?.toString().padStart(2, '0') || '--';
+        const hour = Number(this.selectedHour) > 12
+            ? (Number(this.selectedHour) - 12).toString().padStart(2, '0')
+            : this.selectedHour?.toString().padStart(2, '0') || '--';
         const minute = this.selectedMinute?.toString().padStart(2, '0') || '--';
         return `${hour}:${minute} ${this.selectedPeriod}`;
     }
-    isTimeInRange() {
-        if (!this.rangeMin && !this.rangeMax) {
-            return true;
-        }
-        const selectedTime = this.getTimeInMinutes(Number(this.selectedHour), Number(this.selectedMinute));
-        if (this.rangeMin) {
-            const [minH, minM] = this.rangeMin.split(':').map(Number);
-            const minTime = this.getTimeInMinutes(minH, minM);
-            if (selectedTime < minTime) {
-                return false;
-            }
-        }
-        if (this.rangeMax) {
-            const [maxH, maxM] = this.rangeMax.split(':').map(Number);
-            const maxTime = this.getTimeInMinutes(maxH, maxM);
-            if (selectedTime > maxTime) {
-                return false;
-            }
-        }
-        return true;
-    }
-    getTimeInMinutes(hour, minute) {
-        return hour * 60 + minute;
-    }
+    // private isTimeInRange(): boolean {
+    //   if (!this.rangeMin && !this.rangeMax) {
+    //     return true;
+    //   }
+    //   const selectedTime = this.getTimeInMinutes(
+    //     Number(this.selectedHour),
+    //     Number(this.selectedMinute)
+    //   );
+    //   if (this.rangeMin) {
+    //     const [minH, minM] = this.rangeMin.split(':').map(Number);
+    //     const minTime = this.getTimeInMinutes(minH, minM);
+    //     if (selectedTime < minTime) {
+    //       return false;
+    //     }
+    //   }
+    //   if (this.rangeMax) {
+    //     const [maxH, maxM] = this.rangeMax.split(':').map(Number);
+    //     const maxTime = this.getTimeInMinutes(maxH, maxM);
+    //     if (selectedTime > maxTime) {
+    //       return false;
+    //     }
+    //   }
+    //   return true;
+    // }
+    // private getTimeInMinutes(hour: number, minute: number): number {
+    //   return hour * 60 + minute;
+    // }
     getItemOpacity(index, scrollElement, arrayLength) {
         if (!scrollElement)
             return 0.3;
@@ -5004,6 +5009,7 @@ i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.17", ngImpo
                         FormsModule,
                         ClickOutsideDirective,
                         TranslateModule,
+                        JsonPipe,
                     ], template: "<div class=\"time-picker-container\" [style]=\"{ '--height': height }\">\n  @if(label){\n  <label [for]=\"label\" [class]=\"'custom-label ' + labelClass\">\n    {{ label }}\n\n    @if(containRequiredError()){\n    <span\n      style=\"\n        color: var(--vms-color-alert-error);\n        font-size: 0.95em;\n        font-weight: 500;\n      \"\n    >\n      *\n    </span>\n    } @else{\n    <span\n      style=\"\n        color: var(--vms-color-alert-error);\n        font-size: 0.95em;\n        font-weight: 500;\n      \"\n      >&nbsp;</span\n    >\n    }\n  </label>\n  }\n  <div class=\"time-picker__input\">\n    <div class=\"time-error-container\">\n      @if( parentForm.controls[controlName].invalid &&\n      parentForm.controls[controlName].touched ){\n      <custom-app-error\n        [control]=\"parentForm.controls[controlName]\"\n        [validation]=\"validation\"\n        [name]=\"controlName\"\n      />\n      }\n    </div>\n    <input\n      type=\"text\"\n      readonly\n      [class]=\"'custom-input ' + inputClass\"\n      [value]=\"displayTime()\"\n      (click)=\"toggleDropdown()\"\n      [attr.name]=\"name\"\n      [attr.id]=\"name\"\n      [class.input-error]=\"\n        parentForm.controls[controlName].invalid &&\n        parentForm.controls[controlName].touched\n      \"\n    />\n    <span class=\"time-picker__input--time-icon\" (click)=\"toggleDropdown()\">\n      <svg\n        width=\"20\"\n        height=\"20\"\n        viewBox=\"0 0 20 20\"\n        fill=\"none\"\n        xmlns=\"http://www.w3.org/2000/svg\"\n      >\n        <g opacity=\"0.5\">\n          <path\n            d=\"M6.07512 7.64174C6.23125 7.48653 6.44246 7.39941 6.66262 7.39941C6.88277 7.39941 7.09398 7.48653 7.25012 7.64174L10.2418 10.5917L13.1918 7.64174C13.3479 7.48653 13.5591 7.39941 13.7793 7.39941C13.9994 7.39941 14.2106 7.48653 14.3668 7.64174C14.4449 7.71921 14.5069 7.81138 14.5492 7.91293C14.5915 8.01448 14.6133 8.1234 14.6133 8.23341C14.6133 8.34342 14.5915 8.45234 14.5492 8.55389C14.5069 8.65544 14.4449 8.74761 14.3668 8.82507L10.8334 12.3584C10.756 12.4365 10.6638 12.4985 10.5623 12.5408C10.4607 12.5831 10.3518 12.6049 10.2418 12.6049C10.1318 12.6049 10.0229 12.5831 9.9213 12.5408C9.81975 12.4985 9.72758 12.4365 9.65012 12.3584L6.07512 8.82507C5.99701 8.7476 5.93501 8.65544 5.89271 8.55389C5.8504 8.45234 5.82862 8.34342 5.82862 8.23341C5.82862 8.1234 5.8504 8.01448 5.89271 7.91293C5.93501 7.81138 5.99701 7.71921 6.07512 7.64174Z\"\n            fill=\"#4B4F55\"\n          />\n        </g>\n      </svg>\n    </span>\n  </div>\n\n  @if(dropdownOpen()){\n  <div\n    #dropdownOptions\n    [clickOutside]=\"dropdownOptions\"\n    (clickOutsideEmitter)=\"toggleDropdown()\"\n    class=\"time-picker-modal\"\n  >\n    <div class=\"time-picker-header\">\n      <h3>Pickup Time:</h3>\n    </div>\n\n    <div class=\"time-picker-container\">\n      <!-- Selection Indicator -->\n      <div class=\"selection-indicator\"></div>\n      <!--  -->\n      <div class=\"time-picker-columns\">\n        <!--  -->\n        <!-- Hour Column -->\n        <div class=\"time-column\">\n          <div class=\"scroll-container\" #hourScroll>\n            <div class=\"scroll-padding\"></div>\n            @for(h of filteredHours; track $index) {\n            <div\n              class=\"time-item\"\n              id=\"#time-item\"\n              [class.selected]=\"h === selectedHour\"\n              [style.opacity]=\"\n                getItemOpacity($index, hourScrollRef, filteredHours.length)\n              \"\n              [style.font-weight]=\"getItemFontWeight($index, hourScrollRef)\"\n            >\n              {{ h < 10 ? \"0\" + h : h }}\n            </div>\n            }\n            <div class=\"scroll-padding\"></div>\n          </div>\n        </div>\n\n        <div class=\"time-separator\">:</div>\n\n        <!-- Minute Column -->\n        <div class=\"time-column\">\n          <div class=\"scroll-container\" #minuteScroll>\n            <div class=\"scroll-padding\"></div>\n            @for(m of filteredMinutes; track $index) {\n            <div\n              class=\"time-item\"\n              [class.selected]=\"m === selectedMinute\"\n              [style.opacity]=\"\n                getItemOpacity($index, minuteScrollRef, filteredMinutes.length)\n              \"\n              [style.font-weight]=\"getItemFontWeight($index, minuteScrollRef)\"\n            >\n              {{ m < 10 ? \"0\" + m : m }}\n            </div>\n            }\n            <div class=\"scroll-padding\"></div>\n          </div>\n        </div>\n\n        <!-- Period Column -->\n        <div class=\"time-column period-column\">\n          <div class=\"scroll-container\" #periodScroll>\n            <div class=\"scroll-padding\"></div>\n            @for(p of periods; track $index) {\n            <div\n              class=\"time-item\"\n              [class.selected]=\"p === selectedPeriod\"\n              [style.opacity]=\"\n                getItemOpacity($index, periodScrollRef, periods.length)\n              \"\n              [style.font-weight]=\"getItemFontWeight($index, periodScrollRef)\"\n            >\n              {{ p }}\n            </div>\n            }\n            <div class=\"scroll-padding\"></div>\n          </div>\n        </div>\n      </div>\n    </div>\n\n    <button type=\"button\" (click)=\"confirmTime()\" class=\"done-btn\">\n      <p>\n        {{ \"GENERAL.DONE\" | translate }}\n      </p>\n    </button>\n  </div>\n  }\n</div>\n<!-- @if(dropdownOpen()){\n<div\n  #dropdownOptions\n  [clickOutside]=\"dropdownOptions\"\n  (clickOutsideEmitter)=\"toggleDropdown()\"\n  class=\"time-dropdown-container\"\n>\n  <select\n    [(ngModel)]=\"selectedHour\"\n    class=\"time-select\"\n    (ngModelChange)=\"onHourChange()\"\n  >\n    @for( h of filteredHours ;track $index){\n    <option [value]=\"h\">{{ h < 10 ? \"0\" + h : h }}</option>\n    }\n  </select>\n\n  <span>:</span>\n\n  <select [(ngModel)]=\"selectedMinute\" class=\"time-select\">\n    @for( m of filteredMinutes ;track $index){\n\n    <option [value]=\"m\">{{ m < 10 ? \"0\" + m : m }}</option>\n    }\n  </select>\n\n  <select [(ngModel)]=\"selectedPeriod\" class=\"time-select time-period\">\n    <option value=\"AM\">AM</option>\n    <option value=\"PM\">PM</option>\n  </select>\n\n  <button type=\"button\" (click)=\"confirmTime()\" class=\"confirm-btn\">\u2714</button>\n</div>\n} -->\n\n<!--\nWHEEL 1\n\nimport \"./styles.css\";\nimport React, { useState } from \"react\";\nimport styled from \"styled-components\";\nimport TimePicker from \"./TimePicker\";\n\nconst CustomTimePicker = styled(TimePicker)`\n  & {\n    font-family: \"Open Sans\";\n    font-size: 12px;\n\n    .picker-container .picker-column .picker-item.picker-item-selected {\n      color: #3f3f46;\n    }\n\n    .picker-container .picker-column .picker-item {\n      color: #7d7d7d;\n    }\n\n    & .picker-container .picker-inner {\n      padding: 0;\n    }\n\n    & .picker-highlight {\n      color: #212529;\n      &::before {\n        transform: scaleY(1);\n        background-color: #d1d1d1;\n      }\n      &::after {\n        transform: scaleY(1);\n        background-color: #d1d1d1;\n      }\n    }\n  }\n`;\n\nconst optionGroups = {\n  hour: [...Array(24).keys()].map((s) =>\n    s.toString().length === 1 ? \"0\" + s : s\n  ),\n  minute: [...Array(60).keys()].map((s) =>\n    s.toString().length === 1 ? \"0\" + s : s\n  ),\n};\n\nexport default () => {\n  const [valueGroups, setValueGroups] = useState({\n    hour: 12,\n    minute: 30,\n  });\n\n  // Update the value in response to user picking event\n  const handleChange = (name, value) => {\n    setValueGroups({\n      ...valueGroups,\n      [name]: value,\n    });\n  };\n\n  console.log(\"rerender\");\n\n  return (\n    <CustomTimePicker\n      optionGroups={optionGroups}\n      valueGroups={valueGroups}\n      onChange={handleChange}\n    />\n  );\n};\n\n\nwheel 2\nimport React from \"react\";\n\nimport Picker from \"time-picker-scroll\";\n\nexport default ({ className, optionGroups, valueGroups, onChange }) => {\n  return (\n    <div className={className}>\n      <div\n        style={{\n          textAlign: \"center\",\n          display: \"flex\",\n        }}\n      >\n        <span\n          style={{\n            display: \"inline-block\",\n            flex: \"1 1 150px\",\n            fontWeight: 600,\n            color: \"#676767\",\n          }}\n        >\n          Hour\n        </span>\n        <span\n          style={{\n            display: \"inline-block\",\n            flex: \"1 1 150px\",\n            fontWeight: 600,\n            color: \"#676767\",\n          }}\n        >\n          Minute\n        </span>\n      </div>\n\n      <div\n        style={{\n          position: \"relative\",\n        }}\n      >\n        <Picker\n          optionGroups={optionGroups}\n          valueGroups={valueGroups}\n          onChange={onChange}\n          itemHeight={44}\n          height={270}\n        />\n        <div\n          style={{\n            margin: 0,\n            position: \"absolute\",\n            top: \"50%\",\n            transform: \"translateY(-50%)\",\n            left: \"50%\",\n            fontSize: \"20px\",\n            textAlign: \"center\",\n            height: \"30px\",\n          }}\n        >\n          :\n        </div>\n      </div>\n\n      <div\n        style={{\n          width: \"100%\",\n          textAlign: \"center\",\n        }}\n      >\n        <button\n          style={{\n            width: \"75%\",\n            height: \"40px\",\n            backgroundColor: \"transparent\",\n            border: \"1px solid #D1D1D1\",\n            borderRadius: \"2px\",\n            color: \"#007BFF\",\n            fontWeight: 600,\n          }}\n        >\n          Set Time\n        </button>\n      </div>\n    </div>\n  );\n};\n\n-->\n", styles: [".time-picker-container{position:relative;width:100%;cursor:pointer;min-width:8em;height:100%}.custom-label{font-size:1.6em;font-weight:500;display:block;color:var(--vms-color-form-label);margin-bottom:.3em}.time-picker__input{position:relative}.custom-input{height:var(--height, 3em);width:100%;border-radius:.75em;border:1px solid #82828233;padding:0 1em;outline:none!important;box-shadow:none;font-size:1.6em;font-weight:400;cursor:pointer}.input-error-container{position:relative}.custom-input.input-error{border:1px solid #e55658;box-shadow:1px 0 6px #e5565826}.time-picker__input--time-icon{position:absolute;right:.5em;top:50%;transform:translateY(-50%);pointer-events:none}.time-error-container{position:absolute;top:100%;left:1.15em;width:100%}.time-error-container custom-app-error{pointer-events:none}.time-picker-modal{position:absolute;top:100%;right:0;background:#fff;border-radius:.6em;padding:24px;border:1px solid #82828233;z-index:1000;min-width:22.1em;max-width:100%;width:100%;height:33em;display:grid;grid-template-rows:1fr 20em auto;gap:.9em}.time-picker-header h3{font-size:1.5em;font-weight:600;margin:0;color:#1a1a1a}.time-picker-columns{display:flex;justify-content:center;align-items:center;gap:8px;height:100%}.time-column{flex:1;height:100%;position:relative}.period-column{flex:.8}.time-separator{font-size:2em;font-weight:700;color:#1a1a1a;align-self:center;padding:0 4px;z-index:1}.scroll-container{height:100%;overflow-y:scroll;scroll-snap-type:y mandatory;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none;cursor:grab;-webkit-user-select:none;user-select:none}.scroll-container:active{cursor:grabbing}.scroll-container::-webkit-scrollbar{display:none}.scroll-padding{height:8.3em;scroll-snap-align:start}.time-item{height:36px;display:flex;align-items:center;justify-content:center;font-size:1.5em;color:#1a1a1a;scroll-snap-align:start;transition:opacity .2s ease,font-weight .2s ease;-webkit-user-select:none;user-select:none}.time-item.selected{font-weight:700;opacity:1}.selection-indicator{position:absolute;top:50%;left:0;right:0;height:3.6em;transform:translateY(-50%);background:#f8f8f8;pointer-events:none;border-radius:.45em}.done-btn{width:100%;height:3rem;background:#25c7bc;color:#fff;border:none;border-radius:.4rem;font-weight:600;cursor:pointer;transition:background .2s ease}.done-btn p{font-size:1.4rem}.done-btn:hover{background:#159b92}.done-btn:active{transform:scale(.98)}@media (max-width: 480px){.time-picker-modal{min-width:90vw;max-width:90vw}}\n"] }]
         }], propDecorators: { parentForm: [{
                 type: Input,

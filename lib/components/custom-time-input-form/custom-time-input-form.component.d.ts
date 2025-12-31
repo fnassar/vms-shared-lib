@@ -63,8 +63,6 @@ export declare class CustomTimeInputFormComponent implements AfterViewInit {
     setExcistValue(): void;
     private setTimeFromString;
     displayTime(): string | null;
-    private isTimeInRange;
-    private getTimeInMinutes;
     getItemOpacity(index: number, scrollElement: ElementRef<HTMLDivElement> | undefined, arrayLength: number): number;
     getItemFontWeight(index: number, scrollElement: ElementRef<HTMLDivElement> | undefined): string;
     static ɵfac: i0.ɵɵFactoryDeclaration<CustomTimeInputFormComponent, never>;
