@@ -4892,11 +4892,11 @@ class CustomTimeInputFormComponent {
             this.selectedMinute =
                 this.selectedMinute ?? (this.filteredMinutes[0] || 0);
             this.selectedPeriod = this.selectedPeriod ?? 'AM';
-            // if (!this.isTimeInRange()) {
-            //   this.parentForm.get(this.controlName)?.setErrors({ timeRange: true });
-            //   this.parentForm.get(this.controlName)?.markAsTouched();
-            //   return;
-            // }
+            if (!this.isTimeInRange()) {
+                this.parentForm.get(this.controlName)?.setErrors({ timeRange: true });
+                this.parentForm.get(this.controlName)?.markAsTouched();
+                return;
+            }
             this.timeChange.emit({
                 hour: Number(this.selectedHour),
                 minute: Number(this.selectedMinute),
@@ -4952,33 +4952,30 @@ class CustomTimeInputFormComponent {
         const minute = this.selectedMinute?.toString().padStart(2, '0') || '--';
         return `${hour}:${minute} ${this.selectedPeriod}`;
     }
-    // private isTimeInRange(): boolean {
-    //   if (!this.rangeMin && !this.rangeMax) {
-    //     return true;
-    //   }
-    //   const selectedTime = this.getTimeInMinutes(
-    //     Number(this.selectedHour),
-    //     Number(this.selectedMinute)
-    //   );
-    //   if (this.rangeMin) {
-    //     const [minH, minM] = this.rangeMin.split(':').map(Number);
-    //     const minTime = this.getTimeInMinutes(minH, minM);
-    //     if (selectedTime < minTime) {
-    //       return false;
-    //     }
-    //   }
-    //   if (this.rangeMax) {
-    //     const [maxH, maxM] = this.rangeMax.split(':').map(Number);
-    //     const maxTime = this.getTimeInMinutes(maxH, maxM);
-    //     if (selectedTime > maxTime) {
-    //       return false;
-    //     }
-    //   }
-    //   return true;
-    // }
-    // private getTimeInMinutes(hour: number, minute: number): number {
-    //   return hour * 60 + minute;
-    // }
+    isTimeInRange() {
+        if (!this.rangeMin && !this.rangeMax) {
+            return true;
+        }
+        const selectedTime = this.getTimeInMinutes(Number(this.selectedHour), Number(this.selectedMinute));
+        if (this.rangeMin) {
+            const [minH, minM] = this.rangeMin.split(':').map(Number);
+            const minTime = this.getTimeInMinutes(minH, minM);
+            if (selectedTime < minTime) {
+                return false;
+            }
+        }
+        if (this.rangeMax) {
+            const [maxH, maxM] = this.rangeMax.split(':').map(Number);
+            const maxTime = this.getTimeInMinutes(maxH, maxM);
+            if (selectedTime > maxTime) {
+                return false;
+            }
+        }
+        return true;
+    }
+    getTimeInMinutes(hour, minute) {
+        return hour * 60 + minute;
+    }
     getItemOpacity(index, scrollElement, arrayLength) {
         if (!scrollElement)
             return 0.3;
@@ -8692,12 +8689,12 @@ class CustomTimeInputComponent {
             return;
         }
         let hour24 = this.selectedHour;
-        // if (this.selectedPeriod === 'PM' && hour24 !== 12) {
-        //   hour24 += 12;
-        // }
-        // if (this.selectedPeriod === 'AM' && hour24 === 12) {
-        //   hour24 = 0;
-        // }
+        if (this.selectedPeriod === 'PM' && hour24 !== 12) {
+            hour24 += 12;
+        }
+        if (this.selectedPeriod === 'AM' && hour24 === 12) {
+            hour24 = 0;
+        }
         const h = hour24.toString().padStart(2, '0');
         const m = this.selectedMinute.toString().padStart(2, '0');
         this.valueChange.emit(`${h}:${m}:00`);
@@ -8707,9 +8704,9 @@ class CustomTimeInputComponent {
         if (this.selectedHour == null || this.selectedMinute == null) {
             return '--:--';
         }
-        return `${this.selectedHour
-            .toString()
-            .padStart(2, '0')}:${this.selectedMinute.toString().padStart(2, '0')} ${this.selectedPeriod}`;
+        return `${this.selectedHour > 12
+            ? this.selectedHour - 12
+            : this.selectedHour.toString().padStart(2, '0')}:${this.selectedMinute.toString().padStart(2, '0')} ${this.selectedPeriod}`;
     }
     setFromValue(value) {
         const timeString = this.value.substring(0, 5); // "HH:MM"
