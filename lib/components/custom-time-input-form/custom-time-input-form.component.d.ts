@@ -39,6 +39,7 @@ export declare class CustomTimeInputFormComponent implements AfterViewInit {
     private animationFrameId;
     get filteredHours(): number[];
     get filteredMinutes(): number[];
+    get filteredPeriods(): string[];
     ngOnInit(): void;
     ngAfterViewInit(): void;
     ngOnDestroy(): void;
@@ -64,7 +65,7 @@ export declare class CustomTimeInputFormComponent implements AfterViewInit {
     private setTimeFromString;
     displayTime(): string | null;
     private isTimeInRange;
-    private getTimeInMinutes;
+    private getTimeInHours;
     getItemOpacity(index: number, scrollElement: ElementRef<HTMLDivElement> | undefined, arrayLength: number): number;
     getItemFontWeight(index: number, scrollElement: ElementRef<HTMLDivElement> | undefined): string;
     static ɵfac: i0.ɵɵFactoryDeclaration<CustomTimeInputFormComponent, never>;
