@@ -1668,7 +1668,8 @@ class CustomCheckBoxFormComponent {
     parentForm;
     validation = [];
     valueChange = new EventEmitter();
-    get uniqueId() {
+    uniqueId = this.setUniqueId();
+    setUniqueId() {
         return (this.name +
             '_' +
             this.controlName +
