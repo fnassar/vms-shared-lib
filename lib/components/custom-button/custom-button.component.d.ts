@@ -1,7 +1,7 @@
 import * as i0 from "@angular/core";
 export declare class CustomButtonComponent {
     variant: 'primary' | 'primary-inverse' | 'secondary' | 'secondary-inverse' | 'danger';
-    size: 'small' | 'medium' | 'large';
+    size: 'x-small' | 'small' | 'medium' | 'large';
     disabled: boolean;
     type: 'button' | 'submit' | 'reset';
     get buttonClass(): string;
