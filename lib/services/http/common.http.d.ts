@@ -6,7 +6,6 @@ export declare class CommonHttpService {
     private baseUrl?;
     constructor(http: HttpClient, baseUrl?: string | undefined);
     private buildUrl;
-    private buildHeaders;
     CommonPostRequests(url: string, body: any, options?: any): Observable<any>;
     CommonPutRequests(url: string, body: any, options?: any): Observable<any>;
     CommonGetRequests(url: string, options?: any): Observable<any>;
