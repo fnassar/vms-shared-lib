@@ -2,7 +2,7 @@ import * as i0 from '@angular/core';
 import { Injectable, signal, InjectionToken, Inject, computed, Optional, input, Input, Component, HostListener, Directive, EventEmitter, PLATFORM_ID, Output, effect, HostBinding, Pipe, inject, ElementRef, ContentChild, ViewChild, Injector, ViewContainerRef, ViewEncapsulation, model, output, ViewChildren, ApplicationRef, EnvironmentInjector, createComponent } from '@angular/core';
 import { retry, catchError, BehaviorSubject, Subscription, fromEvent, filter, Subject, takeUntil, ReplaySubject, debounceTime, distinctUntilChanged, take, firstValueFrom, Observable, map, throwError, finalize, tap } from 'rxjs';
 import * as i1 from '@angular/common/http';
-import { HttpContextToken, HttpContext, HttpHeaders, HttpResponse } from '@angular/common/http';
+import { HttpContextToken, HttpContext, HttpResponse } from '@angular/common/http';
 import * as i3 from '@angular/router';
 import { Router } from '@angular/router';
 import * as i1$1 from '@ngx-translate/core';
@@ -721,28 +721,17 @@ class CommonHttpService {
         endpoint = endpoint.startsWith('/') ? endpoint.substring(1) : endpoint;
         return `${this.baseUrl}/${endpoint}`;
     }
-    buildHeaders(options) {
-        let headers = new HttpHeaders({
-            'ngrok-skip-browser-warning': 'true',
-        });
-        if (options?.headers) {
-            Object.keys(options.headers).forEach((key) => {
-                headers = headers.set(key, options.headers[key]);
-            });
-        }
-        return options ? { ...options, headers } : { headers };
-    }
     CommonPostRequests(url, body, options) {
-        return this.http.post(this.buildUrl(url), body, this.buildHeaders(options));
+        return this.http.post(this.buildUrl(url), body, options);
     }
     CommonPutRequests(url, body, options) {
-        return this.http.put(this.buildUrl(url), body, this.buildHeaders(options));
+        return this.http.put(this.buildUrl(url), body, options);
     }
     CommonGetRequests(url, options) {
-        return this.http.get(this.buildUrl(url), this.buildHeaders(options));
+        return this.http.get(this.buildUrl(url), options);
     }
     CommonDeleteRequest(url, options) {
-        return this.http.delete(this.buildUrl(url), this.buildHeaders(options));
+        return this.http.delete(this.buildUrl(url), options);
     }
     CommonGetRequestsWithQuery(url, Model, options) {
         if (Model) {
@@ -754,7 +743,7 @@ class CommonHttpService {
                 .join('&');
             url += queryString == '' ? '' : '?' + queryString;
         }
-        return this.http.get(this.buildUrl(url), this.buildHeaders(options));
+        return this.http.get(this.buildUrl(url), options);
     }
     CommonPostRequestsWithQuery(url, Model, body, options) {
         if (Model) {
@@ -767,7 +756,7 @@ class CommonHttpService {
                 .join('&');
             url += queryString == '' ? '' : '?' + queryString;
         }
-        return this.http.post(this.buildUrl(url), body, this.buildHeaders(options));
+        return this.http.post(this.buildUrl(url), body, options);
     }
     CommonPutRequestsWithQuery(url, Model, body, options) {
         if (Model) {
@@ -780,7 +769,7 @@ class CommonHttpService {
                 .join('&');
             url += queryString == '' ? '' : '?' + queryString;
         }
-        return this.http.put(this.buildUrl(url), body, this.buildHeaders(options));
+        return this.http.put(this.buildUrl(url), body, options);
     }
     static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.17", ngImport: i0, type: CommonHttpService, deps: [{ token: i1.HttpClient }, { token: API_BASE_URL, optional: true }], target: i0.ɵɵFactoryTarget.Injectable });
     static ɵprov = i0.ɵɵngDeclareInjectable({ minVersion: "12.0.0", version: "19.2.17", ngImport: i0, type: CommonHttpService, providedIn: 'root' });
