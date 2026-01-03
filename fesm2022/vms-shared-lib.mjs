@@ -9668,7 +9668,6 @@ const AuthInterceptor = (request, next) => {
     // 'Content-Type': 'application/json',
     const headersConfig = {
         'accept-language': translate === I18nConstant.EN ? 'en-US' : 'e.g',
-        'ngrok-skip-browser-warning': 'true',
     };
     if (!skipToken) {
         headersConfig['Authorization'] = `Bearer ${token}`;
