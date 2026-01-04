@@ -8,6 +8,7 @@ export declare class CustomTableComponent<T> {
     tableHeader: ITableHeader<T>[];
     tableData: T[] | null;
     showActionColumn: boolean;
+    showActionHeader: boolean;
     tableCategories: ITableCategory<T>[] | null;
     cellTemplates: {
         [key: string]: TemplateRef<any>;
@@ -29,5 +30,5 @@ export declare class CustomTableComponent<T> {
     constructor(sanitizer: DomSanitizer);
     ngOnInit(): void;
     static ɵfac: i0.ɵɵFactoryDeclaration<CustomTableComponent<any>, never>;
-    static ɵcmp: i0.ɵɵComponentDeclaration<CustomTableComponent<any>, "custom-table", never, { "tableHeader": { "alias": "tableHeader"; "required": true; }; "tableData": { "alias": "tableData"; "required": true; }; "showActionColumn": { "alias": "showActionColumn"; "required": false; }; "tableCategories": { "alias": "tableCategories"; "required": false; }; "cellTemplates": { "alias": "cellTemplates"; "required": false; }; "templates": { "alias": "templates"; "required": false; }; "actionsTemplate": { "alias": "actionsTemplate"; "required": false; }; "showNumberCol": { "alias": "showNumberCol"; "required": false; }; "pagination": { "alias": "pagination"; "required": false; }; "rowClass": { "alias": "rowClass"; "required": false; }; "headerClass": { "alias": "headerClass"; "required": false; }; }, { "onRowClick": "onRowClick"; "sortColumn": "sortColumn"; }, never, never, true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CustomTableComponent<any>, "custom-table", never, { "tableHeader": { "alias": "tableHeader"; "required": true; }; "tableData": { "alias": "tableData"; "required": true; }; "showActionColumn": { "alias": "showActionColumn"; "required": false; }; "showActionHeader": { "alias": "showActionHeader"; "required": false; }; "tableCategories": { "alias": "tableCategories"; "required": false; }; "cellTemplates": { "alias": "cellTemplates"; "required": false; }; "templates": { "alias": "templates"; "required": false; }; "actionsTemplate": { "alias": "actionsTemplate"; "required": false; }; "showNumberCol": { "alias": "showNumberCol"; "required": false; }; "pagination": { "alias": "pagination"; "required": false; }; "rowClass": { "alias": "rowClass"; "required": false; }; "headerClass": { "alias": "headerClass"; "required": false; }; }, { "onRowClick": "onRowClick"; "sortColumn": "sortColumn"; }, never, never, true, never>;
 }
