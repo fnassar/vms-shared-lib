@@ -39,7 +39,6 @@ export declare class CustomTimeInputFormComponent implements AfterViewInit {
     private animationFrameId;
     get filteredHours(): number[];
     get filteredMinutes(): number[];
-    get filteredPeriods(): string[];
     ngOnInit(): void;
     ngAfterViewInit(): void;
     ngOnDestroy(): void;
