@@ -7,6 +7,8 @@ export interface IActions {
     icon?: string;
     class?: string;
     isDisabled?: boolean;
+    htmlRef?: string;
+    item?: any;
     callback: (ctx: any) => void;
 }
 export declare class CustomActionsDropdownComponent {
@@ -21,6 +23,9 @@ export declare class CustomActionsDropdownComponent {
     injectedTrigger: boolean;
     expandSide: 'RIGHT' | 'LEFT';
     expandDirection: 'TOP' | 'BOTTOM';
+    templates: {
+        [key: string]: TemplateRef<any>;
+    };
     actionsPopup?: ElementRef<HTMLDivElement>;
     triggerWrapper?: ElementRef<HTMLDivElement>;
     actionDropdownContainer?: ElementRef<HTMLDivElement>;
@@ -40,5 +45,5 @@ export declare class CustomActionsDropdownComponent {
     }, event: MouseEvent): void;
     ngOnDestroy(): void;
     static ɵfac: i0.ɵɵFactoryDeclaration<CustomActionsDropdownComponent, never>;
-    static ɵcmp: i0.ɵɵComponentDeclaration<CustomActionsDropdownComponent, "custom-actions-dropdown", never, { "actions": { "alias": "actions"; "required": false; }; "context": { "alias": "context"; "required": false; }; "horizontalDots": { "alias": "horizontalDots"; "required": false; }; "hasActionTemplate": { "alias": "hasActionTemplate"; "required": false; }; "injectedTrigger": { "alias": "injectedTrigger"; "required": false; }; "expandSide": { "alias": "expandSide"; "required": false; }; "expandDirection": { "alias": "expandDirection"; "required": false; }; }, {}, ["triggerTemplate"], ["*"], true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CustomActionsDropdownComponent, "custom-actions-dropdown", never, { "actions": { "alias": "actions"; "required": false; }; "context": { "alias": "context"; "required": false; }; "horizontalDots": { "alias": "horizontalDots"; "required": false; }; "hasActionTemplate": { "alias": "hasActionTemplate"; "required": false; }; "injectedTrigger": { "alias": "injectedTrigger"; "required": false; }; "expandSide": { "alias": "expandSide"; "required": false; }; "expandDirection": { "alias": "expandDirection"; "required": false; }; "templates": { "alias": "templates"; "required": false; }; }, {}, ["triggerTemplate"], ["*"], true, never>;
 }

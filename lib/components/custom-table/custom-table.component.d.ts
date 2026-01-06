@@ -1,6 +1,7 @@
 import { EventEmitter, TemplateRef } from '@angular/core';
 import { ITableCategory, ITableHeader } from '../../interfaces';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { IActions } from '../custom-actions-dropdown/custom-actions-dropdown.component';
 import * as i0 from "@angular/core";
 export declare class CustomTableComponent<T> {
     private sanitizer;
@@ -9,6 +10,14 @@ export declare class CustomTableComponent<T> {
     tableData: T[] | null;
     showActionColumn: boolean;
     showActionHeader: boolean;
+    actionsItems: IActions[];
+    actionDotsTemplate?: TemplateRef<{
+        $implicit: any;
+    }>;
+    hasActionTemplate: boolean;
+    actionsTemplate?: TemplateRef<{
+        $implicit: any;
+    }>;
     tableCategories: ITableCategory<T>[] | null;
     cellTemplates: {
         [key: string]: TemplateRef<any>;
@@ -16,7 +25,6 @@ export declare class CustomTableComponent<T> {
     templates: {
         [key: string]: TemplateRef<any>;
     };
-    actionsTemplate: TemplateRef<any> | null;
     showNumberCol: boolean;
     pagination: any;
     rowClass: string;
@@ -30,5 +38,5 @@ export declare class CustomTableComponent<T> {
     constructor(sanitizer: DomSanitizer);
     ngOnInit(): void;
     static ɵfac: i0.ɵɵFactoryDeclaration<CustomTableComponent<any>, never>;
-    static ɵcmp: i0.ɵɵComponentDeclaration<CustomTableComponent<any>, "custom-table", never, { "tableHeader": { "alias": "tableHeader"; "required": true; }; "tableData": { "alias": "tableData"; "required": true; }; "showActionColumn": { "alias": "showActionColumn"; "required": false; }; "showActionHeader": { "alias": "showActionHeader"; "required": false; }; "tableCategories": { "alias": "tableCategories"; "required": false; }; "cellTemplates": { "alias": "cellTemplates"; "required": false; }; "templates": { "alias": "templates"; "required": false; }; "actionsTemplate": { "alias": "actionsTemplate"; "required": false; }; "showNumberCol": { "alias": "showNumberCol"; "required": false; }; "pagination": { "alias": "pagination"; "required": false; }; "rowClass": { "alias": "rowClass"; "required": false; }; "headerClass": { "alias": "headerClass"; "required": false; }; }, { "onRowClick": "onRowClick"; "sortColumn": "sortColumn"; }, never, never, true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CustomTableComponent<any>, "custom-table", never, { "tableHeader": { "alias": "tableHeader"; "required": true; }; "tableData": { "alias": "tableData"; "required": true; }; "showActionColumn": { "alias": "showActionColumn"; "required": false; }; "showActionHeader": { "alias": "showActionHeader"; "required": false; }; "actionsItems": { "alias": "actionsItems"; "required": false; }; "actionDotsTemplate": { "alias": "actionDotsTemplate"; "required": false; }; "hasActionTemplate": { "alias": "hasActionTemplate"; "required": false; }; "actionsTemplate": { "alias": "actionsTemplate"; "required": false; }; "tableCategories": { "alias": "tableCategories"; "required": false; }; "cellTemplates": { "alias": "cellTemplates"; "required": false; }; "templates": { "alias": "templates"; "required": false; }; "showNumberCol": { "alias": "showNumberCol"; "required": false; }; "pagination": { "alias": "pagination"; "required": false; }; "rowClass": { "alias": "rowClass"; "required": false; }; "headerClass": { "alias": "headerClass"; "required": false; }; }, { "onRowClick": "onRowClick"; "sortColumn": "sortColumn"; }, never, never, true, never>;
 }
