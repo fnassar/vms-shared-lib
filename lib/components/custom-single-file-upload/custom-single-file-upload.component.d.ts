@@ -29,6 +29,7 @@ export declare class CustomSingleFileUploadComponent {
     private defaultIcon;
     selectedFileName: string | null;
     constructor(sanitizer: DomSanitizer);
+    getFileNameFromBase64(base64: string): string | null;
     fileUrl(file: File): string;
     removeSelectedFile(id: number): void;
     ngOnDestroy(): void;
