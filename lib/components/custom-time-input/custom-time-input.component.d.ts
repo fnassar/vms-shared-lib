@@ -51,6 +51,7 @@ export declare class CustomTimeInputComponent {
     onMinuteSelect(event: Event): void;
     onPeriodSelect(event: Event): void;
     get filteredHours(): number[];
+    private getFilteredHoursList;
     get filteredMinutes(): number[];
     onHourChange(): void;
     confirmTime(): void;
