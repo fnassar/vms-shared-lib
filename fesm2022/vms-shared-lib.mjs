@@ -176,7 +176,11 @@ class StorageService {
         }
     }
     clearLocalStorage() {
+        const lang = localStorage.getItem('lang');
         localStorage.clear();
+        if (lang) {
+            localStorage.setItem('lang', lang);
+        }
     }
     clearSession() {
         sessionStorage.clear();
@@ -3546,11 +3550,11 @@ class CustomBreadcrumbComponent {
         this.router = router;
     }
     static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.17", ngImport: i0, type: CustomBreadcrumbComponent, deps: [{ token: i3.Router }], target: i0.ɵɵFactoryTarget.Component });
-    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "17.0.0", version: "19.2.17", type: CustomBreadcrumbComponent, isStandalone: true, selector: "custom-breadcrumb", inputs: { actionsTemplate: "actionsTemplate", breadcrumbItems: "breadcrumbItems", saveBtnLabel: "saveBtnLabel", cancelBtnLabel: "cancelBtnLabel", saveBtnDisabled: "saveBtnDisabled" }, outputs: { saveBtnClicked: "saveBtnClicked", cancelBtnClicked: "cancelBtnClicked", breadcrumbItemClicked: "breadcrumbItemClicked" }, ngImport: i0, template: "@for(item of breadcrumbItems ; track $index){\n\n<p\n  [ngClass]=\"{\n      'first-item' : $index !== breadcrumbItems.length - 1 || breadcrumbItems.length === 1,\n      'last-item' : $index === breadcrumbItems.length - 1 && breadcrumbItems.length !== 1,\n      }\"\n  (click)=\"breadcrumbItemClicked(item)\"\n>\n  {{ item.label | translate }}\n</p>\n\n@if( $index !== breadcrumbItems.length -1 ){\n<div class=\"icon-wrapper\">\n  {{ \"/\" }}\n</div>\n}}\n", styles: [":host{position:absolute;top:0;left:0;padding:2em 2.4em;margin:0;display:flex;align-items:center;list-style:none;gap:.8em;font-size:1em;font-weight:500;letter-spacing:2%}.last-item{margin:0!important;cursor:pointer;opacity:.4;font-size:var(--vms-font-size-h4);line-height:var(--vms-line-height-h4)}.first-item{margin:0!important;cursor:pointer;font-size:var(--vms-font-size-h4);line-height:var(--vms-line-height-h4)}.icon-wrapper{height:auto;font-size:var(--vms-font-size-h4);line-height:var(--vms-line-height-h4);opacity:.4}\n"], dependencies: [{ kind: "directive", type: NgClass, selector: "[ngClass]", inputs: ["class", "ngClass"] }, { kind: "ngmodule", type: TranslateModule }, { kind: "pipe", type: i1$1.TranslatePipe, name: "translate" }] });
+    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "17.0.0", version: "19.2.17", type: CustomBreadcrumbComponent, isStandalone: true, selector: "custom-breadcrumb", inputs: { actionsTemplate: "actionsTemplate", breadcrumbItems: "breadcrumbItems", saveBtnLabel: "saveBtnLabel", cancelBtnLabel: "cancelBtnLabel", saveBtnDisabled: "saveBtnDisabled" }, outputs: { saveBtnClicked: "saveBtnClicked", cancelBtnClicked: "cancelBtnClicked", breadcrumbItemClicked: "breadcrumbItemClicked" }, ngImport: i0, template: "@for(item of breadcrumbItems ; track $index){\n\n<p\n  [ngClass]=\"{\n      'first-item' : $index !== breadcrumbItems.length - 1 || breadcrumbItems.length === 1,\n      'last-item' : $index === breadcrumbItems.length - 1 && breadcrumbItems.length !== 1,\n      }\"\n  (click)=\"breadcrumbItemClicked(item)\"\n>\n  {{ item.label | translate }}\n</p>\n\n@if( $index !== breadcrumbItems.length -1 ){\n<div class=\"icon-wrapper\">\n  {{ \"/\" }}\n</div>\n}}\n", styles: [":host{position:absolute;top:0;inset-inline-start:0;padding:2em 2.4em;margin:0;display:flex;align-items:center;list-style:none;gap:.8em;font-size:1em;font-weight:500;letter-spacing:2%}.last-item{margin:0!important;cursor:pointer;opacity:.4;font-size:var(--vms-font-size-h4);line-height:var(--vms-line-height-h4)}.first-item{margin:0!important;cursor:pointer;font-size:var(--vms-font-size-h4);line-height:var(--vms-line-height-h4)}.icon-wrapper{height:auto;font-size:var(--vms-font-size-h4);line-height:var(--vms-line-height-h4);opacity:.4}\n"], dependencies: [{ kind: "directive", type: NgClass, selector: "[ngClass]", inputs: ["class", "ngClass"] }, { kind: "ngmodule", type: TranslateModule }, { kind: "pipe", type: i1$1.TranslatePipe, name: "translate" }] });
 }
 i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.17", ngImport: i0, type: CustomBreadcrumbComponent, decorators: [{
             type: Component,
-            args: [{ selector: 'custom-breadcrumb', imports: [NgClass, TranslateModule], template: "@for(item of breadcrumbItems ; track $index){\n\n<p\n  [ngClass]=\"{\n      'first-item' : $index !== breadcrumbItems.length - 1 || breadcrumbItems.length === 1,\n      'last-item' : $index === breadcrumbItems.length - 1 && breadcrumbItems.length !== 1,\n      }\"\n  (click)=\"breadcrumbItemClicked(item)\"\n>\n  {{ item.label | translate }}\n</p>\n\n@if( $index !== breadcrumbItems.length -1 ){\n<div class=\"icon-wrapper\">\n  {{ \"/\" }}\n</div>\n}}\n", styles: [":host{position:absolute;top:0;left:0;padding:2em 2.4em;margin:0;display:flex;align-items:center;list-style:none;gap:.8em;font-size:1em;font-weight:500;letter-spacing:2%}.last-item{margin:0!important;cursor:pointer;opacity:.4;font-size:var(--vms-font-size-h4);line-height:var(--vms-line-height-h4)}.first-item{margin:0!important;cursor:pointer;font-size:var(--vms-font-size-h4);line-height:var(--vms-line-height-h4)}.icon-wrapper{height:auto;font-size:var(--vms-font-size-h4);line-height:var(--vms-line-height-h4);opacity:.4}\n"] }]
+            args: [{ selector: 'custom-breadcrumb', imports: [NgClass, TranslateModule], template: "@for(item of breadcrumbItems ; track $index){\n\n<p\n  [ngClass]=\"{\n      'first-item' : $index !== breadcrumbItems.length - 1 || breadcrumbItems.length === 1,\n      'last-item' : $index === breadcrumbItems.length - 1 && breadcrumbItems.length !== 1,\n      }\"\n  (click)=\"breadcrumbItemClicked(item)\"\n>\n  {{ item.label | translate }}\n</p>\n\n@if( $index !== breadcrumbItems.length -1 ){\n<div class=\"icon-wrapper\">\n  {{ \"/\" }}\n</div>\n}}\n", styles: [":host{position:absolute;top:0;inset-inline-start:0;padding:2em 2.4em;margin:0;display:flex;align-items:center;list-style:none;gap:.8em;font-size:1em;font-weight:500;letter-spacing:2%}.last-item{margin:0!important;cursor:pointer;opacity:.4;font-size:var(--vms-font-size-h4);line-height:var(--vms-line-height-h4)}.first-item{margin:0!important;cursor:pointer;font-size:var(--vms-font-size-h4);line-height:var(--vms-line-height-h4)}.icon-wrapper{height:auto;font-size:var(--vms-font-size-h4);line-height:var(--vms-line-height-h4);opacity:.4}\n"] }]
         }], ctorParameters: () => [{ type: i3.Router }], propDecorators: { actionsTemplate: [{
                 type: Input
             }], breadcrumbItems: [{
@@ -3766,11 +3770,11 @@ class OverlayPanelComponent {
         this.overlayManager.unregister(this);
     }
     static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.17", ngImport: i0, type: OverlayPanelComponent, deps: [{ token: OverlayManagerService }], target: i0.ɵɵFactoryTarget.Component });
-    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "17.0.0", version: "19.2.17", type: OverlayPanelComponent, isStandalone: true, selector: "overlay-panel", inputs: { overlayClass: "overlayClass", expandSide: "expandSide" }, queries: [{ propertyName: "targetTemplate", first: true, predicate: ["target"], descendants: true }, { propertyName: "overlayTemplate", first: true, predicate: ["overlay"], descendants: true }], ngImport: i0, template: "<div class=\"overlay-container\">\n  <!-- Target content -->\n  <div class=\"cursor-pointer\" (click)=\"toggleDropdown($event)\">\n    <ng-container *ngIf=\"targetTemplate\">\n      <ng-container *ngTemplateOutlet=\"targetTemplate\"></ng-container>\n    </ng-container>\n  </div>\n\n  <!-- Overlay content -->\n  @if(isOpen) {\n  <div\n    #overlayPanel\n    class=\"overlay\"\n    [class]=\"'overlay ' + overlayClass\"\n    [class.show]=\"isOpen\"\n    [class.right]=\"expandSide === 'RIGHT'\"\n    [class.left]=\"expandSide === 'LEFT'\"\n    [clickOutside]=\"overlayPanel\"\n    (clickOutsideEmitter)=\"closeDropdown()\"\n    [DropdownAnimationObject]=\"isOpen\"\n  >\n    <ng-container *ngIf=\"overlayTemplate\">\n      <ng-container *ngTemplateOutlet=\"overlayTemplate\"></ng-container>\n    </ng-container>\n  </div>\n  }\n</div>\n", styles: [".overlay-container{position:relative;display:inline-block}.overlay{position:absolute;top:100%;min-width:15em;max-height:70vh;background-color:#fff;border-radius:.625em;margin-top:.4em;z-index:2000;box-shadow:0 0 4px #0000001a;opacity:0;transform:translateY(-10px);pointer-events:none;transition:opacity .2s ease,transform .2s ease}.overlay.show{opacity:1;transform:translateY(0);pointer-events:auto;border-radius:.625em}.overlay.right{right:0;left:auto}.overlay.left{left:0;right:auto}\n"], dependencies: [{ kind: "directive", type: ClickOutsideDirective, selector: "[clickOutside]", inputs: ["clickOutside"], outputs: ["clickOutsideEmitter"] }, { kind: "ngmodule", type: CommonModule }, { kind: "directive", type: i1$2.NgIf, selector: "[ngIf]", inputs: ["ngIf", "ngIfThen", "ngIfElse"] }, { kind: "directive", type: i1$2.NgTemplateOutlet, selector: "[ngTemplateOutlet]", inputs: ["ngTemplateOutletContext", "ngTemplateOutlet", "ngTemplateOutletInjector"] }, { kind: "directive", type: DropdownsAnimationDirective, selector: "[DropdownAnimationObject]", inputs: ["DropdownAnimationObject"] }], animations: [dropdownAnimation$1] });
+    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "17.0.0", version: "19.2.17", type: OverlayPanelComponent, isStandalone: true, selector: "overlay-panel", inputs: { overlayClass: "overlayClass", expandSide: "expandSide" }, queries: [{ propertyName: "targetTemplate", first: true, predicate: ["target"], descendants: true }, { propertyName: "overlayTemplate", first: true, predicate: ["overlay"], descendants: true }], ngImport: i0, template: "<div class=\"overlay-container\">\n  <!-- Target content -->\n  <div class=\"cursor-pointer\" (click)=\"toggleDropdown($event)\">\n    <ng-container *ngIf=\"targetTemplate\">\n      <ng-container *ngTemplateOutlet=\"targetTemplate\"></ng-container>\n    </ng-container>\n  </div>\n\n  <!-- Overlay content -->\n  @if(isOpen) {\n  <div\n    #overlayPanel\n    class=\"overlay\"\n    [class]=\"'overlay ' + overlayClass\"\n    [class.show]=\"isOpen\"\n    [class.right]=\"expandSide === 'RIGHT'\"\n    [class.left]=\"expandSide === 'LEFT'\"\n    [clickOutside]=\"overlayPanel\"\n    (clickOutsideEmitter)=\"closeDropdown()\"\n    [DropdownAnimationObject]=\"isOpen\"\n  >\n    <ng-container *ngIf=\"overlayTemplate\">\n      <ng-container *ngTemplateOutlet=\"overlayTemplate\"></ng-container>\n    </ng-container>\n  </div>\n  }\n</div>\n", styles: [".overlay-container{position:relative;display:inline-block}.overlay{position:absolute;top:100%;min-width:15em;max-height:70vh;background-color:#fff;border-radius:.625em;margin-top:.4em;z-index:2000;box-shadow:0 0 4px #0000001a;opacity:0;transform:translateY(-10px);pointer-events:none;transition:opacity .2s ease,transform .2s ease}.overlay.show{opacity:1;transform:translateY(0);pointer-events:auto;border-radius:.625em}.overlay.right{inset-inline-start:auto;inset-inline-end:0}.overlay.left{inset-inline-start:0;inset-inline-end:auto}\n"], dependencies: [{ kind: "directive", type: ClickOutsideDirective, selector: "[clickOutside]", inputs: ["clickOutside"], outputs: ["clickOutsideEmitter"] }, { kind: "ngmodule", type: CommonModule }, { kind: "directive", type: i1$2.NgIf, selector: "[ngIf]", inputs: ["ngIf", "ngIfThen", "ngIfElse"] }, { kind: "directive", type: i1$2.NgTemplateOutlet, selector: "[ngTemplateOutlet]", inputs: ["ngTemplateOutletContext", "ngTemplateOutlet", "ngTemplateOutletInjector"] }, { kind: "directive", type: DropdownsAnimationDirective, selector: "[DropdownAnimationObject]", inputs: ["DropdownAnimationObject"] }], animations: [dropdownAnimation$1] });
 }
 i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.17", ngImport: i0, type: OverlayPanelComponent, decorators: [{
             type: Component,
-            args: [{ selector: 'overlay-panel', imports: [ClickOutsideDirective, CommonModule, DropdownsAnimationDirective], animations: [dropdownAnimation$1], template: "<div class=\"overlay-container\">\n  <!-- Target content -->\n  <div class=\"cursor-pointer\" (click)=\"toggleDropdown($event)\">\n    <ng-container *ngIf=\"targetTemplate\">\n      <ng-container *ngTemplateOutlet=\"targetTemplate\"></ng-container>\n    </ng-container>\n  </div>\n\n  <!-- Overlay content -->\n  @if(isOpen) {\n  <div\n    #overlayPanel\n    class=\"overlay\"\n    [class]=\"'overlay ' + overlayClass\"\n    [class.show]=\"isOpen\"\n    [class.right]=\"expandSide === 'RIGHT'\"\n    [class.left]=\"expandSide === 'LEFT'\"\n    [clickOutside]=\"overlayPanel\"\n    (clickOutsideEmitter)=\"closeDropdown()\"\n    [DropdownAnimationObject]=\"isOpen\"\n  >\n    <ng-container *ngIf=\"overlayTemplate\">\n      <ng-container *ngTemplateOutlet=\"overlayTemplate\"></ng-container>\n    </ng-container>\n  </div>\n  }\n</div>\n", styles: [".overlay-container{position:relative;display:inline-block}.overlay{position:absolute;top:100%;min-width:15em;max-height:70vh;background-color:#fff;border-radius:.625em;margin-top:.4em;z-index:2000;box-shadow:0 0 4px #0000001a;opacity:0;transform:translateY(-10px);pointer-events:none;transition:opacity .2s ease,transform .2s ease}.overlay.show{opacity:1;transform:translateY(0);pointer-events:auto;border-radius:.625em}.overlay.right{right:0;left:auto}.overlay.left{left:0;right:auto}\n"] }]
+            args: [{ selector: 'overlay-panel', imports: [ClickOutsideDirective, CommonModule, DropdownsAnimationDirective], animations: [dropdownAnimation$1], template: "<div class=\"overlay-container\">\n  <!-- Target content -->\n  <div class=\"cursor-pointer\" (click)=\"toggleDropdown($event)\">\n    <ng-container *ngIf=\"targetTemplate\">\n      <ng-container *ngTemplateOutlet=\"targetTemplate\"></ng-container>\n    </ng-container>\n  </div>\n\n  <!-- Overlay content -->\n  @if(isOpen) {\n  <div\n    #overlayPanel\n    class=\"overlay\"\n    [class]=\"'overlay ' + overlayClass\"\n    [class.show]=\"isOpen\"\n    [class.right]=\"expandSide === 'RIGHT'\"\n    [class.left]=\"expandSide === 'LEFT'\"\n    [clickOutside]=\"overlayPanel\"\n    (clickOutsideEmitter)=\"closeDropdown()\"\n    [DropdownAnimationObject]=\"isOpen\"\n  >\n    <ng-container *ngIf=\"overlayTemplate\">\n      <ng-container *ngTemplateOutlet=\"overlayTemplate\"></ng-container>\n    </ng-container>\n  </div>\n  }\n</div>\n", styles: [".overlay-container{position:relative;display:inline-block}.overlay{position:absolute;top:100%;min-width:15em;max-height:70vh;background-color:#fff;border-radius:.625em;margin-top:.4em;z-index:2000;box-shadow:0 0 4px #0000001a;opacity:0;transform:translateY(-10px);pointer-events:none;transition:opacity .2s ease,transform .2s ease}.overlay.show{opacity:1;transform:translateY(0);pointer-events:auto;border-radius:.625em}.overlay.right{inset-inline-start:auto;inset-inline-end:0}.overlay.left{inset-inline-start:0;inset-inline-end:auto}\n"] }]
         }], ctorParameters: () => [{ type: OverlayManagerService }], propDecorators: { overlayClass: [{
                 type: Input
             }], targetTemplate: [{
@@ -4592,6 +4596,7 @@ class CustomTimeInputFormComponent {
     hourScrollRef;
     minuteScrollRef;
     periodScrollRef;
+    translate = inject(TranslateService);
     dropdownOpen = signal(false);
     hours = hours;
     minutes = minutes;
@@ -5002,7 +5007,7 @@ class CustomTimeInputFormComponent {
             ? (Number(this.selectedHour) - 12).toString().padStart(2, '0')
             : this.selectedHour?.toString().padStart(2, '0') || '--';
         const minute = this.selectedMinute?.toString().padStart(2, '0') || '--';
-        return `${hour}:${minute} ${this.selectedPeriod}`;
+        return `${hour}:${minute} ${this.translate.instant('GENERAL.' + this.selectedPeriod)}`;
     }
     isTimeInRange() {
         if (!this.rangeMin && !this.rangeMax) {
@@ -5726,12 +5731,24 @@ class CustomPillTabsComponent {
     tabSelected = new EventEmitter();
     tabContainer;
     translationService = inject(TranslationService);
+    dirObserver;
     ngOnInit() {
         if (!this.selectedTab)
             this.selectedTab = this.tabsList[0];
     }
     ngAfterViewInit() {
         this.updatePillPosition();
+        // Listen for dir attribute changes on <html>
+        this.dirObserver = new MutationObserver(() => {
+            this.updatePillPosition();
+        });
+        this.dirObserver.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['dir'],
+        });
+    }
+    ngOnDestroy() {
+        this.dirObserver?.disconnect();
     }
     selectTab(tab) {
         this.selectedTab = tab;
@@ -8434,6 +8451,7 @@ class CustomTimeInputComponent {
     hourScrollRef;
     minuteScrollRef;
     periodScrollRef;
+    translate = inject(TranslateService);
     dropdownOpen = signal(false);
     hours = hours;
     minutes = minutes;
@@ -8799,7 +8817,9 @@ class CustomTimeInputComponent {
         }
         return `${this.selectedHour > 12
             ? this.selectedHour - 12
-            : this.selectedHour.toString().padStart(2, '0')}:${this.selectedMinute.toString().padStart(2, '0')} ${this.selectedPeriod}`;
+            : this.selectedHour.toString().padStart(2, '0')}:${this.selectedMinute
+            .toString()
+            .padStart(2, '0')} ${this.translate.instant('GENERAL.' + this.selectedPeriod)}`;
     }
     setFromValue(value) {
         const timeString = this.value.substring(0, 5); // "HH:MM"

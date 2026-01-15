@@ -21,6 +21,7 @@ export declare class CustomTimeInputFormComponent implements AfterViewInit {
     hourScrollRef: ElementRef<HTMLDivElement>;
     minuteScrollRef: ElementRef<HTMLDivElement>;
     periodScrollRef: ElementRef<HTMLDivElement>;
+    private translate;
     dropdownOpen: import("@angular/core").WritableSignal<boolean>;
     hours: number[];
     minutes: number[];

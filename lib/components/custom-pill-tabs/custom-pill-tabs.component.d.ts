@@ -1,8 +1,8 @@
-import { EventEmitter, TemplateRef, ElementRef } from '@angular/core';
+import { EventEmitter, TemplateRef, ElementRef, OnDestroy } from '@angular/core';
 import { ITabDropdownOption } from '../../interfaces';
 import { TranslationService } from '../../services';
 import * as i0 from "@angular/core";
-export declare class CustomPillTabsComponent {
+export declare class CustomPillTabsComponent implements OnDestroy {
     tabsList: ITabDropdownOption[];
     color: string;
     colorSelected: string;
@@ -16,8 +16,10 @@ export declare class CustomPillTabsComponent {
     tabSelected: EventEmitter<ITabDropdownOption>;
     tabContainer: ElementRef<HTMLDivElement>;
     translationService: TranslationService;
+    private dirObserver;
     ngOnInit(): void;
     ngAfterViewInit(): void;
+    ngOnDestroy(): void;
     selectTab(tab: ITabDropdownOption): void;
     private updatePillPosition;
     static ɵfac: i0.ɵɵFactoryDeclaration<CustomPillTabsComponent, never>;
