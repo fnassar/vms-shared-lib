@@ -1216,6 +1216,133 @@ i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.17", ngImpo
                 args: ['@dropdown']
             }] } });
 
+// activity-time.util.ts
+const SECOND = 1_000;
+const MINUTE = 60 * SECOND;
+const HOUR = 60 * MINUTE;
+const DAY = 24 * HOUR;
+const MONTH = 30 * DAY;
+// hardcoded tiny dict – fast and reliable
+const ACTIVITY_DICT = {
+    en: {
+        ACTIVE_NOW: 'now',
+        SEC_AGO: (n) => `${n} sec ago`,
+        MIN_AGO: (n) => `${n} min ago`,
+        HR_AGO: (n) => `${n} hr ago`,
+        DAY_AGO: (n) => `${n} day ago`,
+    },
+    ar: {
+        ACTIVE_NOW: ' الآن',
+        SEC_AGO: (n) => `منذ ${n} ثانية`,
+        MIN_AGO: (n) => `منذ ${n} دقيقة`,
+        HR_AGO: (n) => `منذ ${n} ساعة`,
+        DAY_AGO: (n) => `منذ ${n} يوم`,
+    }
+};
+function pickLang(lang) {
+    return lang && lang.startsWith('ar') ? 'ar' : 'en';
+}
+function toDate(input) {
+    if (!input)
+        return null;
+    if (input instanceof Date)
+        return isNaN(input.getTime()) ? null : input;
+    const d = new Date(input);
+    return isNaN(d.getTime())
+        ? null
+        : new Date(d.getTime() - d.getTimezoneOffset() * 60000);
+}
+// keep your old formatting: "Oct. 18, 2024"
+function formatAbsolute(date, locale = 'en') {
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = new Intl.DateTimeFormat(locale, { month: 'short' }).format(date);
+    const formattedMonth = month.endsWith('.') ? month : month + '.';
+    const year = date.getFullYear();
+    return `${formattedMonth} ${day}, ${year}`;
+}
+/**
+ * show "ago" for < 1 month, otherwise absolute
+ */
+function formatActivityTime(input, lang, opts) {
+    const date = toDate(input);
+    if (!date)
+        return '-';
+    const now = opts?.now ?? new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const activeNowMs = (opts?.activeNowSeconds ?? 0) * SECOND;
+    const picked = pickLang(lang);
+    const dict = ACTIVITY_DICT[picked];
+    // future → absolute
+    if (diffMs < 0)
+        return formatAbsolute(date, opts?.locale ?? picked);
+    //  Just now / Active now
+    if (diffMs <= activeNowMs)
+        return dict.ACTIVE_NOW;
+    // < 1 minute (Seconds ago)
+    if (diffMs < MINUTE) {
+        const secs = Math.floor(diffMs / SECOND);
+        return dict.SEC_AGO(secs);
+    }
+    // < 1 hour
+    if (diffMs < HOUR) {
+        const mins = Math.floor(diffMs / MINUTE);
+        return dict.MIN_AGO(mins);
+    }
+    // < 1 day
+    if (diffMs < DAY) {
+        const hrs = Math.floor(diffMs / HOUR);
+        return dict.HR_AGO(hrs);
+    }
+    // < 1 month
+    if (diffMs < MONTH) {
+        const days = Math.floor(diffMs / DAY);
+        return dict.DAY_AGO(days);
+    }
+    // ≥ 1 month → absolute
+    return formatAbsolute(date, opts?.locale ?? picked);
+}
+
+class ActivityTimePipe {
+    translate;
+    constructor(translate) {
+        this.translate = translate;
+    }
+    transform(value, lang = this.translate.currentLang) {
+        // now this will ALWAYS return the right text for the lang
+        return formatActivityTime(value, lang, { locale: lang });
+    }
+    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.17", ngImport: i0, type: ActivityTimePipe, deps: [{ token: i1$1.TranslateService }], target: i0.ɵɵFactoryTarget.Pipe });
+    static ɵpipe = i0.ɵɵngDeclarePipe({ minVersion: "14.0.0", version: "19.2.17", ngImport: i0, type: ActivityTimePipe, isStandalone: true, name: "activityTime" });
+}
+i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.17", ngImport: i0, type: ActivityTimePipe, decorators: [{
+            type: Pipe,
+            args: [{
+                    name: 'activityTime',
+                    standalone: true
+                }]
+        }], ctorParameters: () => [{ type: i1$1.TranslateService }] });
+
+class LocalizePipe {
+    translate;
+    constructor(translate) {
+        this.translate = translate;
+    }
+    transform(value, field, lang) {
+        if (!value)
+            return '';
+        const suffix = lang.charAt(0).toUpperCase() + lang.slice(1);
+        return value[`${field}${suffix}`] || '';
+    }
+    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.17", ngImport: i0, type: LocalizePipe, deps: [{ token: i1$1.TranslateService }], target: i0.ɵɵFactoryTarget.Pipe });
+    static ɵpipe = i0.ɵɵngDeclarePipe({ minVersion: "14.0.0", version: "19.2.17", ngImport: i0, type: LocalizePipe, isStandalone: true, name: "localize" });
+}
+i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.17", ngImport: i0, type: LocalizePipe, decorators: [{
+            type: Pipe,
+            args: [{
+                    name: 'localize',
+                }]
+        }], ctorParameters: () => [{ type: i1$1.TranslateService }] });
+
 class CustomCalendarComponent {
     label = '';
     placeholder = 'Select date';
@@ -1238,9 +1365,20 @@ class CustomCalendarComponent {
     currentMonth = new Date();
     days = [];
     weekdays = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+    translationService = inject(TranslationService);
     months = [
-        'January', 'February', 'March', 'April', 'May', 'June',
-        'July', 'August', 'September', 'October', 'November', 'December'
+        { monthEn: 'January', monthAr: 'يناير' },
+        { monthEn: 'February', monthAr: 'فبراير' },
+        { monthEn: 'March', monthAr: 'مارس' },
+        { monthEn: 'April', monthAr: 'أبريل' },
+        { monthEn: 'May', monthAr: 'مايو' },
+        { monthEn: 'June', monthAr: 'يونيو' },
+        { monthEn: 'July', monthAr: 'يوليو' },
+        { monthEn: 'August', monthAr: 'أغسطس' },
+        { monthEn: 'September', monthAr: 'سبتمبر' },
+        { monthEn: 'October', monthAr: 'أكتوبر' },
+        { monthEn: 'November', monthAr: 'نوفمبر' },
+        { monthEn: 'December', monthAr: 'ديسمبر' },
     ];
     years = [];
     constructor() {
@@ -1294,10 +1432,13 @@ class CustomCalendarComponent {
     }
     isSelected(date) {
         if (this.rangeMode) {
-            return ((this.startDate && date.toDateString() === this.startDate.toDateString()) ||
+            return ((this.startDate &&
+                date.toDateString() === this.startDate.toDateString()) ||
                 (this.endDate && date.toDateString() === this.endDate.toDateString()));
         }
-        return this.value ? date.toDateString() === this.value.toDateString() : false;
+        return this.value
+            ? date.toDateString() === this.value.toDateString()
+            : false;
     }
     isInRange(date) {
         if (!this.rangeMode || !this.startDate || !this.endDate)
@@ -1312,7 +1453,11 @@ class CustomCalendarComponent {
             (this.maxDate && date > this.maxDate));
     }
     getMonthName() {
-        return this.currentMonth.toLocaleString('default', { month: 'long' });
+        // return this.currentMonth.toLocaleString('default', { month: 'long' });
+        const lang = this.translationService.currentLang();
+        return lang === 'ar'
+            ? this.months[this.currentMonth.getMonth()].monthAr
+            : this.months[this.currentMonth.getMonth()].monthEn;
     }
     getYear() {
         return this.currentMonth.getFullYear();
@@ -1381,11 +1526,11 @@ class CustomCalendarComponent {
         return this.currentMonth.getFullYear() === year;
     }
     static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.17", ngImport: i0, type: CustomCalendarComponent, deps: [], target: i0.ɵɵFactoryTarget.Component });
-    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "17.0.0", version: "19.2.17", type: CustomCalendarComponent, isStandalone: true, selector: "custom-calendar", inputs: { label: "label", placeholder: "placeholder", labelClass: "labelClass", calendarPopUpClass: "calendarPopUpClass", calendarInputClass: "calendarInputClass", calendarContainerClass: "calendarContainerClass", minDate: "minDate", maxDate: "maxDate", height: "height", value: "value", rangeMode: "rangeMode", showCalendar: "showCalendar", startDate: "startDate", endDate: "endDate" }, outputs: { valueChange: "valueChange", rangeChange: "rangeChange" }, ngImport: i0, template: "<div [class]=\"'custom-calendar-container ' + calendarContainerClass\">\n\n  <label [class]=\"\n      'custom-label floating-label ' +\n      (isFocused || value || startDate ? 'float-active ' : '') +\n      labelClass\n    \">\n    {{ label }}\n  </label>\n  @if(showCalendar && !rangeMode){\n  <div [class]=\"'custom-calendar-input ' + calendarInputClass\" (click)=\"toggleCalendar()\" (focusin)=\"isFocused = true\"\n    (focusout)=\"isFocused = false\" [ngStyle]=\"{ '--height': height }\">\n    <span class=\"calendar-icon\">\n      <svg width=\"inherit\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n        <path d=\"M8 2V5\" stroke=\"#999\" stroke-width=\"1.5\" stroke-linecap=\"round\" />\n        <path d=\"M16 2V5\" stroke=\"#999\" stroke-width=\"1.5\" stroke-linecap=\"round\" />\n        <path d=\"M3.5 9.1H20.5\" stroke=\"#999\" stroke-width=\"1.5\" stroke-linecap=\"round\" />\n        <path d=\"M21 8.5V17C21 20 19.5 22 16 22H8C4.5 22 3 20 3 17V8.5C3 5.5 4.5 3.5 8 3.5H16C19.5 3.5 21 5.5 21 8.5Z\"\n          stroke=\"#999\" stroke-width=\"1.5\" stroke-linecap=\"round\" />\n      </svg>\n    </span>\n\n    <span class=\"placeholder\" *ngIf=\"!value && !startDate\">{{ placeholder }}</span>\n\n    <span class=\"selected-text\" *ngIf=\"value || startDate\">\n      {{ formatDisplayDate() }}\n    </span>\n\n    <span class=\"clear-btn\" *ngIf=\"value || startDate\" (click)=\"clearSelection($event)\">\n      \u2715\n    </span>\n  </div>\n  }\n\n  @if(showCalendar) {\n\n  <div [class]=\"'calendar-popup open ' + calendarPopUpClass\" #calendarPopup [clickOutside]=\"calendarPopup\"\n    (clickOutsideEmitter)=\"rangeMode ? showCalendar = false : null\">\n\n    <div class=\"calendar-header\">\n      <button type=\"button\" class=\"nav-button\" (click)=\"prevMonth($event)\" *ngIf=\"viewMode === 'days'\">\n        \u2039\n      </button>\n\n      <div class=\"month-title\">\n        <span class=\"clickable\" (click)=\"openMonthPicker($event)\">\n          {{ getMonthName() }}\n        </span>\n\n        <span class=\"clickable\" (click)=\"openYearPicker($event)\">\n          {{ getYear() }}\n        </span>\n      </div>\n\n      <button type=\"button\" class=\"nav-button\" (click)=\"nextMonth($event)\" *ngIf=\"viewMode === 'days'\">\n        \u203A\n      </button>\n    </div>\n\n    @if(viewMode === 'days') {\n    <div>\n      <div class=\"weekdays\">\n        @for(weekday of weekdays; track weekday) {\n        <div class=\"weekday\">{{ weekday }}</div>\n        }\n      </div>\n\n      <div class=\"days-grid\">\n        @for(day of days; track day) {\n        <div class=\"day\" [class.current-month]=\"isCurrentMonth(day)\" [class.selected]=\"isSelected(day)\"\n          [class.in-range]=\"isInRange(day)\" [class.disabled]=\"isDisabled(day)\"\n          (click)=\"$event.stopPropagation(); !isDisabled(day) && selectDate(day)\">\n          {{ day.getDate() }}\n        </div>\n        }\n      </div>\n    </div>\n    }\n\n    @if(viewMode === 'months') {\n    <div class=\"months-grid\">\n      @for(m of months; let i = $index; track m) {\n      <div class=\"month-cell\" [class.selected-month]=\"isSelectedMonth(i)\" (click)=\"selectMonth(i, $event)\">\n        {{ m }}\n      </div>\n      }\n    </div>\n    }\n\n    @if(viewMode === 'years') {\n    <div class=\"years-grid\">\n      @for(y of years; track y) {\n      <div class=\"year-cell\" [class.selected-year]=\"isSelectedYear(y)\" (click)=\"selectYear(y, $event)\">\n        {{ y }}\n      </div>\n      }\n    </div>\n    }\n\n  </div>\n\n  }\n\n</div>", styles: [".custom-calendar-container{position:relative;width:100%}.custom-label{display:block;font-size:1.6em;font-weight:500;color:#707070;margin-bottom:.3em}.custom-calendar-input{position:relative;height:var(--height);width:100%;border:1px solid #82828233;border-radius:6px;padding:0 .75em;display:flex;align-items:center;cursor:pointer;background-color:#fff}.placeholder{color:#82828250;font-size:.95em}.calendar-icon{position:absolute;right:12px;height:calc(var(--height) / 2.4)}.fullWidth{width:100%}.calendar-popup{max-height:300px;overflow-y:auto;background-color:#fff;border:1px solid #82828233;border-radius:.375em;margin-top:4px;padding:1rem;z-index:1000;box-shadow:0 4px 6px #0000001a}.calendar-header{display:flex;justify-content:space-between;align-items:center}.month-title{font-weight:600}.nav-button{background:none;border:none;font-size:16px;cursor:pointer;padding:4px 8px}.weekdays{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;font-weight:500;font-size:.75em;margin-bottom:.5em}.days-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:.25em}.day{height:2em;display:flex;align-items:center;justify-content:center;border-radius:.5em;cursor:pointer;font-size:.875em}.day.current-month{color:#111827}.day:not(.current-month){color:#9ca3af}.day.disabled{color:#d1d5db;cursor:not-allowed;text-decoration:line-through}.day:not(.disabled):not(.selected):hover{background-color:#f3f4f6}.day.in-range{background-color:var(--vms-teal-100);color:#120710}.day.selected{background-color:var(--vms-teal-500)!important;color:#fff!important}.custom-calendar-input{display:flex;align-items:center;gap:8px}.calendar-icon{position:relative;right:0;height:calc(var(--height) / 2.4);display:flex;align-items:center}.selected-text{font-size:1em;color:#111827}.floating-label{position:absolute;left:12px;top:14px;transition:.2s ease;pointer-events:none;font-size:1.1em;color:#707070}.float-active{top:-12px;font-size:.85em;color:var(--vms-teal-500)}.clear-btn{position:absolute;right:36px;cursor:pointer;font-size:16px;color:#999;transition:.15s}.clear-btn:hover{color:#333}.calendar-popup{opacity:0;transform:translateY(-6px);transition:opacity .2s ease,transform .2s ease;pointer-events:none}.calendar-popup.open{opacity:1;transform:translateY(0);pointer-events:auto}.custom-calendar-input{padding-top:12px;position:relative;display:flex;align-items:center;gap:8px}.selected-text{color:#111827}.calendar-icon{display:flex;align-items:center;height:calc(var(--height) / 2.4)}.month-title .clickable{cursor:pointer;padding:0 4px;font-weight:600}.month-title .clickable:hover{color:var(--vms-teal-800)}.months-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.5em;padding:.75em}.month-cell{padding:.5em;text-align:center;border-radius:6px;cursor:pointer;background:#f7f7f7;transition:.2s ease}.month-cell:hover{color:var(--vms-teal-100);color:#111827}.years-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:10px;max-height:250px;overflow-y:auto}.year-cell{padding:.5em;text-align:center;border-radius:6px;cursor:pointer;background:#f7f7f7;transition:.2s ease}.year-cell:hover{background:var(--vms-teal-100);color:#111827}.selected-month,.selected-year{background-color:var(--vms-teal-500)!important;color:#fff!important}\n"], dependencies: [{ kind: "ngmodule", type: FormsModule }, { kind: "directive", type: ClickOutsideDirective, selector: "[clickOutside]", inputs: ["clickOutside"], outputs: ["clickOutsideEmitter"] }, { kind: "ngmodule", type: CommonModule }, { kind: "directive", type: i1$2.NgIf, selector: "[ngIf]", inputs: ["ngIf", "ngIfThen", "ngIfElse"] }, { kind: "directive", type: i1$2.NgStyle, selector: "[ngStyle]", inputs: ["ngStyle"] }] });
+    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "17.0.0", version: "19.2.17", type: CustomCalendarComponent, isStandalone: true, selector: "custom-calendar", inputs: { label: "label", placeholder: "placeholder", labelClass: "labelClass", calendarPopUpClass: "calendarPopUpClass", calendarInputClass: "calendarInputClass", calendarContainerClass: "calendarContainerClass", minDate: "minDate", maxDate: "maxDate", height: "height", value: "value", rangeMode: "rangeMode", showCalendar: "showCalendar", startDate: "startDate", endDate: "endDate" }, outputs: { valueChange: "valueChange", rangeChange: "rangeChange" }, ngImport: i0, template: "<div [class]=\"'custom-calendar-container ' + calendarContainerClass\">\n  <label\n    [class]=\"\n      'custom-label floating-label ' +\n      (isFocused || value || startDate ? 'float-active ' : '') +\n      labelClass\n    \"\n  >\n    {{ label }}\n  </label>\n  @if (showCalendar && !rangeMode) {\n    <div\n      [class]=\"'custom-calendar-input ' + calendarInputClass\"\n      (click)=\"toggleCalendar()\"\n      (focusin)=\"isFocused = true\"\n      (focusout)=\"isFocused = false\"\n      [ngStyle]=\"{ '--height': height }\"\n    >\n      <span class=\"calendar-icon\">\n        <svg\n          width=\"inherit\"\n          height=\"24\"\n          viewBox=\"0 0 24 24\"\n          fill=\"none\"\n          xmlns=\"http://www.w3.org/2000/svg\"\n        >\n          <path\n            d=\"M8 2V5\"\n            stroke=\"#999\"\n            stroke-width=\"1.5\"\n            stroke-linecap=\"round\"\n          />\n          <path\n            d=\"M16 2V5\"\n            stroke=\"#999\"\n            stroke-width=\"1.5\"\n            stroke-linecap=\"round\"\n          />\n          <path\n            d=\"M3.5 9.1H20.5\"\n            stroke=\"#999\"\n            stroke-width=\"1.5\"\n            stroke-linecap=\"round\"\n          />\n          <path\n            d=\"M21 8.5V17C21 20 19.5 22 16 22H8C4.5 22 3 20 3 17V8.5C3 5.5 4.5 3.5 8 3.5H16C19.5 3.5 21 5.5 21 8.5Z\"\n            stroke=\"#999\"\n            stroke-width=\"1.5\"\n            stroke-linecap=\"round\"\n          />\n        </svg>\n      </span>\n\n      <span class=\"placeholder\" *ngIf=\"!value && !startDate\">{{\n        placeholder\n      }}</span>\n\n      <span class=\"selected-text\" *ngIf=\"value || startDate\">\n        {{ formatDisplayDate() }}\n      </span>\n\n      <span\n        class=\"clear-btn\"\n        *ngIf=\"value || startDate\"\n        (click)=\"clearSelection($event)\"\n      >\n        \u2715\n      </span>\n    </div>\n  }\n\n  @if (showCalendar) {\n    <div\n      [class]=\"'calendar-popup open ' + calendarPopUpClass\"\n      #calendarPopup\n      [clickOutside]=\"calendarPopup\"\n      (clickOutsideEmitter)=\"rangeMode ? (showCalendar = false) : null\"\n    >\n      <div class=\"calendar-header\">\n        <button\n          type=\"button\"\n          class=\"nav-button\"\n          (click)=\"prevMonth($event)\"\n          *ngIf=\"viewMode === 'days'\"\n        >\n          \u2039\n        </button>\n\n        <div class=\"month-title\">\n          <span class=\"clickable\" (click)=\"openMonthPicker($event)\">\n            {{ getMonthName() }}\n          </span>\n\n          <span class=\"clickable\" (click)=\"openYearPicker($event)\">\n            {{ getYear() }}\n          </span>\n        </div>\n\n        <button\n          type=\"button\"\n          class=\"nav-button\"\n          (click)=\"nextMonth($event)\"\n          *ngIf=\"viewMode === 'days'\"\n        >\n          \u203A\n        </button>\n      </div>\n\n      @if (viewMode === \"days\") {\n        <div>\n          <div class=\"weekdays\">\n            @for (weekday of weekdays; track weekday) {\n              <div class=\"weekday\">{{ weekday }}</div>\n            }\n          </div>\n\n          <div class=\"days-grid\">\n            @for (day of days; track day) {\n              <div\n                class=\"day\"\n                [class.current-month]=\"isCurrentMonth(day)\"\n                [class.selected]=\"isSelected(day)\"\n                [class.in-range]=\"isInRange(day)\"\n                [class.disabled]=\"isDisabled(day)\"\n                (click)=\"\n                  $event.stopPropagation(); !isDisabled(day) && selectDate(day)\n                \"\n              >\n                {{ day.getDate() }}\n              </div>\n            }\n          </div>\n        </div>\n      }\n\n      @if (viewMode === \"months\") {\n        <div class=\"months-grid\">\n          @for (m of months; let i = $index; track m) {\n            <div\n              class=\"month-cell\"\n              [class.selected-month]=\"isSelectedMonth(i)\"\n              (click)=\"selectMonth(i, $event)\"\n            >\n              {{ m | localize: \"month\" : translationService.currentLang() }}\n            </div>\n          }\n        </div>\n      }\n\n      @if (viewMode === \"years\") {\n        <div class=\"years-grid\">\n          @for (y of years; track y) {\n            <div\n              class=\"year-cell\"\n              [class.selected-year]=\"isSelectedYear(y)\"\n              (click)=\"selectYear(y, $event)\"\n            >\n              {{ y }}\n            </div>\n          }\n        </div>\n      }\n    </div>\n  }\n</div>\n", styles: [".custom-calendar-container{position:relative;width:100%}.custom-label{display:block;font-size:1.6em;font-weight:500;color:#707070;margin-bottom:.3em}.custom-calendar-input{position:relative;height:var(--height);width:100%;border:1px solid #82828233;border-radius:6px;padding:0 .75em;display:flex;align-items:center;cursor:pointer;background-color:#fff}.placeholder{color:#82828250;font-size:.95em}.calendar-icon{position:absolute;right:12px;height:calc(var(--height) / 2.4)}.fullWidth{width:100%}.calendar-popup{max-height:300px;overflow-y:auto;background-color:#fff;border:1px solid #82828233;border-radius:.375em;margin-top:4px;padding:1rem;z-index:1000;box-shadow:0 4px 6px #0000001a}.calendar-header{display:flex;justify-content:space-between;align-items:center}.month-title{font-weight:600}.nav-button{background:none;border:none;font-size:16px;cursor:pointer;padding:4px 8px}.weekdays{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;font-weight:500;font-size:.75em;margin-bottom:.5em}.days-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:.25em}.day{height:2em;display:flex;align-items:center;justify-content:center;border-radius:.5em;cursor:pointer;font-size:.875em}.day.current-month{color:#111827}.day:not(.current-month){color:#9ca3af}.day.disabled{color:#d1d5db;cursor:not-allowed;text-decoration:line-through}.day:not(.disabled):not(.selected):hover{background-color:#f3f4f6}.day.in-range{background-color:var(--vms-teal-100);color:#120710}.day.selected{background-color:var(--vms-teal-500)!important;color:#fff!important}.custom-calendar-input{display:flex;align-items:center;gap:8px}.calendar-icon{position:relative;right:0;height:calc(var(--height) / 2.4);display:flex;align-items:center}.selected-text{font-size:1em;color:#111827}.floating-label{position:absolute;left:12px;top:14px;transition:.2s ease;pointer-events:none;font-size:1.1em;color:#707070}.float-active{top:-12px;font-size:.85em;color:var(--vms-teal-500)}.clear-btn{position:absolute;right:36px;cursor:pointer;font-size:16px;color:#999;transition:.15s}.clear-btn:hover{color:#333}.calendar-popup{opacity:0;transform:translateY(-6px);transition:opacity .2s ease,transform .2s ease;pointer-events:none}.calendar-popup.open{opacity:1;transform:translateY(0);pointer-events:auto}.custom-calendar-input{padding-top:12px;position:relative;display:flex;align-items:center;gap:8px}.selected-text{color:#111827}.calendar-icon{display:flex;align-items:center;height:calc(var(--height) / 2.4)}.month-title .clickable{cursor:pointer;padding:0 4px;font-weight:600}.month-title .clickable:hover{color:var(--vms-teal-800)}.months-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.5em;padding:.75em}.month-cell{padding:.5em;text-align:center;border-radius:6px;cursor:pointer;background:#f7f7f7;transition:.2s ease}.month-cell:hover{color:var(--vms-teal-100);color:#111827}.years-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:10px;max-height:250px;overflow-y:auto}.year-cell{padding:.5em;text-align:center;border-radius:6px;cursor:pointer;background:#f7f7f7;transition:.2s ease}.year-cell:hover{background:var(--vms-teal-100);color:#111827}.selected-month,.selected-year{background-color:var(--vms-teal-500)!important;color:#fff!important}\n"], dependencies: [{ kind: "ngmodule", type: FormsModule }, { kind: "directive", type: ClickOutsideDirective, selector: "[clickOutside]", inputs: ["clickOutside"], outputs: ["clickOutsideEmitter"] }, { kind: "ngmodule", type: CommonModule }, { kind: "directive", type: i1$2.NgIf, selector: "[ngIf]", inputs: ["ngIf", "ngIfThen", "ngIfElse"] }, { kind: "directive", type: i1$2.NgStyle, selector: "[ngStyle]", inputs: ["ngStyle"] }, { kind: "pipe", type: LocalizePipe, name: "localize" }] });
 }
 i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.17", ngImport: i0, type: CustomCalendarComponent, decorators: [{
             type: Component,
-            args: [{ selector: 'custom-calendar', standalone: true, imports: [FormsModule, ClickOutsideDirective, CommonModule], template: "<div [class]=\"'custom-calendar-container ' + calendarContainerClass\">\n\n  <label [class]=\"\n      'custom-label floating-label ' +\n      (isFocused || value || startDate ? 'float-active ' : '') +\n      labelClass\n    \">\n    {{ label }}\n  </label>\n  @if(showCalendar && !rangeMode){\n  <div [class]=\"'custom-calendar-input ' + calendarInputClass\" (click)=\"toggleCalendar()\" (focusin)=\"isFocused = true\"\n    (focusout)=\"isFocused = false\" [ngStyle]=\"{ '--height': height }\">\n    <span class=\"calendar-icon\">\n      <svg width=\"inherit\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n        <path d=\"M8 2V5\" stroke=\"#999\" stroke-width=\"1.5\" stroke-linecap=\"round\" />\n        <path d=\"M16 2V5\" stroke=\"#999\" stroke-width=\"1.5\" stroke-linecap=\"round\" />\n        <path d=\"M3.5 9.1H20.5\" stroke=\"#999\" stroke-width=\"1.5\" stroke-linecap=\"round\" />\n        <path d=\"M21 8.5V17C21 20 19.5 22 16 22H8C4.5 22 3 20 3 17V8.5C3 5.5 4.5 3.5 8 3.5H16C19.5 3.5 21 5.5 21 8.5Z\"\n          stroke=\"#999\" stroke-width=\"1.5\" stroke-linecap=\"round\" />\n      </svg>\n    </span>\n\n    <span class=\"placeholder\" *ngIf=\"!value && !startDate\">{{ placeholder }}</span>\n\n    <span class=\"selected-text\" *ngIf=\"value || startDate\">\n      {{ formatDisplayDate() }}\n    </span>\n\n    <span class=\"clear-btn\" *ngIf=\"value || startDate\" (click)=\"clearSelection($event)\">\n      \u2715\n    </span>\n  </div>\n  }\n\n  @if(showCalendar) {\n\n  <div [class]=\"'calendar-popup open ' + calendarPopUpClass\" #calendarPopup [clickOutside]=\"calendarPopup\"\n    (clickOutsideEmitter)=\"rangeMode ? showCalendar = false : null\">\n\n    <div class=\"calendar-header\">\n      <button type=\"button\" class=\"nav-button\" (click)=\"prevMonth($event)\" *ngIf=\"viewMode === 'days'\">\n        \u2039\n      </button>\n\n      <div class=\"month-title\">\n        <span class=\"clickable\" (click)=\"openMonthPicker($event)\">\n          {{ getMonthName() }}\n        </span>\n\n        <span class=\"clickable\" (click)=\"openYearPicker($event)\">\n          {{ getYear() }}\n        </span>\n      </div>\n\n      <button type=\"button\" class=\"nav-button\" (click)=\"nextMonth($event)\" *ngIf=\"viewMode === 'days'\">\n        \u203A\n      </button>\n    </div>\n\n    @if(viewMode === 'days') {\n    <div>\n      <div class=\"weekdays\">\n        @for(weekday of weekdays; track weekday) {\n        <div class=\"weekday\">{{ weekday }}</div>\n        }\n      </div>\n\n      <div class=\"days-grid\">\n        @for(day of days; track day) {\n        <div class=\"day\" [class.current-month]=\"isCurrentMonth(day)\" [class.selected]=\"isSelected(day)\"\n          [class.in-range]=\"isInRange(day)\" [class.disabled]=\"isDisabled(day)\"\n          (click)=\"$event.stopPropagation(); !isDisabled(day) && selectDate(day)\">\n          {{ day.getDate() }}\n        </div>\n        }\n      </div>\n    </div>\n    }\n\n    @if(viewMode === 'months') {\n    <div class=\"months-grid\">\n      @for(m of months; let i = $index; track m) {\n      <div class=\"month-cell\" [class.selected-month]=\"isSelectedMonth(i)\" (click)=\"selectMonth(i, $event)\">\n        {{ m }}\n      </div>\n      }\n    </div>\n    }\n\n    @if(viewMode === 'years') {\n    <div class=\"years-grid\">\n      @for(y of years; track y) {\n      <div class=\"year-cell\" [class.selected-year]=\"isSelectedYear(y)\" (click)=\"selectYear(y, $event)\">\n        {{ y }}\n      </div>\n      }\n    </div>\n    }\n\n  </div>\n\n  }\n\n</div>", styles: [".custom-calendar-container{position:relative;width:100%}.custom-label{display:block;font-size:1.6em;font-weight:500;color:#707070;margin-bottom:.3em}.custom-calendar-input{position:relative;height:var(--height);width:100%;border:1px solid #82828233;border-radius:6px;padding:0 .75em;display:flex;align-items:center;cursor:pointer;background-color:#fff}.placeholder{color:#82828250;font-size:.95em}.calendar-icon{position:absolute;right:12px;height:calc(var(--height) / 2.4)}.fullWidth{width:100%}.calendar-popup{max-height:300px;overflow-y:auto;background-color:#fff;border:1px solid #82828233;border-radius:.375em;margin-top:4px;padding:1rem;z-index:1000;box-shadow:0 4px 6px #0000001a}.calendar-header{display:flex;justify-content:space-between;align-items:center}.month-title{font-weight:600}.nav-button{background:none;border:none;font-size:16px;cursor:pointer;padding:4px 8px}.weekdays{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;font-weight:500;font-size:.75em;margin-bottom:.5em}.days-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:.25em}.day{height:2em;display:flex;align-items:center;justify-content:center;border-radius:.5em;cursor:pointer;font-size:.875em}.day.current-month{color:#111827}.day:not(.current-month){color:#9ca3af}.day.disabled{color:#d1d5db;cursor:not-allowed;text-decoration:line-through}.day:not(.disabled):not(.selected):hover{background-color:#f3f4f6}.day.in-range{background-color:var(--vms-teal-100);color:#120710}.day.selected{background-color:var(--vms-teal-500)!important;color:#fff!important}.custom-calendar-input{display:flex;align-items:center;gap:8px}.calendar-icon{position:relative;right:0;height:calc(var(--height) / 2.4);display:flex;align-items:center}.selected-text{font-size:1em;color:#111827}.floating-label{position:absolute;left:12px;top:14px;transition:.2s ease;pointer-events:none;font-size:1.1em;color:#707070}.float-active{top:-12px;font-size:.85em;color:var(--vms-teal-500)}.clear-btn{position:absolute;right:36px;cursor:pointer;font-size:16px;color:#999;transition:.15s}.clear-btn:hover{color:#333}.calendar-popup{opacity:0;transform:translateY(-6px);transition:opacity .2s ease,transform .2s ease;pointer-events:none}.calendar-popup.open{opacity:1;transform:translateY(0);pointer-events:auto}.custom-calendar-input{padding-top:12px;position:relative;display:flex;align-items:center;gap:8px}.selected-text{color:#111827}.calendar-icon{display:flex;align-items:center;height:calc(var(--height) / 2.4)}.month-title .clickable{cursor:pointer;padding:0 4px;font-weight:600}.month-title .clickable:hover{color:var(--vms-teal-800)}.months-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.5em;padding:.75em}.month-cell{padding:.5em;text-align:center;border-radius:6px;cursor:pointer;background:#f7f7f7;transition:.2s ease}.month-cell:hover{color:var(--vms-teal-100);color:#111827}.years-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:10px;max-height:250px;overflow-y:auto}.year-cell{padding:.5em;text-align:center;border-radius:6px;cursor:pointer;background:#f7f7f7;transition:.2s ease}.year-cell:hover{background:var(--vms-teal-100);color:#111827}.selected-month,.selected-year{background-color:var(--vms-teal-500)!important;color:#fff!important}\n"] }]
+            args: [{ selector: 'custom-calendar', standalone: true, imports: [FormsModule, ClickOutsideDirective, CommonModule, LocalizePipe], template: "<div [class]=\"'custom-calendar-container ' + calendarContainerClass\">\n  <label\n    [class]=\"\n      'custom-label floating-label ' +\n      (isFocused || value || startDate ? 'float-active ' : '') +\n      labelClass\n    \"\n  >\n    {{ label }}\n  </label>\n  @if (showCalendar && !rangeMode) {\n    <div\n      [class]=\"'custom-calendar-input ' + calendarInputClass\"\n      (click)=\"toggleCalendar()\"\n      (focusin)=\"isFocused = true\"\n      (focusout)=\"isFocused = false\"\n      [ngStyle]=\"{ '--height': height }\"\n    >\n      <span class=\"calendar-icon\">\n        <svg\n          width=\"inherit\"\n          height=\"24\"\n          viewBox=\"0 0 24 24\"\n          fill=\"none\"\n          xmlns=\"http://www.w3.org/2000/svg\"\n        >\n          <path\n            d=\"M8 2V5\"\n            stroke=\"#999\"\n            stroke-width=\"1.5\"\n            stroke-linecap=\"round\"\n          />\n          <path\n            d=\"M16 2V5\"\n            stroke=\"#999\"\n            stroke-width=\"1.5\"\n            stroke-linecap=\"round\"\n          />\n          <path\n            d=\"M3.5 9.1H20.5\"\n            stroke=\"#999\"\n            stroke-width=\"1.5\"\n            stroke-linecap=\"round\"\n          />\n          <path\n            d=\"M21 8.5V17C21 20 19.5 22 16 22H8C4.5 22 3 20 3 17V8.5C3 5.5 4.5 3.5 8 3.5H16C19.5 3.5 21 5.5 21 8.5Z\"\n            stroke=\"#999\"\n            stroke-width=\"1.5\"\n            stroke-linecap=\"round\"\n          />\n        </svg>\n      </span>\n\n      <span class=\"placeholder\" *ngIf=\"!value && !startDate\">{{\n        placeholder\n      }}</span>\n\n      <span class=\"selected-text\" *ngIf=\"value || startDate\">\n        {{ formatDisplayDate() }}\n      </span>\n\n      <span\n        class=\"clear-btn\"\n        *ngIf=\"value || startDate\"\n        (click)=\"clearSelection($event)\"\n      >\n        \u2715\n      </span>\n    </div>\n  }\n\n  @if (showCalendar) {\n    <div\n      [class]=\"'calendar-popup open ' + calendarPopUpClass\"\n      #calendarPopup\n      [clickOutside]=\"calendarPopup\"\n      (clickOutsideEmitter)=\"rangeMode ? (showCalendar = false) : null\"\n    >\n      <div class=\"calendar-header\">\n        <button\n          type=\"button\"\n          class=\"nav-button\"\n          (click)=\"prevMonth($event)\"\n          *ngIf=\"viewMode === 'days'\"\n        >\n          \u2039\n        </button>\n\n        <div class=\"month-title\">\n          <span class=\"clickable\" (click)=\"openMonthPicker($event)\">\n            {{ getMonthName() }}\n          </span>\n\n          <span class=\"clickable\" (click)=\"openYearPicker($event)\">\n            {{ getYear() }}\n          </span>\n        </div>\n\n        <button\n          type=\"button\"\n          class=\"nav-button\"\n          (click)=\"nextMonth($event)\"\n          *ngIf=\"viewMode === 'days'\"\n        >\n          \u203A\n        </button>\n      </div>\n\n      @if (viewMode === \"days\") {\n        <div>\n          <div class=\"weekdays\">\n            @for (weekday of weekdays; track weekday) {\n              <div class=\"weekday\">{{ weekday }}</div>\n            }\n          </div>\n\n          <div class=\"days-grid\">\n            @for (day of days; track day) {\n              <div\n                class=\"day\"\n                [class.current-month]=\"isCurrentMonth(day)\"\n                [class.selected]=\"isSelected(day)\"\n                [class.in-range]=\"isInRange(day)\"\n                [class.disabled]=\"isDisabled(day)\"\n                (click)=\"\n                  $event.stopPropagation(); !isDisabled(day) && selectDate(day)\n                \"\n              >\n                {{ day.getDate() }}\n              </div>\n            }\n          </div>\n        </div>\n      }\n\n      @if (viewMode === \"months\") {\n        <div class=\"months-grid\">\n          @for (m of months; let i = $index; track m) {\n            <div\n              class=\"month-cell\"\n              [class.selected-month]=\"isSelectedMonth(i)\"\n              (click)=\"selectMonth(i, $event)\"\n            >\n              {{ m | localize: \"month\" : translationService.currentLang() }}\n            </div>\n          }\n        </div>\n      }\n\n      @if (viewMode === \"years\") {\n        <div class=\"years-grid\">\n          @for (y of years; track y) {\n            <div\n              class=\"year-cell\"\n              [class.selected-year]=\"isSelectedYear(y)\"\n              (click)=\"selectYear(y, $event)\"\n            >\n              {{ y }}\n            </div>\n          }\n        </div>\n      }\n    </div>\n  }\n</div>\n", styles: [".custom-calendar-container{position:relative;width:100%}.custom-label{display:block;font-size:1.6em;font-weight:500;color:#707070;margin-bottom:.3em}.custom-calendar-input{position:relative;height:var(--height);width:100%;border:1px solid #82828233;border-radius:6px;padding:0 .75em;display:flex;align-items:center;cursor:pointer;background-color:#fff}.placeholder{color:#82828250;font-size:.95em}.calendar-icon{position:absolute;right:12px;height:calc(var(--height) / 2.4)}.fullWidth{width:100%}.calendar-popup{max-height:300px;overflow-y:auto;background-color:#fff;border:1px solid #82828233;border-radius:.375em;margin-top:4px;padding:1rem;z-index:1000;box-shadow:0 4px 6px #0000001a}.calendar-header{display:flex;justify-content:space-between;align-items:center}.month-title{font-weight:600}.nav-button{background:none;border:none;font-size:16px;cursor:pointer;padding:4px 8px}.weekdays{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;font-weight:500;font-size:.75em;margin-bottom:.5em}.days-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:.25em}.day{height:2em;display:flex;align-items:center;justify-content:center;border-radius:.5em;cursor:pointer;font-size:.875em}.day.current-month{color:#111827}.day:not(.current-month){color:#9ca3af}.day.disabled{color:#d1d5db;cursor:not-allowed;text-decoration:line-through}.day:not(.disabled):not(.selected):hover{background-color:#f3f4f6}.day.in-range{background-color:var(--vms-teal-100);color:#120710}.day.selected{background-color:var(--vms-teal-500)!important;color:#fff!important}.custom-calendar-input{display:flex;align-items:center;gap:8px}.calendar-icon{position:relative;right:0;height:calc(var(--height) / 2.4);display:flex;align-items:center}.selected-text{font-size:1em;color:#111827}.floating-label{position:absolute;left:12px;top:14px;transition:.2s ease;pointer-events:none;font-size:1.1em;color:#707070}.float-active{top:-12px;font-size:.85em;color:var(--vms-teal-500)}.clear-btn{position:absolute;right:36px;cursor:pointer;font-size:16px;color:#999;transition:.15s}.clear-btn:hover{color:#333}.calendar-popup{opacity:0;transform:translateY(-6px);transition:opacity .2s ease,transform .2s ease;pointer-events:none}.calendar-popup.open{opacity:1;transform:translateY(0);pointer-events:auto}.custom-calendar-input{padding-top:12px;position:relative;display:flex;align-items:center;gap:8px}.selected-text{color:#111827}.calendar-icon{display:flex;align-items:center;height:calc(var(--height) / 2.4)}.month-title .clickable{cursor:pointer;padding:0 4px;font-weight:600}.month-title .clickable:hover{color:var(--vms-teal-800)}.months-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.5em;padding:.75em}.month-cell{padding:.5em;text-align:center;border-radius:6px;cursor:pointer;background:#f7f7f7;transition:.2s ease}.month-cell:hover{color:var(--vms-teal-100);color:#111827}.years-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:10px;max-height:250px;overflow-y:auto}.year-cell{padding:.5em;text-align:center;border-radius:6px;cursor:pointer;background:#f7f7f7;transition:.2s ease}.year-cell:hover{background:var(--vms-teal-100);color:#111827}.selected-month,.selected-year{background-color:var(--vms-teal-500)!important;color:#fff!important}\n"] }]
         }], ctorParameters: () => [], propDecorators: { label: [{
                 type: Input
             }], placeholder: [{
@@ -1705,133 +1850,6 @@ i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.17", ngImpo
             }], valueChange: [{
                 type: Output
             }] } });
-
-// activity-time.util.ts
-const SECOND = 1_000;
-const MINUTE = 60 * SECOND;
-const HOUR = 60 * MINUTE;
-const DAY = 24 * HOUR;
-const MONTH = 30 * DAY;
-// hardcoded tiny dict – fast and reliable
-const ACTIVITY_DICT = {
-    en: {
-        ACTIVE_NOW: 'now',
-        SEC_AGO: (n) => `${n} sec ago`,
-        MIN_AGO: (n) => `${n} min ago`,
-        HR_AGO: (n) => `${n} hr ago`,
-        DAY_AGO: (n) => `${n} day ago`,
-    },
-    ar: {
-        ACTIVE_NOW: ' الآن',
-        SEC_AGO: (n) => `منذ ${n} ثانية`,
-        MIN_AGO: (n) => `منذ ${n} دقيقة`,
-        HR_AGO: (n) => `منذ ${n} ساعة`,
-        DAY_AGO: (n) => `منذ ${n} يوم`,
-    }
-};
-function pickLang(lang) {
-    return lang && lang.startsWith('ar') ? 'ar' : 'en';
-}
-function toDate(input) {
-    if (!input)
-        return null;
-    if (input instanceof Date)
-        return isNaN(input.getTime()) ? null : input;
-    const d = new Date(input);
-    return isNaN(d.getTime())
-        ? null
-        : new Date(d.getTime() - d.getTimezoneOffset() * 60000);
-}
-// keep your old formatting: "Oct. 18, 2024"
-function formatAbsolute(date, locale = 'en') {
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = new Intl.DateTimeFormat(locale, { month: 'short' }).format(date);
-    const formattedMonth = month.endsWith('.') ? month : month + '.';
-    const year = date.getFullYear();
-    return `${formattedMonth} ${day}, ${year}`;
-}
-/**
- * show "ago" for < 1 month, otherwise absolute
- */
-function formatActivityTime(input, lang, opts) {
-    const date = toDate(input);
-    if (!date)
-        return '-';
-    const now = opts?.now ?? new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const activeNowMs = (opts?.activeNowSeconds ?? 0) * SECOND;
-    const picked = pickLang(lang);
-    const dict = ACTIVITY_DICT[picked];
-    // future → absolute
-    if (diffMs < 0)
-        return formatAbsolute(date, opts?.locale ?? picked);
-    //  Just now / Active now
-    if (diffMs <= activeNowMs)
-        return dict.ACTIVE_NOW;
-    // < 1 minute (Seconds ago)
-    if (diffMs < MINUTE) {
-        const secs = Math.floor(diffMs / SECOND);
-        return dict.SEC_AGO(secs);
-    }
-    // < 1 hour
-    if (diffMs < HOUR) {
-        const mins = Math.floor(diffMs / MINUTE);
-        return dict.MIN_AGO(mins);
-    }
-    // < 1 day
-    if (diffMs < DAY) {
-        const hrs = Math.floor(diffMs / HOUR);
-        return dict.HR_AGO(hrs);
-    }
-    // < 1 month
-    if (diffMs < MONTH) {
-        const days = Math.floor(diffMs / DAY);
-        return dict.DAY_AGO(days);
-    }
-    // ≥ 1 month → absolute
-    return formatAbsolute(date, opts?.locale ?? picked);
-}
-
-class ActivityTimePipe {
-    translate;
-    constructor(translate) {
-        this.translate = translate;
-    }
-    transform(value, lang = this.translate.currentLang) {
-        // now this will ALWAYS return the right text for the lang
-        return formatActivityTime(value, lang, { locale: lang });
-    }
-    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.17", ngImport: i0, type: ActivityTimePipe, deps: [{ token: i1$1.TranslateService }], target: i0.ɵɵFactoryTarget.Pipe });
-    static ɵpipe = i0.ɵɵngDeclarePipe({ minVersion: "14.0.0", version: "19.2.17", ngImport: i0, type: ActivityTimePipe, isStandalone: true, name: "activityTime" });
-}
-i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.17", ngImport: i0, type: ActivityTimePipe, decorators: [{
-            type: Pipe,
-            args: [{
-                    name: 'activityTime',
-                    standalone: true
-                }]
-        }], ctorParameters: () => [{ type: i1$1.TranslateService }] });
-
-class LocalizePipe {
-    translate;
-    constructor(translate) {
-        this.translate = translate;
-    }
-    transform(value, field, lang) {
-        if (!value)
-            return '';
-        const suffix = lang.charAt(0).toUpperCase() + lang.slice(1);
-        return value[`${field}${suffix}`] || '';
-    }
-    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.17", ngImport: i0, type: LocalizePipe, deps: [{ token: i1$1.TranslateService }], target: i0.ɵɵFactoryTarget.Pipe });
-    static ɵpipe = i0.ɵɵngDeclarePipe({ minVersion: "14.0.0", version: "19.2.17", ngImport: i0, type: LocalizePipe, isStandalone: true, name: "localize" });
-}
-i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.17", ngImport: i0, type: LocalizePipe, decorators: [{
-            type: Pipe,
-            args: [{
-                    name: 'localize',
-                }]
-        }], ctorParameters: () => [{ type: i1$1.TranslateService }] });
 
 class CustomDropdownComponent {
     label;

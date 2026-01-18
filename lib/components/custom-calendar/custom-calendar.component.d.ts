@@ -1,4 +1,5 @@
 import { EventEmitter } from '@angular/core';
+import { TranslationService } from '../../services';
 import * as i0 from "@angular/core";
 export type CalendarValue = Date | null;
 export interface CalendarRange {
@@ -27,7 +28,11 @@ export declare class CustomCalendarComponent {
     currentMonth: Date;
     days: Date[];
     weekdays: string[];
-    months: string[];
+    translationService: TranslationService;
+    months: {
+        monthEn: string;
+        monthAr: string;
+    }[];
     years: number[];
     constructor();
     toggleCalendar(): void;
