@@ -1,7 +1,7 @@
 import { EventEmitter } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { IComponentFormError } from '../../interfaces';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslationService } from '../../services';
 import * as i0 from "@angular/core";
 export declare class CustomCalenderOpenFormComponent {
     private translationService;
@@ -35,7 +35,7 @@ export declare class CustomCalenderOpenFormComponent {
     years: number[];
     selectedMonth: number | null;
     selectedYear: number | null;
-    constructor(translationService: TranslateService);
+    constructor(translationService: TranslationService);
     ngOnInit(): void;
     private initializeMonthsAndYears;
     private updateMonthLabels;
