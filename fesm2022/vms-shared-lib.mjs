@@ -5621,11 +5621,9 @@ class CustomPillTabsComponent {
     ngOnInit() {
         if (!this.selectedTab)
             this.selectedTab = this.tabsList[0];
-        this.updatePillPosition();
     }
     ngAfterViewInit() {
         this.updatePillPosition();
-        // Listen for dir attribute changes on <html>
         this.dirObserver = new MutationObserver(() => {
             this.updatePillPosition();
         });
@@ -5651,7 +5649,6 @@ class CustomPillTabsComponent {
             const button = buttons[selectedIndex];
             const containerRect = this.tabContainer.nativeElement.getBoundingClientRect();
             const buttonRect = button.getBoundingClientRect();
-            // Calculate the translate distance and pill width
             const translateX = buttonRect.left - containerRect.left - 0.4;
             const pillWidth = buttonRect.width;
             const container = this.tabContainer.nativeElement;
