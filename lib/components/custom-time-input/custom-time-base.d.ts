@@ -1,0 +1,30 @@
+import { ElementRef, AfterViewInit } from '@angular/core';
+import * as i0 from "@angular/core";
+export declare abstract class CustomTimeBaseComponent implements AfterViewInit {
+    hourScrollRef: ElementRef<HTMLDivElement>;
+    minuteScrollRef: ElementRef<HTMLDivElement>;
+    periodScrollRef: ElementRef<HTMLDivElement>;
+    hours: number[];
+    minutes: number[];
+    periods: string[];
+    selectedHour?: number;
+    selectedMinute?: number;
+    selectedPeriod: 'AM' | 'PM';
+    rangeMin: string;
+    rangeMax: string;
+    protected itemHeight: number;
+    ngAfterViewInit(): void;
+    get filteredHours(): number[];
+    protected getFilteredHoursList(): number[];
+    get filteredMinutes(): number[];
+    protected scrollToSelectedValues(): void;
+    protected to24Hour(hour: number, period: 'AM' | 'PM'): number;
+    getItemOpacity(index: number, scrollElement: ElementRef<HTMLDivElement> | undefined): number;
+    getItemFontWeight(index: number, scrollElement: ElementRef<HTMLDivElement> | undefined): string;
+    onHourScroll(): void;
+    onMinuteScroll(): void;
+    onPeriodScroll(): void;
+    protected setTimeFromString(timeStr: string): void;
+    static ɵfac: i0.ɵɵFactoryDeclaration<CustomTimeBaseComponent, never>;
+    static ɵdir: i0.ɵɵDirectiveDeclaration<CustomTimeBaseComponent, never, never, {}, {}, never, never, true, never>;
+}

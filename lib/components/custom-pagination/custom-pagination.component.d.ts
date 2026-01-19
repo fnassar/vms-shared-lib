@@ -1,5 +1,6 @@
 import { EventEmitter } from '@angular/core';
 import { IPageChangeEvent } from '../../interfaces';
+import { LoadingService, TranslationService } from '../../services';
 import * as i0 from "@angular/core";
 export declare class CustomPaginationComponent {
     maxVisiblePages: number;
@@ -15,6 +16,8 @@ export declare class CustomPaginationComponent {
     pageSizeOptions: import("@angular/core").Signal<number[]>;
     totalPageCount: import("@angular/core").Signal<number>;
     totalPages: import("@angular/core").Signal<number[]>;
+    translationService: TranslationService;
+    loadingService: LoadingService;
     prevPage(): void;
     nextPage(): void;
     changePage(index: number): void;

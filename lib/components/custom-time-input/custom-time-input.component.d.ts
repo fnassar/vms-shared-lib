@@ -1,6 +1,7 @@
-import { ElementRef, EventEmitter, AfterViewInit, OnDestroy, OnInit } from '@angular/core';
+import { EventEmitter, OnInit } from '@angular/core';
+import { CustomTimeBaseComponent } from './custom-time-base';
 import * as i0 from "@angular/core";
-export declare class CustomTimeInputComponent implements OnInit, AfterViewInit, OnDestroy {
+export declare class CustomTimeInputComponent extends CustomTimeBaseComponent implements OnInit {
     value: string | null;
     valueChange: EventEmitter<string | null>;
     label: string;
@@ -11,41 +12,16 @@ export declare class CustomTimeInputComponent implements OnInit, AfterViewInit, 
     rangeMax: string;
     required: boolean;
     defaultTime: string;
-    hourScrollRef: ElementRef<HTMLDivElement>;
-    minuteScrollRef: ElementRef<HTMLDivElement>;
-    periodScrollRef: ElementRef<HTMLDivElement>;
     private translate;
     dropdownOpen: import("@angular/core").WritableSignal<boolean>;
-    hours: number[];
-    minutes: number[];
-    periods: string[];
-    selectedHour?: number;
-    selectedMinute?: number;
-    selectedPeriod: 'AM' | 'PM';
-    private itemHeight;
     ngOnInit(): void;
     ngAfterViewInit(): void;
-    ngOnDestroy(): void;
     toggleDropdown(): void;
-    private setTimeFromString;
-    private scrollToSelectedValues;
-    onHourSelect(event: Event): void;
-    onMinuteSelect(event: Event): void;
-    onPeriodSelect(event: Event): void;
-    get filteredHours(): number[];
-    private getFilteredHoursList;
-    get filteredMinutes(): number[];
     onHourChange(): void;
     confirmTime(): void;
     displayTime(): string;
     private setFromValue;
-    private to24Hour;
     private isTimeInRange;
-    getItemOpacity(index: number, scrollElement: ElementRef<HTMLDivElement> | undefined): number;
-    getItemFontWeight(index: number, scrollElement: ElementRef<HTMLDivElement> | undefined): string;
-    onHourScroll(): void;
-    onMinuteScroll(): void;
-    onPeriodScroll(): void;
     static ɵfac: i0.ɵɵFactoryDeclaration<CustomTimeInputComponent, never>;
     static ɵcmp: i0.ɵɵComponentDeclaration<CustomTimeInputComponent, "custom-time-input", never, { "value": { "alias": "value"; "required": false; }; "label": { "alias": "label"; "required": false; }; "labelClass": { "alias": "labelClass"; "required": false; }; "inputClass": { "alias": "inputClass"; "required": false; }; "height": { "alias": "height"; "required": false; }; "rangeMin": { "alias": "rangeMin"; "required": false; }; "rangeMax": { "alias": "rangeMax"; "required": false; }; "required": { "alias": "required"; "required": false; }; "defaultTime": { "alias": "defaultTime"; "required": false; }; }, { "valueChange": "valueChange"; }, never, never, true, never>;
 }
