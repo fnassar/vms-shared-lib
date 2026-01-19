@@ -4,6 +4,7 @@ export declare abstract class CustomTimeBaseComponent implements AfterViewInit {
     hourScrollRef: ElementRef<HTMLDivElement>;
     minuteScrollRef: ElementRef<HTMLDivElement>;
     periodScrollRef: ElementRef<HTMLDivElement>;
+    timeInputRef: ElementRef<HTMLInputElement>;
     hours: number[];
     minutes: number[];
     periods: string[];
@@ -14,6 +15,7 @@ export declare abstract class CustomTimeBaseComponent implements AfterViewInit {
     rangeMax: string;
     protected itemHeight: number;
     ngAfterViewInit(): void;
+    updateItemHeight: () => void;
     get filteredHours(): number[];
     protected getFilteredHoursList(): number[];
     get filteredMinutes(): number[];
