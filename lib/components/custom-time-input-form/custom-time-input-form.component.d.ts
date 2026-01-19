@@ -1,8 +1,8 @@
-import { EventEmitter, ElementRef, AfterViewInit } from '@angular/core';
+import { EventEmitter, ElementRef, AfterViewInit, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { IComponentFormError } from '../../interfaces';
 import * as i0 from "@angular/core";
-export declare class CustomTimeInputFormComponent implements AfterViewInit {
+export declare class CustomTimeInputFormComponent implements OnInit, AfterViewInit, OnDestroy {
     parentForm: FormGroup;
     name: string;
     controlName: string;
