@@ -3027,6 +3027,8 @@ class CustomPaginationComponent {
         }
         return pages;
     });
+    translationService = inject(TranslationService);
+    loadingService = inject(LoadingService);
     prevPage() {
         if (this.page > 1) {
             // this._page.set(this.page - 1);
@@ -3112,11 +3114,11 @@ class CustomPaginationComponent {
         };
     }
     static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.17", ngImport: i0, type: CustomPaginationComponent, deps: [], target: i0.ɵɵFactoryTarget.Component });
-    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "17.0.0", version: "19.2.17", type: CustomPaginationComponent, isStandalone: true, selector: "custom-pagination", inputs: { maxVisiblePages: { classPropertyName: "maxVisiblePages", publicName: "maxVisiblePages", isSignal: false, isRequired: false, transformFunction: null }, page: { classPropertyName: "page", publicName: "page", isSignal: false, isRequired: false, transformFunction: null }, pageSize: { classPropertyName: "pageSize", publicName: "pageSize", isSignal: true, isRequired: false, transformFunction: null }, totalCount: { classPropertyName: "totalCount", publicName: "totalCount", isSignal: true, isRequired: false, transformFunction: null }, baseValue: { classPropertyName: "baseValue", publicName: "baseValue", isSignal: false, isRequired: false, transformFunction: null }, hideTotalCount: { classPropertyName: "hideTotalCount", publicName: "hideTotalCount", isSignal: true, isRequired: false, transformFunction: null }, showPageSize: { classPropertyName: "showPageSize", publicName: "showPageSize", isSignal: false, isRequired: false, transformFunction: null } }, outputs: { pageChange: "pageChange" }, ngImport: i0, template: "<div class=\"pagination\">\n  <div class=\"page-container\">\n    <div\n      class=\"page\"\n      (click)=\"prevPage()\"\n      [ngClass]=\"{\n        disabled: 1 === (page <= totalPageCount() ? page : totalPageCount())\n      }\"\n    >\n      <svg\n        width=\"20\"\n        height=\"20\"\n        viewBox=\"0 0 20 20\"\n        fill=\"none\"\n        xmlns=\"http://www.w3.org/2000/svg\"\n      >\n        <path\n          d=\"M12.3622 13.9249C12.5174 13.7687 12.6045 13.5575 12.6045 13.3374C12.6045 13.1172 12.5174 12.906 12.3622 12.7499L9.41217 9.75822L12.3622 6.80822C12.5174 6.65208 12.6045 6.44087 12.6045 6.22072C12.6045 6.00056 12.5174 5.78935 12.3622 5.63322C12.2847 5.55511 12.1925 5.49311 12.091 5.45081C11.9894 5.4085 11.8805 5.38672 11.7705 5.38672C11.6605 5.38672 11.5516 5.4085 11.45 5.45081C11.3485 5.49311 11.2563 5.55511 11.1788 5.63322L7.6455 9.16655C7.56739 9.24402 7.5054 9.33619 7.46309 9.43774C7.42078 9.53929 7.399 9.64821 7.399 9.75822C7.399 9.86823 7.42078 9.97715 7.46309 10.0787C7.5054 10.1802 7.56739 10.2724 7.6455 10.3499L11.1788 13.9249C11.2563 14.003 11.3485 14.065 11.45 14.1073C11.5516 14.1496 11.6605 14.1714 11.7705 14.1714C11.8805 14.1714 11.9894 14.1496 12.091 14.1073C12.1925 14.065 12.2847 14.003 12.3622 13.9249Z\"\n          fill=\"#1F1F1F\"\n        />\n      </svg>\n    </div>\n    <div class=\"pages\">\n      @for(item of totalPages(); track item) {\n      <div\n        (click)=\"changePage(item)\"\n        class=\"page\"\n        [ngClass]=\"{\n          active: item === (page <= totalPageCount() ? page : totalPageCount())\n        }\"\n      >\n        <span> {{ item }}</span>\n      </div>\n\n      }\n    </div>\n    <div\n      class=\"page\"\n      (click)=\"nextPage()\"\n      [ngClass]=\"{\n        disabled:\n          totalPages().length ===\n          (page <= totalPageCount() ? page : totalPageCount())\n      }\"\n    >\n      <svg\n        width=\"20\"\n        height=\"20\"\n        viewBox=\"0 0 20 20\"\n        fill=\"none\"\n        xmlns=\"http://www.w3.org/2000/svg\"\n      >\n        <path\n          d=\"M7.63784 13.9249C7.48263 13.7687 7.39551 13.5575 7.39551 13.3374C7.39551 13.1172 7.48263 12.906 7.63784 12.7499L10.5878 9.75822L7.63784 6.80822C7.48263 6.65208 7.39551 6.44087 7.39551 6.22072C7.39551 6.00056 7.48263 5.78935 7.63784 5.63322C7.7153 5.55511 7.80747 5.49311 7.90902 5.45081C8.01057 5.4085 8.11949 5.38672 8.2295 5.38672C8.33951 5.38672 8.44843 5.4085 8.54998 5.45081C8.65153 5.49311 8.7437 5.55511 8.82117 5.63322L12.3545 9.16655C12.4326 9.24402 12.4946 9.33619 12.5369 9.43774C12.5792 9.53929 12.601 9.64821 12.601 9.75822C12.601 9.86823 12.5792 9.97715 12.5369 10.0787C12.4946 10.1802 12.4326 10.2724 12.3545 10.3499L8.82117 13.9249C8.7437 14.003 8.65153 14.065 8.54998 14.1073C8.44843 14.1496 8.33951 14.1714 8.2295 14.1714C8.11949 14.1714 8.01057 14.1496 7.90902 14.1073C7.80747 14.065 7.7153 14.003 7.63784 13.9249Z\"\n          fill=\"#1F1F1F\"\n        />\n      </svg>\n    </div>\n    @if(showPageSize) {\n    <div class=\"pageSize\">\n      <select\n        class=\"pageSizeSelect\"\n        [ngModel]=\"pageSize()\"\n        (change)=\"onPageSizeChange($event)\"\n      >\n        @for(option of pageSizeOptions(); track option){\n        <option [value]=\"option\">\n          {{ option }} {{ \"GENERAL.ITEMS\" | translate }}\n        </option>\n        }\n      </select>\n    </div>\n    }\n  </div>\n  @if(!hideTotalCount()) {\n\n  <p class=\"totalCount\">\n    {{ \"GENERAL.SHOWING\" | translate }}\n    <b>{{ startItem() }}</b> {{ \"GENERAL.TO\" | translate }}\n    <b>{{ endItem() }}</b>\n    {{ \"GENERAL.OF\" | translate }}\n    <b class=\"plum\">{{ totalCount() }}</b>\n    {{ \"GENERAL.ITEMS\" | translate }}\n  </p>\n  <!-- <p class=\"totalCount\">\n    A total of {{ totalCount() }} data</p> -->\n  }\n</div>\n", styles: [".pagination{display:flex;justify-content:space-between;align-items:center;width:100%;max-height:50px;margin:5px 0;padding:0 10px 0 0}.totalCount{font-size:1.2em;color:#595959;font-weight:500}.totalCount .plum{color:var(--vms-plum-500)}.page-container{display:flex;align-items:center;gap:2.4em;max-height:50px}.pages{display:flex;align-items:center;gap:1.2em}.page{width:2.8em;height:2.8em;max-width:2.8rem;max-height:2.8rem;border-radius:.8em;border:1px solid var(--vms-gray-150);color:var(--vms-gray-900);font-weight:500;display:flex;justify-content:center;align-items:center;cursor:pointer;span{font-size:var(--vms-font-size-pm);line-height:var(--vms-line-height-pm)}}.page.active{border:0px solid #602450;background-color:var(--vms-plum-500);color:var(--vms-white)}.page.disabled{opacity:.3;cursor:auto}.pageSizeSelect{height:2em;border-radius:.57em;font-size:var(--vms-font-size-pm);line-height:var(--vms-line-height-pm);border:1px solid var(--vms-gray-150);color:var(--vms-gray-900);font-weight:500;display:flex;justify-content:center;align-items:center;cursor:pointer;padding:0 .8em}.pageSizeSelect::selection{color:var(--vms-gray-900)}.pageSizeSelect::-webkit-select-placeholder,.pageSizeSelect::-webkit-input-placeholder{color:var(--vms-gray-900)}select:focus-visible{outline:none;border:1px solid rgba(217,217,217,1)}.pageSizeSelect:focus-visible{outline:none;border:1px solid rgba(217,217,217,1)}\n"], dependencies: [{ kind: "ngmodule", type: CommonModule }, { kind: "directive", type: i1$2.NgClass, selector: "[ngClass]", inputs: ["class", "ngClass"] }, { kind: "ngmodule", type: FormsModule }, { kind: "directive", type: i1$3.NgSelectOption, selector: "option", inputs: ["ngValue", "value"] }, { kind: "directive", type: i1$3.ɵNgSelectMultipleOption, selector: "option", inputs: ["ngValue", "value"] }, { kind: "directive", type: i1$3.SelectControlValueAccessor, selector: "select:not([multiple])[formControlName],select:not([multiple])[formControl],select:not([multiple])[ngModel]", inputs: ["compareWith"] }, { kind: "directive", type: i1$3.NgControlStatus, selector: "[formControlName],[ngModel],[formControl]" }, { kind: "directive", type: i1$3.NgModel, selector: "[ngModel]:not([formControlName]):not([formControl])", inputs: ["name", "disabled", "ngModel", "ngModelOptions"], outputs: ["ngModelChange"], exportAs: ["ngModel"] }, { kind: "ngmodule", type: TranslateModule }, { kind: "pipe", type: i1$1.TranslatePipe, name: "translate" }] });
+    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "17.0.0", version: "19.2.17", type: CustomPaginationComponent, isStandalone: true, selector: "custom-pagination", inputs: { maxVisiblePages: { classPropertyName: "maxVisiblePages", publicName: "maxVisiblePages", isSignal: false, isRequired: false, transformFunction: null }, page: { classPropertyName: "page", publicName: "page", isSignal: false, isRequired: false, transformFunction: null }, pageSize: { classPropertyName: "pageSize", publicName: "pageSize", isSignal: true, isRequired: false, transformFunction: null }, totalCount: { classPropertyName: "totalCount", publicName: "totalCount", isSignal: true, isRequired: false, transformFunction: null }, baseValue: { classPropertyName: "baseValue", publicName: "baseValue", isSignal: false, isRequired: false, transformFunction: null }, hideTotalCount: { classPropertyName: "hideTotalCount", publicName: "hideTotalCount", isSignal: true, isRequired: false, transformFunction: null }, showPageSize: { classPropertyName: "showPageSize", publicName: "showPageSize", isSignal: false, isRequired: false, transformFunction: null } }, outputs: { pageChange: "pageChange" }, ngImport: i0, template: "@if(!loadingService.loading()) {\n\n\n  <div class=\"pagination\">\n    <div class=\"page-container\">\n      <div\n        class=\"page\"\n        (click)=\"prevPage()\"\n        [ngClass]=\"{\n          disabled: 1 === (page <= totalPageCount() ? page : totalPageCount())\n        }\"\n         [style.transform]=\"\n          translationService.currentLang() === 'en'\n            ? 'rotate(0deg)'\n            : 'rotate(180deg)'\n        \"\n      >\n        <svg\n          width=\"20\"\n          height=\"20\"\n          viewBox=\"0 0 20 20\"\n          fill=\"none\"\n          xmlns=\"http://www.w3.org/2000/svg\"\n        >\n          <path\n            d=\"M12.3622 13.9249C12.5174 13.7687 12.6045 13.5575 12.6045 13.3374C12.6045 13.1172 12.5174 12.906 12.3622 12.7499L9.41217 9.75822L12.3622 6.80822C12.5174 6.65208 12.6045 6.44087 12.6045 6.22072C12.6045 6.00056 12.5174 5.78935 12.3622 5.63322C12.2847 5.55511 12.1925 5.49311 12.091 5.45081C11.9894 5.4085 11.8805 5.38672 11.7705 5.38672C11.6605 5.38672 11.5516 5.4085 11.45 5.45081C11.3485 5.49311 11.2563 5.55511 11.1788 5.63322L7.6455 9.16655C7.56739 9.24402 7.5054 9.33619 7.46309 9.43774C7.42078 9.53929 7.399 9.64821 7.399 9.75822C7.399 9.86823 7.42078 9.97715 7.46309 10.0787C7.5054 10.1802 7.56739 10.2724 7.6455 10.3499L11.1788 13.9249C11.2563 14.003 11.3485 14.065 11.45 14.1073C11.5516 14.1496 11.6605 14.1714 11.7705 14.1714C11.8805 14.1714 11.9894 14.1496 12.091 14.1073C12.1925 14.065 12.2847 14.003 12.3622 13.9249Z\"\n            fill=\"#1F1F1F\"\n          />\n        </svg>\n      </div>\n      <div class=\"pages\">\n        @for(item of totalPages(); track item) {\n        <div\n          (click)=\"changePage(item)\"\n          class=\"page\"\n          [ngClass]=\"{\n            active: item === (page <= totalPageCount() ? page : totalPageCount())\n          }\"\n        >\n          <span> {{ item }}</span>\n        </div>\n\n        }\n      </div>\n      <div\n        class=\"page\"\n        (click)=\"nextPage()\"\n        [ngClass]=\"{\n          disabled:\n            totalPages().length ===\n            (page <= totalPageCount() ? page : totalPageCount())\n        }\"\n         [style.transform]=\"\n          translationService.currentLang() === 'en'\n            ? 'rotate(0deg)'\n            : 'rotate(180deg)'\n        \"\n      >\n        <svg\n          width=\"20\"\n          height=\"20\"\n          viewBox=\"0 0 20 20\"\n          fill=\"none\"\n          xmlns=\"http://www.w3.org/2000/svg\"\n        >\n          <path\n            d=\"M7.63784 13.9249C7.48263 13.7687 7.39551 13.5575 7.39551 13.3374C7.39551 13.1172 7.48263 12.906 7.63784 12.7499L10.5878 9.75822L7.63784 6.80822C7.48263 6.65208 7.39551 6.44087 7.39551 6.22072C7.39551 6.00056 7.48263 5.78935 7.63784 5.63322C7.7153 5.55511 7.80747 5.49311 7.90902 5.45081C8.01057 5.4085 8.11949 5.38672 8.2295 5.38672C8.33951 5.38672 8.44843 5.4085 8.54998 5.45081C8.65153 5.49311 8.7437 5.55511 8.82117 5.63322L12.3545 9.16655C12.4326 9.24402 12.4946 9.33619 12.5369 9.43774C12.5792 9.53929 12.601 9.64821 12.601 9.75822C12.601 9.86823 12.5792 9.97715 12.5369 10.0787C12.4946 10.1802 12.4326 10.2724 12.3545 10.3499L8.82117 13.9249C8.7437 14.003 8.65153 14.065 8.54998 14.1073C8.44843 14.1496 8.33951 14.1714 8.2295 14.1714C8.11949 14.1714 8.01057 14.1496 7.90902 14.1073C7.80747 14.065 7.7153 14.003 7.63784 13.9249Z\"\n            fill=\"#1F1F1F\"\n          />\n        </svg>\n      </div>\n      @if(showPageSize) {\n      <div class=\"pageSize\">\n        <select\n          class=\"pageSizeSelect\"\n          [ngModel]=\"pageSize()\"\n          (change)=\"onPageSizeChange($event)\"\n        >\n          @for(option of pageSizeOptions(); track option){\n          <option [value]=\"option\">\n            {{ option }} {{ \"GENERAL.ITEMS\" | translate }}\n          </option>\n          }\n        </select>\n      </div>\n      }\n    </div>\n    @if(!hideTotalCount()) {\n\n    <p class=\"totalCount\">\n      {{ \"GENERAL.SHOWING\" | translate }}\n      <b>{{ startItem() }}</b> {{ \"GENERAL.TO\" | translate }}\n      <b>{{ endItem() }}</b>\n      {{ \"GENERAL.OF\" | translate }}\n      <b class=\"plum\">{{ totalCount() }}</b>\n      {{ \"GENERAL.ITEMS\" | translate }}\n    </p>\n    <!-- <p class=\"totalCount\">\n      A total of {{ totalCount() }} data</p> -->\n    }\n  </div>\n}\n", styles: [".pagination{display:flex;justify-content:space-between;align-items:center;width:100%;max-height:50px;margin:5px 0;padding:0 10px 0 0}.totalCount{font-size:1.2em;color:#595959;font-weight:500}.totalCount .plum{color:var(--vms-plum-500)}.page-container{display:flex;align-items:center;gap:2.4em;max-height:50px}.pages{display:flex;align-items:center;gap:1.2em}.page{width:2.8em;height:2.8em;max-width:2.8rem;max-height:2.8rem;border-radius:.8em;border:1px solid var(--vms-gray-150);color:var(--vms-gray-900);font-weight:500;display:flex;justify-content:center;align-items:center;cursor:pointer;span{font-size:var(--vms-font-size-pm);line-height:var(--vms-line-height-pm)}}.page.active{border:0px solid #602450;background-color:var(--vms-plum-500);color:var(--vms-white)}.page.disabled{opacity:.3;cursor:auto}.pageSizeSelect{height:2em;border-radius:.57em;font-size:var(--vms-font-size-pm);line-height:var(--vms-line-height-pm);border:1px solid var(--vms-gray-150);color:var(--vms-gray-900);font-weight:500;display:flex;justify-content:center;align-items:center;cursor:pointer;padding:0 .8em}.pageSizeSelect::selection{color:var(--vms-gray-900)}.pageSizeSelect::-webkit-select-placeholder,.pageSizeSelect::-webkit-input-placeholder{color:var(--vms-gray-900)}select:focus-visible{outline:none;border:1px solid rgba(217,217,217,1)}.pageSizeSelect:focus-visible{outline:none;border:1px solid rgba(217,217,217,1)}\n"], dependencies: [{ kind: "ngmodule", type: CommonModule }, { kind: "directive", type: i1$2.NgClass, selector: "[ngClass]", inputs: ["class", "ngClass"] }, { kind: "ngmodule", type: FormsModule }, { kind: "directive", type: i1$3.NgSelectOption, selector: "option", inputs: ["ngValue", "value"] }, { kind: "directive", type: i1$3.ɵNgSelectMultipleOption, selector: "option", inputs: ["ngValue", "value"] }, { kind: "directive", type: i1$3.SelectControlValueAccessor, selector: "select:not([multiple])[formControlName],select:not([multiple])[formControl],select:not([multiple])[ngModel]", inputs: ["compareWith"] }, { kind: "directive", type: i1$3.NgControlStatus, selector: "[formControlName],[ngModel],[formControl]" }, { kind: "directive", type: i1$3.NgModel, selector: "[ngModel]:not([formControlName]):not([formControl])", inputs: ["name", "disabled", "ngModel", "ngModelOptions"], outputs: ["ngModelChange"], exportAs: ["ngModel"] }, { kind: "ngmodule", type: TranslateModule }, { kind: "pipe", type: i1$1.TranslatePipe, name: "translate" }] });
 }
 i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.17", ngImport: i0, type: CustomPaginationComponent, decorators: [{
             type: Component,
-            args: [{ selector: 'custom-pagination', standalone: true, imports: [CommonModule, FormsModule, TranslateModule], template: "<div class=\"pagination\">\n  <div class=\"page-container\">\n    <div\n      class=\"page\"\n      (click)=\"prevPage()\"\n      [ngClass]=\"{\n        disabled: 1 === (page <= totalPageCount() ? page : totalPageCount())\n      }\"\n    >\n      <svg\n        width=\"20\"\n        height=\"20\"\n        viewBox=\"0 0 20 20\"\n        fill=\"none\"\n        xmlns=\"http://www.w3.org/2000/svg\"\n      >\n        <path\n          d=\"M12.3622 13.9249C12.5174 13.7687 12.6045 13.5575 12.6045 13.3374C12.6045 13.1172 12.5174 12.906 12.3622 12.7499L9.41217 9.75822L12.3622 6.80822C12.5174 6.65208 12.6045 6.44087 12.6045 6.22072C12.6045 6.00056 12.5174 5.78935 12.3622 5.63322C12.2847 5.55511 12.1925 5.49311 12.091 5.45081C11.9894 5.4085 11.8805 5.38672 11.7705 5.38672C11.6605 5.38672 11.5516 5.4085 11.45 5.45081C11.3485 5.49311 11.2563 5.55511 11.1788 5.63322L7.6455 9.16655C7.56739 9.24402 7.5054 9.33619 7.46309 9.43774C7.42078 9.53929 7.399 9.64821 7.399 9.75822C7.399 9.86823 7.42078 9.97715 7.46309 10.0787C7.5054 10.1802 7.56739 10.2724 7.6455 10.3499L11.1788 13.9249C11.2563 14.003 11.3485 14.065 11.45 14.1073C11.5516 14.1496 11.6605 14.1714 11.7705 14.1714C11.8805 14.1714 11.9894 14.1496 12.091 14.1073C12.1925 14.065 12.2847 14.003 12.3622 13.9249Z\"\n          fill=\"#1F1F1F\"\n        />\n      </svg>\n    </div>\n    <div class=\"pages\">\n      @for(item of totalPages(); track item) {\n      <div\n        (click)=\"changePage(item)\"\n        class=\"page\"\n        [ngClass]=\"{\n          active: item === (page <= totalPageCount() ? page : totalPageCount())\n        }\"\n      >\n        <span> {{ item }}</span>\n      </div>\n\n      }\n    </div>\n    <div\n      class=\"page\"\n      (click)=\"nextPage()\"\n      [ngClass]=\"{\n        disabled:\n          totalPages().length ===\n          (page <= totalPageCount() ? page : totalPageCount())\n      }\"\n    >\n      <svg\n        width=\"20\"\n        height=\"20\"\n        viewBox=\"0 0 20 20\"\n        fill=\"none\"\n        xmlns=\"http://www.w3.org/2000/svg\"\n      >\n        <path\n          d=\"M7.63784 13.9249C7.48263 13.7687 7.39551 13.5575 7.39551 13.3374C7.39551 13.1172 7.48263 12.906 7.63784 12.7499L10.5878 9.75822L7.63784 6.80822C7.48263 6.65208 7.39551 6.44087 7.39551 6.22072C7.39551 6.00056 7.48263 5.78935 7.63784 5.63322C7.7153 5.55511 7.80747 5.49311 7.90902 5.45081C8.01057 5.4085 8.11949 5.38672 8.2295 5.38672C8.33951 5.38672 8.44843 5.4085 8.54998 5.45081C8.65153 5.49311 8.7437 5.55511 8.82117 5.63322L12.3545 9.16655C12.4326 9.24402 12.4946 9.33619 12.5369 9.43774C12.5792 9.53929 12.601 9.64821 12.601 9.75822C12.601 9.86823 12.5792 9.97715 12.5369 10.0787C12.4946 10.1802 12.4326 10.2724 12.3545 10.3499L8.82117 13.9249C8.7437 14.003 8.65153 14.065 8.54998 14.1073C8.44843 14.1496 8.33951 14.1714 8.2295 14.1714C8.11949 14.1714 8.01057 14.1496 7.90902 14.1073C7.80747 14.065 7.7153 14.003 7.63784 13.9249Z\"\n          fill=\"#1F1F1F\"\n        />\n      </svg>\n    </div>\n    @if(showPageSize) {\n    <div class=\"pageSize\">\n      <select\n        class=\"pageSizeSelect\"\n        [ngModel]=\"pageSize()\"\n        (change)=\"onPageSizeChange($event)\"\n      >\n        @for(option of pageSizeOptions(); track option){\n        <option [value]=\"option\">\n          {{ option }} {{ \"GENERAL.ITEMS\" | translate }}\n        </option>\n        }\n      </select>\n    </div>\n    }\n  </div>\n  @if(!hideTotalCount()) {\n\n  <p class=\"totalCount\">\n    {{ \"GENERAL.SHOWING\" | translate }}\n    <b>{{ startItem() }}</b> {{ \"GENERAL.TO\" | translate }}\n    <b>{{ endItem() }}</b>\n    {{ \"GENERAL.OF\" | translate }}\n    <b class=\"plum\">{{ totalCount() }}</b>\n    {{ \"GENERAL.ITEMS\" | translate }}\n  </p>\n  <!-- <p class=\"totalCount\">\n    A total of {{ totalCount() }} data</p> -->\n  }\n</div>\n", styles: [".pagination{display:flex;justify-content:space-between;align-items:center;width:100%;max-height:50px;margin:5px 0;padding:0 10px 0 0}.totalCount{font-size:1.2em;color:#595959;font-weight:500}.totalCount .plum{color:var(--vms-plum-500)}.page-container{display:flex;align-items:center;gap:2.4em;max-height:50px}.pages{display:flex;align-items:center;gap:1.2em}.page{width:2.8em;height:2.8em;max-width:2.8rem;max-height:2.8rem;border-radius:.8em;border:1px solid var(--vms-gray-150);color:var(--vms-gray-900);font-weight:500;display:flex;justify-content:center;align-items:center;cursor:pointer;span{font-size:var(--vms-font-size-pm);line-height:var(--vms-line-height-pm)}}.page.active{border:0px solid #602450;background-color:var(--vms-plum-500);color:var(--vms-white)}.page.disabled{opacity:.3;cursor:auto}.pageSizeSelect{height:2em;border-radius:.57em;font-size:var(--vms-font-size-pm);line-height:var(--vms-line-height-pm);border:1px solid var(--vms-gray-150);color:var(--vms-gray-900);font-weight:500;display:flex;justify-content:center;align-items:center;cursor:pointer;padding:0 .8em}.pageSizeSelect::selection{color:var(--vms-gray-900)}.pageSizeSelect::-webkit-select-placeholder,.pageSizeSelect::-webkit-input-placeholder{color:var(--vms-gray-900)}select:focus-visible{outline:none;border:1px solid rgba(217,217,217,1)}.pageSizeSelect:focus-visible{outline:none;border:1px solid rgba(217,217,217,1)}\n"] }]
+            args: [{ selector: 'custom-pagination', standalone: true, imports: [CommonModule, FormsModule, TranslateModule], template: "@if(!loadingService.loading()) {\n\n\n  <div class=\"pagination\">\n    <div class=\"page-container\">\n      <div\n        class=\"page\"\n        (click)=\"prevPage()\"\n        [ngClass]=\"{\n          disabled: 1 === (page <= totalPageCount() ? page : totalPageCount())\n        }\"\n         [style.transform]=\"\n          translationService.currentLang() === 'en'\n            ? 'rotate(0deg)'\n            : 'rotate(180deg)'\n        \"\n      >\n        <svg\n          width=\"20\"\n          height=\"20\"\n          viewBox=\"0 0 20 20\"\n          fill=\"none\"\n          xmlns=\"http://www.w3.org/2000/svg\"\n        >\n          <path\n            d=\"M12.3622 13.9249C12.5174 13.7687 12.6045 13.5575 12.6045 13.3374C12.6045 13.1172 12.5174 12.906 12.3622 12.7499L9.41217 9.75822L12.3622 6.80822C12.5174 6.65208 12.6045 6.44087 12.6045 6.22072C12.6045 6.00056 12.5174 5.78935 12.3622 5.63322C12.2847 5.55511 12.1925 5.49311 12.091 5.45081C11.9894 5.4085 11.8805 5.38672 11.7705 5.38672C11.6605 5.38672 11.5516 5.4085 11.45 5.45081C11.3485 5.49311 11.2563 5.55511 11.1788 5.63322L7.6455 9.16655C7.56739 9.24402 7.5054 9.33619 7.46309 9.43774C7.42078 9.53929 7.399 9.64821 7.399 9.75822C7.399 9.86823 7.42078 9.97715 7.46309 10.0787C7.5054 10.1802 7.56739 10.2724 7.6455 10.3499L11.1788 13.9249C11.2563 14.003 11.3485 14.065 11.45 14.1073C11.5516 14.1496 11.6605 14.1714 11.7705 14.1714C11.8805 14.1714 11.9894 14.1496 12.091 14.1073C12.1925 14.065 12.2847 14.003 12.3622 13.9249Z\"\n            fill=\"#1F1F1F\"\n          />\n        </svg>\n      </div>\n      <div class=\"pages\">\n        @for(item of totalPages(); track item) {\n        <div\n          (click)=\"changePage(item)\"\n          class=\"page\"\n          [ngClass]=\"{\n            active: item === (page <= totalPageCount() ? page : totalPageCount())\n          }\"\n        >\n          <span> {{ item }}</span>\n        </div>\n\n        }\n      </div>\n      <div\n        class=\"page\"\n        (click)=\"nextPage()\"\n        [ngClass]=\"{\n          disabled:\n            totalPages().length ===\n            (page <= totalPageCount() ? page : totalPageCount())\n        }\"\n         [style.transform]=\"\n          translationService.currentLang() === 'en'\n            ? 'rotate(0deg)'\n            : 'rotate(180deg)'\n        \"\n      >\n        <svg\n          width=\"20\"\n          height=\"20\"\n          viewBox=\"0 0 20 20\"\n          fill=\"none\"\n          xmlns=\"http://www.w3.org/2000/svg\"\n        >\n          <path\n            d=\"M7.63784 13.9249C7.48263 13.7687 7.39551 13.5575 7.39551 13.3374C7.39551 13.1172 7.48263 12.906 7.63784 12.7499L10.5878 9.75822L7.63784 6.80822C7.48263 6.65208 7.39551 6.44087 7.39551 6.22072C7.39551 6.00056 7.48263 5.78935 7.63784 5.63322C7.7153 5.55511 7.80747 5.49311 7.90902 5.45081C8.01057 5.4085 8.11949 5.38672 8.2295 5.38672C8.33951 5.38672 8.44843 5.4085 8.54998 5.45081C8.65153 5.49311 8.7437 5.55511 8.82117 5.63322L12.3545 9.16655C12.4326 9.24402 12.4946 9.33619 12.5369 9.43774C12.5792 9.53929 12.601 9.64821 12.601 9.75822C12.601 9.86823 12.5792 9.97715 12.5369 10.0787C12.4946 10.1802 12.4326 10.2724 12.3545 10.3499L8.82117 13.9249C8.7437 14.003 8.65153 14.065 8.54998 14.1073C8.44843 14.1496 8.33951 14.1714 8.2295 14.1714C8.11949 14.1714 8.01057 14.1496 7.90902 14.1073C7.80747 14.065 7.7153 14.003 7.63784 13.9249Z\"\n            fill=\"#1F1F1F\"\n          />\n        </svg>\n      </div>\n      @if(showPageSize) {\n      <div class=\"pageSize\">\n        <select\n          class=\"pageSizeSelect\"\n          [ngModel]=\"pageSize()\"\n          (change)=\"onPageSizeChange($event)\"\n        >\n          @for(option of pageSizeOptions(); track option){\n          <option [value]=\"option\">\n            {{ option }} {{ \"GENERAL.ITEMS\" | translate }}\n          </option>\n          }\n        </select>\n      </div>\n      }\n    </div>\n    @if(!hideTotalCount()) {\n\n    <p class=\"totalCount\">\n      {{ \"GENERAL.SHOWING\" | translate }}\n      <b>{{ startItem() }}</b> {{ \"GENERAL.TO\" | translate }}\n      <b>{{ endItem() }}</b>\n      {{ \"GENERAL.OF\" | translate }}\n      <b class=\"plum\">{{ totalCount() }}</b>\n      {{ \"GENERAL.ITEMS\" | translate }}\n    </p>\n    <!-- <p class=\"totalCount\">\n      A total of {{ totalCount() }} data</p> -->\n    }\n  </div>\n}\n", styles: [".pagination{display:flex;justify-content:space-between;align-items:center;width:100%;max-height:50px;margin:5px 0;padding:0 10px 0 0}.totalCount{font-size:1.2em;color:#595959;font-weight:500}.totalCount .plum{color:var(--vms-plum-500)}.page-container{display:flex;align-items:center;gap:2.4em;max-height:50px}.pages{display:flex;align-items:center;gap:1.2em}.page{width:2.8em;height:2.8em;max-width:2.8rem;max-height:2.8rem;border-radius:.8em;border:1px solid var(--vms-gray-150);color:var(--vms-gray-900);font-weight:500;display:flex;justify-content:center;align-items:center;cursor:pointer;span{font-size:var(--vms-font-size-pm);line-height:var(--vms-line-height-pm)}}.page.active{border:0px solid #602450;background-color:var(--vms-plum-500);color:var(--vms-white)}.page.disabled{opacity:.3;cursor:auto}.pageSizeSelect{height:2em;border-radius:.57em;font-size:var(--vms-font-size-pm);line-height:var(--vms-line-height-pm);border:1px solid var(--vms-gray-150);color:var(--vms-gray-900);font-weight:500;display:flex;justify-content:center;align-items:center;cursor:pointer;padding:0 .8em}.pageSizeSelect::selection{color:var(--vms-gray-900)}.pageSizeSelect::-webkit-select-placeholder,.pageSizeSelect::-webkit-input-placeholder{color:var(--vms-gray-900)}select:focus-visible{outline:none;border:1px solid rgba(217,217,217,1)}.pageSizeSelect:focus-visible{outline:none;border:1px solid rgba(217,217,217,1)}\n"] }]
         }], propDecorators: { maxVisiblePages: [{
                 type: Input
             }], page: [{
@@ -4598,40 +4600,34 @@ i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.17", ngImpo
 const minutes = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55];
 const hours = Array.from({ length: 12 }, (_, i) => i + 1);
 
-class CustomTimeInputFormComponent {
-    parentForm;
-    name = '';
-    controlName = '';
-    label = '';
-    labelClass = '';
-    inputClass = '';
-    validation = [];
-    defaultTime = '';
-    rangeMin = '';
-    rangeMax = '';
-    height = '3em';
-    timeChange = new EventEmitter();
+class CustomTimeBaseComponent {
     hourScrollRef;
     minuteScrollRef;
     periodScrollRef;
-    translate = inject(TranslateService);
-    dropdownOpen = signal(false);
+    timeInputRef;
     hours = hours;
     minutes = minutes;
     periods = ['AM', 'PM'];
     selectedHour;
     selectedMinute;
     selectedPeriod = 'AM';
+    rangeMin = '';
+    rangeMax = '';
     itemHeight = 36;
-    // Drag state
-    isDragging = false;
-    startY = 0;
-    startScrollTop = 0;
-    currentScrollElement = null;
-    velocityY = 0;
-    lastY = 0;
-    lastTime = 0;
-    animationFrameId = null;
+    ngAfterViewInit() {
+        this.scrollToSelectedValues();
+        // get font size from host element to calculate item height
+        this.updateItemHeight();
+        window.addEventListener('resize', this.updateItemHeight);
+    }
+    updateItemHeight = () => {
+        const hostElem = this.timeInputRef.nativeElement.parentElement.parentElement;
+        const fontSize = window
+            .getComputedStyle(hostElem)
+            .getPropertyValue('font-size');
+        console.log('Font size:', fontSize);
+        this.itemHeight = parseFloat(fontSize) * 2.86;
+    };
     get filteredHours() {
         const hoursList = this.rangeMin || this.rangeMax ? this.getFilteredHoursList() : this.hours;
         // Move 12 to the top
@@ -4642,7 +4638,7 @@ class CustomTimeInputFormComponent {
         return filtered;
     }
     getFilteredHoursList() {
-        const hours = this.hours.filter((h) => {
+        return this.hours.filter((h) => {
             let hour24 = h;
             if (this.selectedPeriod === 'PM' && h !== 12) {
                 hour24 = h + 12;
@@ -4662,20 +4658,12 @@ class CustomTimeInputFormComponent {
             }
             return true;
         });
-        // console.log('filtered hours: ', hours);
-        return hours;
     }
     get filteredMinutes() {
-        if ((!this.rangeMin && !this.rangeMax) || !this.selectedHour) {
+        if (this.selectedHour == null || (!this.rangeMin && !this.rangeMax)) {
             return this.minutes;
         }
-        let hour24 = Number(this.selectedHour);
-        if (this.selectedPeriod === 'PM' && hour24 !== 12) {
-            hour24 = hour24 + 12;
-        }
-        else if (this.selectedPeriod === 'AM' && hour24 === 12) {
-            hour24 = 0;
-        }
+        const hour24 = this.to24Hour(this.selectedHour, this.selectedPeriod);
         return this.minutes.filter((m) => {
             if (this.rangeMin) {
                 const [minH, minM] = this.rangeMin.split(':').map(Number);
@@ -4689,45 +4677,6 @@ class CustomTimeInputFormComponent {
             }
             return true;
         });
-    }
-    ngOnInit() {
-        if (this.defaultTime) {
-            this.setTimeFromString(this.defaultTime);
-        }
-        const control = this.parentForm.get(this.controlName);
-        if (control?.value) {
-            this.setExcistValue();
-        }
-    }
-    ngAfterViewInit() {
-        // Initialize scroll positions after view is ready
-        this.scrollToSelectedValues();
-    }
-    ngOnDestroy() {
-        // Clean up event listeners
-        if (this.animationFrameId) {
-            cancelAnimationFrame(this.animationFrameId);
-        }
-    }
-    containRequiredError() {
-        return this.validation.some((error) => error.errorType.includes(ComponentFormErrorConstant.REQUIRED));
-    }
-    toggleDropdown() {
-        this.dropdownOpen.set(!this.dropdownOpen());
-        const control = this.parentForm.get(this.controlName);
-        if (control?.value) {
-            this.setExcistValue();
-        }
-        if (this.dropdownOpen()) {
-            requestAnimationFrame(() => {
-                this.scrollToSelectedValues();
-                this.setupScrollListeners();
-            });
-        }
-        if (!this.dropdownOpen()) {
-            this.parentForm.get(this.controlName)?.markAsTouched();
-            this.confirmTime();
-        }
     }
     scrollToSelectedValues() {
         if (this.hourScrollRef) {
@@ -4752,158 +4701,32 @@ class CustomTimeInputFormComponent {
             }
         }
     }
-    setupScrollListeners() {
-        if (this.hourScrollRef) {
-            const el = this.hourScrollRef.nativeElement;
-            el.addEventListener('scroll', () => this.onHourScroll());
-            this.setupDragListeners(el);
-        }
-        if (this.minuteScrollRef) {
-            const el = this.minuteScrollRef.nativeElement;
-            el.addEventListener('scroll', () => this.onMinuteScroll());
-            this.setupDragListeners(el);
-        }
-        if (this.periodScrollRef) {
-            const el = this.periodScrollRef.nativeElement;
-            el.addEventListener('scroll', () => this.onPeriodScroll());
-            this.setupDragListeners(el);
-        }
+    to24Hour(hour, period) {
+        if (period === 'PM' && hour !== 12)
+            return hour + 12;
+        if (period === 'AM' && hour === 12)
+            return 0;
+        return hour;
     }
-    // DRAG START LISTENERS
-    setupDragListeners(element) {
-        // Mouse events
-        element.addEventListener('mousedown', (e) => this.onDragStart(e, element));
-        // Touch events
-        element.addEventListener('touchstart', (e) => this.onTouchStart(e, element), { passive: false });
+    getItemOpacity(index, scrollElement) {
+        if (!scrollElement)
+            return 0.3;
+        const scrollTop = scrollElement.nativeElement.scrollTop;
+        const centerIndex = Math.round(scrollTop / this.itemHeight);
+        const distance = Math.abs(index - centerIndex);
+        if (distance === 0)
+            return 1;
+        if (distance === 1)
+            return 0.6;
+        return 0.3;
     }
-    onDragStart(e, element) {
-        this.isDragging = true;
-        this.currentScrollElement = element;
-        this.startY = e.clientY;
-        this.startScrollTop = element.scrollTop;
-        this.lastY = e.clientY;
-        this.lastTime = Date.now();
-        this.velocityY = 0;
-        element.style.cursor = 'grabbing';
-        element.style.scrollBehavior = 'auto';
-        // Add global listeners
-        document.addEventListener('mousemove', this.onDragMove);
-        document.addEventListener('mouseup', this.onDragEnd);
-        e.preventDefault();
+    getItemFontWeight(index, scrollElement) {
+        if (!scrollElement)
+            return 'normal';
+        const scrollTop = scrollElement.nativeElement.scrollTop;
+        const centerIndex = Math.round(scrollTop / this.itemHeight);
+        return index === centerIndex ? 'bold' : 'normal';
     }
-    onDragMove = (e) => {
-        if (!this.isDragging || !this.currentScrollElement)
-            return;
-        const deltaY = e.clientY - this.startY;
-        const now = Date.now();
-        const dt = now - this.lastTime;
-        if (dt > 0) {
-            this.velocityY = (e.clientY - this.lastY) / dt;
-        }
-        this.currentScrollElement.scrollTop = this.startScrollTop - deltaY;
-        this.lastY = e.clientY;
-        this.lastTime = now;
-        e.preventDefault();
-    };
-    onDragEnd = (e) => {
-        if (!this.isDragging || !this.currentScrollElement)
-            return;
-        const element = this.currentScrollElement;
-        element.style.cursor = 'grab';
-        // Apply momentum scrolling
-        if (Math.abs(this.velocityY) > 0.5) {
-            this.applyMomentum(element, this.velocityY);
-        }
-        else {
-            // Snap to nearest item
-            this.snapToNearest(element);
-        }
-        // Clean up
-        document.removeEventListener('mousemove', this.onDragMove);
-        document.removeEventListener('mouseup', this.onDragEnd);
-        this.isDragging = false;
-        this.currentScrollElement = null;
-        e.preventDefault();
-    };
-    onTouchStart(e, element) {
-        this.isDragging = true;
-        this.currentScrollElement = element;
-        this.startY = e.touches[0].clientY;
-        this.startScrollTop = element.scrollTop;
-        this.lastY = e.touches[0].clientY;
-        this.lastTime = Date.now();
-        this.velocityY = 0;
-        element.style.scrollBehavior = 'auto';
-        // Add touch listeners
-        element.addEventListener('touchmove', this.onTouchMove, { passive: false });
-        element.addEventListener('touchend', this.onTouchEnd);
-    }
-    onTouchMove = (e) => {
-        if (!this.isDragging || !this.currentScrollElement)
-            return;
-        const touch = e.touches[0];
-        const deltaY = touch.clientY - this.startY;
-        const now = Date.now();
-        const dt = now - this.lastTime;
-        if (dt > 0) {
-            this.velocityY = (touch.clientY - this.lastY) / dt;
-        }
-        this.currentScrollElement.scrollTop = this.startScrollTop - deltaY;
-        this.lastY = touch.clientY;
-        this.lastTime = now;
-        e.preventDefault();
-    };
-    onTouchEnd = (e) => {
-        if (!this.isDragging || !this.currentScrollElement)
-            return;
-        const element = this.currentScrollElement;
-        // Apply momentum scrolling
-        if (Math.abs(this.velocityY) > 0.5) {
-            this.applyMomentum(element, this.velocityY);
-        }
-        else {
-            // Snap to nearest item
-            this.snapToNearest(element);
-        }
-        // Clean up
-        element.removeEventListener('touchmove', this.onTouchMove);
-        element.removeEventListener('touchend', this.onTouchEnd);
-        this.isDragging = false;
-        this.currentScrollElement = null;
-    };
-    // TODO: FIX ON DRAG -- SKIPS SOME ITEMS
-    applyMomentum(element, velocity) {
-        if (this.animationFrameId) {
-            cancelAnimationFrame(this.animationFrameId);
-        }
-        const friction = 0.95;
-        const threshold = 0.1;
-        const animate = () => {
-            if (Math.abs(velocity) < threshold) {
-                this.snapToNearest(element);
-                return;
-            }
-            velocity *= friction;
-            element.scrollTop -= velocity * 16; // Approximate 60fps frame time
-            this.animationFrameId = requestAnimationFrame(animate);
-        };
-        animate();
-    }
-    snapToNearest(element) {
-        element.style.scrollBehavior = 'smooth';
-        const scrollTop = element.scrollTop;
-        const index = Math.round(scrollTop / this.itemHeight);
-        const targetScroll = index * this.itemHeight;
-        element.scrollTop = targetScroll;
-        // Reset scroll behavior after snap using scrollend event
-        const resetScrollBehavior = () => {
-            if (element) {
-                element.style.scrollBehavior = 'auto';
-            }
-        };
-        element.addEventListener('scrollend', resetScrollBehavior, { once: true });
-    }
-    // SCROLL LISTENERS
     onHourScroll() {
         const scrollTop = this.hourScrollRef.nativeElement.scrollTop;
         const index = Math.round(scrollTop / this.itemHeight);
@@ -4923,6 +4746,82 @@ class CustomTimeInputFormComponent {
         const index = Math.round(scrollTop / this.itemHeight);
         if (this.periods[index] !== undefined) {
             this.selectedPeriod = this.periods[index];
+        }
+    }
+    setTimeFromString(timeStr) {
+        const match = timeStr.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+        if (match) {
+            this.selectedHour = parseInt(match[1], 10);
+            this.selectedMinute = parseInt(match[2], 10);
+            this.selectedPeriod = match[3].toUpperCase();
+        }
+    }
+    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.17", ngImport: i0, type: CustomTimeBaseComponent, deps: [], target: i0.ɵɵFactoryTarget.Directive });
+    static ɵdir = i0.ɵɵngDeclareDirective({ minVersion: "14.0.0", version: "19.2.17", type: CustomTimeBaseComponent, isStandalone: true, viewQueries: [{ propertyName: "hourScrollRef", first: true, predicate: ["hourScroll"], descendants: true }, { propertyName: "minuteScrollRef", first: true, predicate: ["minuteScroll"], descendants: true }, { propertyName: "periodScrollRef", first: true, predicate: ["periodScroll"], descendants: true }, { propertyName: "timeInputRef", first: true, predicate: ["timeInput"], descendants: true }], ngImport: i0 });
+}
+i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.17", ngImport: i0, type: CustomTimeBaseComponent, decorators: [{
+            type: Directive
+        }], propDecorators: { hourScrollRef: [{
+                type: ViewChild,
+                args: ['hourScroll']
+            }], minuteScrollRef: [{
+                type: ViewChild,
+                args: ['minuteScroll']
+            }], periodScrollRef: [{
+                type: ViewChild,
+                args: ['periodScroll']
+            }], timeInputRef: [{
+                type: ViewChild,
+                args: ['timeInput']
+            }] } });
+
+class CustomTimeInputFormComponent extends CustomTimeBaseComponent {
+    parentForm;
+    name = '';
+    controlName = '';
+    label = '';
+    labelClass = '';
+    inputClass = '';
+    validation = [];
+    defaultTime = '';
+    rangeMin = '';
+    rangeMax = '';
+    height = '3em';
+    timeChange = new EventEmitter();
+    translate = inject(TranslateService);
+    dropdownOpen = signal(false);
+    ngOnInit() {
+        if (this.defaultTime) {
+            this.setTimeFromString(this.defaultTime);
+        }
+        const control = this.parentForm.get(this.controlName);
+        if (control?.value) {
+            this.setExcistValue();
+        }
+    }
+    ngAfterViewInit() {
+        super.ngAfterViewInit();
+    }
+    ngOnDestroy() {
+        // Clean up event listeners
+    }
+    containRequiredError() {
+        return this.validation.some((error) => error.errorType.includes(ComponentFormErrorConstant.REQUIRED));
+    }
+    toggleDropdown() {
+        this.dropdownOpen.set(!this.dropdownOpen());
+        const control = this.parentForm.get(this.controlName);
+        if (control?.value) {
+            this.setExcistValue();
+        }
+        if (this.dropdownOpen()) {
+            requestAnimationFrame(() => {
+                this.scrollToSelectedValues();
+            });
+        }
+        if (!this.dropdownOpen()) {
+            this.parentForm.get(this.controlName)?.markAsTouched();
+            this.confirmTime();
         }
     }
     confirmTime() {
@@ -4952,7 +4851,7 @@ class CustomTimeInputFormComponent {
             this.selectedHour = Number(this.selectedHour) + 12;
         }
         if (this.selectedPeriod == 'AM' && this.selectedHour == 12) {
-            this.selectedHour = '00';
+            this.selectedHour = 0;
         }
         this.selectedHour =
             !this.selectedHour || Number.isNaN(Number(this.selectedHour))
@@ -4978,15 +4877,15 @@ class CustomTimeInputFormComponent {
     }
     setFormValue() {
         let targetHour = this.selectedHour;
-        let taregtMin = this.selectedMinute;
+        let targetMin = this.selectedMinute;
         if (this.selectedHour !== undefined && this.selectedMinute !== undefined) {
             if (Number(this.selectedHour) < 10)
                 targetHour = `0${Number(this.selectedHour)}`;
             if (Number(this.selectedMinute) < 10)
-                taregtMin = `0${Number(this.selectedMinute)}`;
+                targetMin = `0${Number(this.selectedMinute)}`;
             this.parentForm
                 .get(this.controlName)
-                ?.setValue(`${targetHour}:${taregtMin}:00`);
+                ?.setValue(`${targetHour}:${targetMin}:00`);
         }
         else {
             this.parentForm.get(this.controlName)?.setValue(null);
@@ -5008,14 +4907,6 @@ class CustomTimeInputFormComponent {
             this.selectedPeriod = 'AM';
         }
         this.selectedMinute = Number(minute);
-    }
-    setTimeFromString(timeStr) {
-        const match = timeStr.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
-        if (match) {
-            this.selectedHour = parseInt(match[1], 10);
-            this.selectedMinute = parseInt(match[2], 10);
-            this.selectedPeriod = match[3].toUpperCase();
-        }
     }
     displayTime() {
         const hour = Number(this.selectedHour) > 12
@@ -5048,27 +4939,8 @@ class CustomTimeInputFormComponent {
     getTimeInHours(hour, minute) {
         return hour + minute / 60;
     }
-    getItemOpacity(index, scrollElement, arrayLength) {
-        if (!scrollElement)
-            return 0.3;
-        const scrollTop = scrollElement.nativeElement.scrollTop;
-        const centerIndex = Math.round(scrollTop / this.itemHeight);
-        const distance = Math.abs(index - centerIndex);
-        if (distance === 0)
-            return 1;
-        if (distance === 1)
-            return 0.6;
-        return 0.3;
-    }
-    getItemFontWeight(index, scrollElement) {
-        if (!scrollElement)
-            return 'normal';
-        const scrollTop = scrollElement.nativeElement.scrollTop;
-        const centerIndex = Math.round(scrollTop / this.itemHeight);
-        return index === centerIndex ? 'bold' : 'normal';
-    }
-    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.17", ngImport: i0, type: CustomTimeInputFormComponent, deps: [], target: i0.ɵɵFactoryTarget.Component });
-    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "17.0.0", version: "19.2.17", type: CustomTimeInputFormComponent, isStandalone: true, selector: "custom-time-input-form", inputs: { parentForm: "parentForm", name: "name", controlName: "controlName", label: "label", labelClass: "labelClass", inputClass: "inputClass", validation: "validation", defaultTime: "defaultTime", rangeMin: "rangeMin", rangeMax: "rangeMax", height: "height" }, outputs: { timeChange: "timeChange" }, viewQueries: [{ propertyName: "hourScrollRef", first: true, predicate: ["hourScroll"], descendants: true }, { propertyName: "minuteScrollRef", first: true, predicate: ["minuteScroll"], descendants: true }, { propertyName: "periodScrollRef", first: true, predicate: ["periodScroll"], descendants: true }], ngImport: i0, template: "<div class=\"time-picker-container\" [style]=\"{ '--height': height }\">\n  @if (label) {\n    <label [for]=\"label\" [class]=\"'custom-label ' + labelClass\">\n      {{ label }}\n\n      @if (containRequiredError()) {\n        <span\n          style=\"\n            color: var(--vms-color-alert-error);\n            font-size: 0.95em;\n            font-weight: 500;\n          \"\n        >\n          *\n        </span>\n      } @else {\n        <span\n          style=\"\n            color: var(--vms-color-alert-error);\n            font-size: 0.95em;\n            font-weight: 500;\n          \"\n          >&nbsp;</span\n        >\n      }\n    </label>\n  }\n  <!--\n  {{ parentForm.controls[controlName].errors | json }}\n  {{ parentForm.controls[controlName].value }}\n   -->\n  <div class=\"time-picker__input\">\n    <div class=\"time-error-container\">\n      @if (\n        parentForm.controls[controlName].invalid &&\n        parentForm.controls[controlName].touched\n      ) {\n        <custom-app-error\n          [control]=\"parentForm.controls[controlName]\"\n          [validation]=\"validation\"\n          [name]=\"controlName\"\n        />\n      }\n    </div>\n    <input\n      type=\"text\"\n      readonly\n      [class]=\"'custom-input ' + inputClass\"\n      [value]=\"displayTime()\"\n      (click)=\"toggleDropdown()\"\n      [attr.name]=\"name\"\n      [attr.id]=\"name\"\n      [class.input-error]=\"\n        parentForm.controls[controlName].invalid &&\n        parentForm.controls[controlName].touched\n      \"\n    />\n    <span class=\"time-picker__input--time-icon\" (click)=\"toggleDropdown()\">\n      <svg\n        width=\"20\"\n        height=\"20\"\n        viewBox=\"0 0 20 20\"\n        fill=\"none\"\n        xmlns=\"http://www.w3.org/2000/svg\"\n      >\n        <g opacity=\"0.5\">\n          <path\n            d=\"M6.07512 7.64174C6.23125 7.48653 6.44246 7.39941 6.66262 7.39941C6.88277 7.39941 7.09398 7.48653 7.25012 7.64174L10.2418 10.5917L13.1918 7.64174C13.3479 7.48653 13.5591 7.39941 13.7793 7.39941C13.9994 7.39941 14.2106 7.48653 14.3668 7.64174C14.4449 7.71921 14.5069 7.81138 14.5492 7.91293C14.5915 8.01448 14.6133 8.1234 14.6133 8.23341C14.6133 8.34342 14.5915 8.45234 14.5492 8.55389C14.5069 8.65544 14.4449 8.74761 14.3668 8.82507L10.8334 12.3584C10.756 12.4365 10.6638 12.4985 10.5623 12.5408C10.4607 12.5831 10.3518 12.6049 10.2418 12.6049C10.1318 12.6049 10.0229 12.5831 9.9213 12.5408C9.81975 12.4985 9.72758 12.4365 9.65012 12.3584L6.07512 8.82507C5.99701 8.7476 5.93501 8.65544 5.89271 8.55389C5.8504 8.45234 5.82862 8.34342 5.82862 8.23341C5.82862 8.1234 5.8504 8.01448 5.89271 7.91293C5.93501 7.81138 5.99701 7.71921 6.07512 7.64174Z\"\n            fill=\"#4B4F55\"\n          />\n        </g>\n      </svg>\n    </span>\n  </div>\n\n  @if (dropdownOpen()) {\n    <div\n      #dropdownOptions\n      [clickOutside]=\"dropdownOptions\"\n      (clickOutsideEmitter)=\"toggleDropdown()\"\n      class=\"time-picker-modal\"\n    >\n      <div class=\"time-picker-header\">\n        <h3>{{ \"GENERAL.PICKUP_TIME\" | translate }}</h3>\n      </div>\n\n      <div class=\"time-picker-container\">\n        <!-- Selection Indicator -->\n        <div class=\"selection-indicator\"></div>\n        <!--  -->\n        <div class=\"time-picker-columns\">\n          <!--  -->\n          <!-- Hour Column -->\n          <div class=\"time-column\">\n            <div class=\"scroll-container\" #hourScroll>\n              <div class=\"scroll-padding\"></div>\n              @for (h of filteredHours; track $index) {\n                <div\n                  class=\"time-item\"\n                  id=\"#time-item\"\n                  [class.selected]=\"h === selectedHour\"\n                  [style.opacity]=\"\n                    getItemOpacity($index, hourScrollRef, filteredHours.length)\n                  \"\n                  [style.font-weight]=\"getItemFontWeight($index, hourScrollRef)\"\n                >\n                  {{ h < 10 ? \"0\" + h : h }}\n                </div>\n              }\n              <div class=\"scroll-padding\"></div>\n            </div>\n          </div>\n\n          <div class=\"time-separator\">:</div>\n\n          <!-- Minute Column -->\n          <div class=\"time-column\">\n            <div class=\"scroll-container\" #minuteScroll>\n              <div class=\"scroll-padding\"></div>\n              @for (m of filteredMinutes; track $index) {\n                <div\n                  class=\"time-item\"\n                  [class.selected]=\"m === selectedMinute\"\n                  [style.opacity]=\"\n                    getItemOpacity(\n                      $index,\n                      minuteScrollRef,\n                      filteredMinutes.length\n                    )\n                  \"\n                  [style.font-weight]=\"\n                    getItemFontWeight($index, minuteScrollRef)\n                  \"\n                >\n                  {{ m < 10 ? \"0\" + m : m }}\n                </div>\n              }\n              <div class=\"scroll-padding\"></div>\n            </div>\n          </div>\n\n          <!-- Period Column -->\n          <div class=\"time-column period-column\">\n            <div class=\"scroll-container\" #periodScroll>\n              <div class=\"scroll-padding\"></div>\n              @for (p of periods; track $index) {\n                <div\n                  class=\"time-item\"\n                  [class.selected]=\"p === selectedPeriod\"\n                  [style.opacity]=\"\n                    getItemOpacity($index, periodScrollRef, periods.length)\n                  \"\n                  [style.font-weight]=\"\n                    getItemFontWeight($index, periodScrollRef)\n                  \"\n                >\n                  {{ \"GENERAL.\" + p | translate }}\n                </div>\n              }\n              <div class=\"scroll-padding\"></div>\n            </div>\n          </div>\n        </div>\n      </div>\n\n      <button type=\"button\" (click)=\"confirmTime()\" class=\"done-btn\">\n        <p>\n          {{ \"GENERAL.DONE\" | translate }}\n        </p>\n      </button>\n    </div>\n  }\n</div>\n<!-- @if(dropdownOpen()){\n<div\n  #dropdownOptions\n  [clickOutside]=\"dropdownOptions\"\n  (clickOutsideEmitter)=\"toggleDropdown()\"\n  class=\"time-dropdown-container\"\n>\n  <select\n    [(ngModel)]=\"selectedHour\"\n    class=\"time-select\"\n    (ngModelChange)=\"onHourChange()\"\n  >\n    @for( h of filteredHours ;track $index){\n    <option [value]=\"h\">{{ h < 10 ? \"0\" + h : h }}</option>\n    }\n  </select>\n\n  <span>:</span>\n\n  <select [(ngModel)]=\"selectedMinute\" class=\"time-select\">\n    @for( m of filteredMinutes ;track $index){\n\n    <option [value]=\"m\">{{ m < 10 ? \"0\" + m : m }}</option>\n    }\n  </select>\n\n  <select [(ngModel)]=\"selectedPeriod\" class=\"time-select time-period\">\n    <option value=\"AM\">AM</option>\n    <option value=\"PM\">PM</option>\n  </select>\n\n  <button type=\"button\" (click)=\"confirmTime()\" class=\"confirm-btn\">\u2714</button>\n</div>\n} -->\n\n<!--\nWHEEL 1\n\nimport \"./styles.css\";\nimport React, { useState } from \"react\";\nimport styled from \"styled-components\";\nimport TimePicker from \"./TimePicker\";\n\nconst CustomTimePicker = styled(TimePicker)`\n  & {\n    font-family: \"Open Sans\";\n    font-size: 12px;\n\n    .picker-container .picker-column .picker-item.picker-item-selected {\n      color: #3f3f46;\n    }\n\n    .picker-container .picker-column .picker-item {\n      color: #7d7d7d;\n    }\n\n    & .picker-container .picker-inner {\n      padding: 0;\n    }\n\n    & .picker-highlight {\n      color: #212529;\n      &::before {\n        transform: scaleY(1);\n        background-color: #d1d1d1;\n      }\n      &::after {\n        transform: scaleY(1);\n        background-color: #d1d1d1;\n      }\n    }\n  }\n`;\n\nconst optionGroups = {\n  hour: [...Array(24).keys()].map((s) =>\n    s.toString().length === 1 ? \"0\" + s : s\n  ),\n  minute: [...Array(60).keys()].map((s) =>\n    s.toString().length === 1 ? \"0\" + s : s\n  ),\n};\n\nexport default () => {\n  const [valueGroups, setValueGroups] = useState({\n    hour: 12,\n    minute: 30,\n  });\n\n  // Update the value in response to user picking event\n  const handleChange = (name, value) => {\n    setValueGroups({\n      ...valueGroups,\n      [name]: value,\n    });\n  };\n\n  console.log(\"rerender\");\n\n  return (\n    <CustomTimePicker\n      optionGroups={optionGroups}\n      valueGroups={valueGroups}\n      onChange={handleChange}\n    />\n  );\n};\n\n\nwheel 2\nimport React from \"react\";\n\nimport Picker from \"time-picker-scroll\";\n\nexport default ({ className, optionGroups, valueGroups, onChange }) => {\n  return (\n    <div className={className}>\n      <div\n        style={{\n          textAlign: \"center\",\n          display: \"flex\",\n        }}\n      >\n        <span\n          style={{\n            display: \"inline-block\",\n            flex: \"1 1 150px\",\n            fontWeight: 600,\n            color: \"#676767\",\n          }}\n        >\n          Hour\n        </span>\n        <span\n          style={{\n            display: \"inline-block\",\n            flex: \"1 1 150px\",\n            fontWeight: 600,\n            color: \"#676767\",\n          }}\n        >\n          Minute\n        </span>\n      </div>\n\n      <div\n        style={{\n          position: \"relative\",\n        }}\n      >\n        <Picker\n          optionGroups={optionGroups}\n          valueGroups={valueGroups}\n          onChange={onChange}\n          itemHeight={44}\n          height={270}\n        />\n        <div\n          style={{\n            margin: 0,\n            position: \"absolute\",\n            top: \"50%\",\n            transform: \"translateY(-50%)\",\n            left: \"50%\",\n            fontSize: \"20px\",\n            textAlign: \"center\",\n            height: \"30px\",\n          }}\n        >\n          :\n        </div>\n      </div>\n\n      <div\n        style={{\n          width: \"100%\",\n          textAlign: \"center\",\n        }}\n      >\n        <button\n          style={{\n            width: \"75%\",\n            height: \"40px\",\n            backgroundColor: \"transparent\",\n            border: \"1px solid #D1D1D1\",\n            borderRadius: \"2px\",\n            color: \"#007BFF\",\n            fontWeight: 600,\n          }}\n        >\n          Set Time\n        </button>\n      </div>\n    </div>\n  );\n};\n\n-->\n", styles: [".time-picker-container{position:relative;width:100%;cursor:pointer;min-width:8em;height:100%}.custom-label{font-size:1.6em;font-weight:500;display:block;color:var(--vms-color-form-label);margin-bottom:.3em}.time-picker__input{position:relative}.custom-input{height:var(--height, 3em);width:100%;border-radius:.75em;border:1px solid #82828233;padding:0 1em;outline:none!important;box-shadow:none;font-size:1.6em;font-weight:400;cursor:pointer}.input-error-container{position:relative}.custom-input.input-error{border:1px solid #e55658;box-shadow:1px 0 6px #e5565826}.time-picker__input--time-icon{position:absolute;inset-inline-end:.5em;top:50%;transform:translateY(-50%);pointer-events:none}.time-error-container{position:absolute;top:100%;left:1.15em;width:100%}.time-error-container custom-app-error{pointer-events:none}.time-picker-modal{position:absolute;top:100%;inset-inline-end:0;background:#fff;border-radius:.6em;padding:24px;border:1px solid #82828233;z-index:1000;min-width:22.1em;max-width:100%;width:100%;height:33em;display:grid;grid-template-rows:1fr 20em auto;gap:.9em}.time-picker-header h3{font-size:1.5em;font-weight:600;margin:0;color:#1a1a1a}.time-picker-columns{display:flex;justify-content:center;align-items:center;gap:8px;height:100%}.time-column{flex:1;height:100%;position:relative}.period-column{flex:.8}.time-separator{font-size:2em;font-weight:700;color:#1a1a1a;align-self:center;padding:0 4px;z-index:1}.scroll-container{height:100%;overflow-y:scroll;scroll-snap-type:y mandatory;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none;cursor:grab;-webkit-user-select:none;user-select:none}.scroll-container:active{cursor:grabbing}.scroll-container::-webkit-scrollbar{display:none}.scroll-padding{height:8.3em;scroll-snap-align:start}.time-item{height:36px;display:flex;align-items:center;justify-content:center;font-size:1.5em;color:#1a1a1a;scroll-snap-align:start;transition:opacity .2s ease,font-weight .2s ease;-webkit-user-select:none;user-select:none}.time-item.selected{font-weight:700;opacity:1}.selection-indicator{position:absolute;top:50%;left:0;right:0;height:3.6em;transform:translateY(-50%);background:#f8f8f8;pointer-events:none;border-radius:.45em}.done-btn{width:100%;height:3rem;background:#25c7bc;color:#fff;border:none;border-radius:.4rem;font-weight:600;cursor:pointer;transition:background .2s ease}.done-btn p{font-size:1.4rem}.done-btn:hover{background:#159b92}.done-btn:active{transform:scale(.98)}@media (max-width: 480px){.time-picker-modal{min-width:90vw;max-width:90vw}}\n"], dependencies: [{ kind: "component", type: CustomAppErrorComponent, selector: "custom-app-error", inputs: ["control", "validation", "name", "showErrors"] }, { kind: "ngmodule", type: ReactiveFormsModule }, { kind: "ngmodule", type: FormsModule }, { kind: "directive", type: ClickOutsideDirective, selector: "[clickOutside]", inputs: ["clickOutside"], outputs: ["clickOutsideEmitter"] }, { kind: "ngmodule", type: TranslateModule }, { kind: "pipe", type: i1$1.TranslatePipe, name: "translate" }] });
+    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.17", ngImport: i0, type: CustomTimeInputFormComponent, deps: null, target: i0.ɵɵFactoryTarget.Component });
+    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "17.0.0", version: "19.2.17", type: CustomTimeInputFormComponent, isStandalone: true, selector: "custom-time-input-form", inputs: { parentForm: "parentForm", name: "name", controlName: "controlName", label: "label", labelClass: "labelClass", inputClass: "inputClass", validation: "validation", defaultTime: "defaultTime", rangeMin: "rangeMin", rangeMax: "rangeMax", height: "height" }, outputs: { timeChange: "timeChange" }, usesInheritance: true, ngImport: i0, template: "<div class=\"time-picker-container\" [style]=\"{ '--height': height }\">\n  @if (label) {\n    <label [for]=\"label\" [class]=\"'custom-label ' + labelClass\">\n      {{ label }}\n\n      @if (containRequiredError()) {\n        <span\n          style=\"\n            color: var(--vms-color-alert-error);\n            font-size: 0.95em;\n            font-weight: 500;\n          \"\n        >\n          *\n        </span>\n      } @else {\n        <span\n          style=\"\n            color: var(--vms-color-alert-error);\n            font-size: 0.95em;\n            font-weight: 500;\n          \"\n          >&nbsp;</span\n        >\n      }\n    </label>\n  }\n  <!--\n  {{ parentForm.controls[controlName].errors | json }}\n  {{ parentForm.controls[controlName].value }}\n   -->\n  <div class=\"time-picker__input\">\n    <div class=\"time-error-container\">\n      @if (\n        parentForm.controls[controlName].invalid &&\n        parentForm.controls[controlName].touched\n      ) {\n        <custom-app-error\n          [control]=\"parentForm.controls[controlName]\"\n          [validation]=\"validation\"\n          [name]=\"controlName\"\n        />\n      }\n    </div>\n    <input\n      type=\"text\"\n      readonly\n      [class]=\"'custom-input ' + inputClass\"\n      [value]=\"displayTime()\"\n      (click)=\"toggleDropdown()\"\n      [attr.name]=\"name\"\n      [attr.id]=\"name\"\n      [class.input-error]=\"\n        parentForm.controls[controlName].invalid &&\n        parentForm.controls[controlName].touched\n      \"\n    />\n    <span class=\"time-picker__input--time-icon\" (click)=\"toggleDropdown()\">\n      <svg\n        width=\"20\"\n        height=\"20\"\n        viewBox=\"0 0 20 20\"\n        fill=\"none\"\n        xmlns=\"http://www.w3.org/2000/svg\"\n      >\n        <g opacity=\"0.5\">\n          <path\n            d=\"M6.07512 7.64174C6.23125 7.48653 6.44246 7.39941 6.66262 7.39941C6.88277 7.39941 7.09398 7.48653 7.25012 7.64174L10.2418 10.5917L13.1918 7.64174C13.3479 7.48653 13.5591 7.39941 13.7793 7.39941C13.9994 7.39941 14.2106 7.48653 14.3668 7.64174C14.4449 7.71921 14.5069 7.81138 14.5492 7.91293C14.5915 8.01448 14.6133 8.1234 14.6133 8.23341C14.6133 8.34342 14.5915 8.45234 14.5492 8.55389C14.5069 8.65544 14.4449 8.74761 14.3668 8.82507L10.8334 12.3584C10.756 12.4365 10.6638 12.4985 10.5623 12.5408C10.4607 12.5831 10.3518 12.6049 10.2418 12.6049C10.1318 12.6049 10.0229 12.5831 9.9213 12.5408C9.81975 12.4985 9.72758 12.4365 9.65012 12.3584L6.07512 8.82507C5.99701 8.7476 5.93501 8.65544 5.89271 8.55389C5.8504 8.45234 5.82862 8.34342 5.82862 8.23341C5.82862 8.1234 5.8504 8.01448 5.89271 7.91293C5.93501 7.81138 5.99701 7.71921 6.07512 7.64174Z\"\n            fill=\"#4B4F55\"\n          />\n        </g>\n      </svg>\n    </span>\n  </div>\n\n  @if (dropdownOpen()) {\n    <div\n      #dropdownOptions\n      [clickOutside]=\"dropdownOptions\"\n      (clickOutsideEmitter)=\"toggleDropdown()\"\n      class=\"time-picker-modal\"\n    >\n      <div class=\"time-picker-header\">\n        <h3>{{ \"GENERAL.PICKUP_TIME\" | translate }}</h3>\n      </div>\n\n      <div class=\"time-picker-container\">\n        <!-- Selection Indicator -->\n        <div class=\"selection-indicator\"></div>\n        <!--  -->\n        <div class=\"time-picker-columns\">\n          <!--  -->\n          <!-- Hour Column -->\n          <div class=\"time-column\">\n            <div class=\"scroll-container\" #hourScroll (scroll)=\"onHourScroll()\">\n              <div class=\"scroll-padding\"></div>\n              @for (h of filteredHours; track $index) {\n                <div\n                  class=\"time-item\"\n                  id=\"#time-item\"\n                  [class.selected]=\"h === selectedHour\"\n                  [style.opacity]=\"getItemOpacity($index, hourScrollRef)\"\n                  [style.font-weight]=\"getItemFontWeight($index, hourScrollRef)\"\n                >\n                  {{ h < 10 ? \"0\" + h : h }}\n                </div>\n              }\n              <div class=\"scroll-padding\"></div>\n            </div>\n          </div>\n\n          <div class=\"time-separator\">:</div>\n\n          <!-- Minute Column -->\n          <div class=\"time-column\">\n            <div\n              class=\"scroll-container\"\n              #minuteScroll\n              (scroll)=\"onMinuteScroll()\"\n            >\n              <div class=\"scroll-padding\"></div>\n              @for (m of filteredMinutes; track $index) {\n                <div\n                  class=\"time-item\"\n                  [class.selected]=\"m === selectedMinute\"\n                  [style.opacity]=\"getItemOpacity($index, minuteScrollRef)\"\n                  [style.font-weight]=\"\n                    getItemFontWeight($index, minuteScrollRef)\n                  \"\n                >\n                  {{ m < 10 ? \"0\" + m : m }}\n                </div>\n              }\n              <div class=\"scroll-padding\"></div>\n            </div>\n          </div>\n\n          <!-- Period Column -->\n          <div class=\"time-column period-column\">\n            <div\n              class=\"scroll-container\"\n              #periodScroll\n              (scroll)=\"onPeriodScroll()\"\n            >\n              <div class=\"scroll-padding\"></div>\n              @for (p of periods; track $index) {\n                <div\n                  class=\"time-item\"\n                  [class.selected]=\"p === selectedPeriod\"\n                  [style.opacity]=\"getItemOpacity($index, periodScrollRef)\"\n                  [style.font-weight]=\"\n                    getItemFontWeight($index, periodScrollRef)\n                  \"\n                >\n                  {{ \"GENERAL.\" + p | translate }}\n                </div>\n              }\n              <div class=\"scroll-padding\"></div>\n            </div>\n          </div>\n        </div>\n      </div>\n\n      <button type=\"button\" (click)=\"confirmTime()\" class=\"done-btn\">\n        <p>\n          {{ \"GENERAL.DONE\" | translate }}\n        </p>\n      </button>\n    </div>\n  }\n</div>\n<!-- @if(dropdownOpen()){\n<div\n  #dropdownOptions\n  [clickOutside]=\"dropdownOptions\"\n  (clickOutsideEmitter)=\"toggleDropdown()\"\n  class=\"time-dropdown-container\"\n>\n  <select\n    [(ngModel)]=\"selectedHour\"\n    class=\"time-select\"\n    (ngModelChange)=\"onHourChange()\"\n  >\n    @for( h of filteredHours ;track $index){\n    <option [value]=\"h\">{{ h < 10 ? \"0\" + h : h }}</option>\n    }\n  </select>\n\n  <span>:</span>\n\n  <select [(ngModel)]=\"selectedMinute\" class=\"time-select\">\n    @for( m of filteredMinutes ;track $index){\n\n    <option [value]=\"m\">{{ m < 10 ? \"0\" + m : m }}</option>\n    }\n  </select>\n\n  <select [(ngModel)]=\"selectedPeriod\" class=\"time-select time-period\">\n    <option value=\"AM\">AM</option>\n    <option value=\"PM\">PM</option>\n  </select>\n\n  <button type=\"button\" (click)=\"confirmTime()\" class=\"confirm-btn\">\u2714</button>\n</div>\n} -->\n\n<!--\nWHEEL 1\n\nimport \"./styles.css\";\nimport React, { useState } from \"react\";\nimport styled from \"styled-components\";\nimport TimePicker from \"./TimePicker\";\n\nconst CustomTimePicker = styled(TimePicker)`\n  & {\n    font-family: \"Open Sans\";\n    font-size: 12px;\n\n    .picker-container .picker-column .picker-item.picker-item-selected {\n      color: #3f3f46;\n    }\n\n    .picker-container .picker-column .picker-item {\n      color: #7d7d7d;\n    }\n\n    & .picker-container .picker-inner {\n      padding: 0;\n    }\n\n    & .picker-highlight {\n      color: #212529;\n      &::before {\n        transform: scaleY(1);\n        background-color: #d1d1d1;\n      }\n      &::after {\n        transform: scaleY(1);\n        background-color: #d1d1d1;\n      }\n    }\n  }\n`;\n\nconst optionGroups = {\n  hour: [...Array(24).keys()].map((s) =>\n    s.toString().length === 1 ? \"0\" + s : s\n  ),\n  minute: [...Array(60).keys()].map((s) =>\n    s.toString().length === 1 ? \"0\" + s : s\n  ),\n};\n\nexport default () => {\n  const [valueGroups, setValueGroups] = useState({\n    hour: 12,\n    minute: 30,\n  });\n\n  // Update the value in response to user picking event\n  const handleChange = (name, value) => {\n    setValueGroups({\n      ...valueGroups,\n      [name]: value,\n    });\n  };\n\n  console.log(\"rerender\");\n\n  return (\n    <CustomTimePicker\n      optionGroups={optionGroups}\n      valueGroups={valueGroups}\n      onChange={handleChange}\n    />\n  );\n};\n\n\nwheel 2\nimport React from \"react\";\n\nimport Picker from \"time-picker-scroll\";\n\nexport default ({ className, optionGroups, valueGroups, onChange }) => {\n  return (\n    <div className={className}>\n      <div\n        style={{\n          textAlign: \"center\",\n          display: \"flex\",\n        }}\n      >\n        <span\n          style={{\n            display: \"inline-block\",\n            flex: \"1 1 150px\",\n            fontWeight: 600,\n            color: \"#676767\",\n          }}\n        >\n          Hour\n        </span>\n        <span\n          style={{\n            display: \"inline-block\",\n            flex: \"1 1 150px\",\n            fontWeight: 600,\n            color: \"#676767\",\n          }}\n        >\n          Minute\n        </span>\n      </div>\n\n      <div\n        style={{\n          position: \"relative\",\n        }}\n      >\n        <Picker\n          optionGroups={optionGroups}\n          valueGroups={valueGroups}\n          onChange={onChange}\n          itemHeight={44}\n          height={270}\n        />\n        <div\n          style={{\n            margin: 0,\n            position: \"absolute\",\n            top: \"50%\",\n            transform: \"translateY(-50%)\",\n            left: \"50%\",\n            fontSize: \"20px\",\n            textAlign: \"center\",\n            height: \"30px\",\n          }}\n        >\n          :\n        </div>\n      </div>\n\n      <div\n        style={{\n          width: \"100%\",\n          textAlign: \"center\",\n        }}\n      >\n        <button\n          style={{\n            width: \"75%\",\n            height: \"40px\",\n            backgroundColor: \"transparent\",\n            border: \"1px solid #D1D1D1\",\n            borderRadius: \"2px\",\n            color: \"#007BFF\",\n            fontWeight: 600,\n          }}\n        >\n          Set Time\n        </button>\n      </div>\n    </div>\n  );\n};\n\n-->\n", styles: [".time-picker-container{position:relative;width:100%;cursor:pointer;min-width:8em;height:100%}.custom-label{font-size:1.6em;font-weight:500;display:block;color:var(--vms-color-form-label);margin-bottom:.3em}.time-picker__input{position:relative}.custom-input{height:var(--height, 3em);width:100%;border-radius:.75em;border:1px solid #82828233;padding:0 1em;outline:none!important;box-shadow:none;font-size:1.6em;font-weight:400;cursor:pointer}.input-error-container{position:relative}.custom-input.input-error{border:1px solid #e55658;box-shadow:1px 0 6px #e5565826}.time-picker__input--time-icon{position:absolute;inset-inline-end:.5em;top:50%;transform:translateY(-50%);pointer-events:none}.time-error-container{position:absolute;top:100%;left:1.15em;width:100%}.time-error-container custom-app-error{pointer-events:none}.time-picker-modal{position:absolute;top:100%;inset-inline-end:0;background:#fff;border-radius:.6em;padding:24px;border:1px solid #82828233;z-index:1000;min-width:22.1em;max-width:100%;width:100%;height:33em;display:grid;grid-template-rows:1fr 20em auto;gap:.9em}.time-picker-header h3{font-size:1.5em;font-weight:600;margin:0;color:#1a1a1a}.time-picker-columns{display:flex;justify-content:center;align-items:center;gap:8px;height:100%}.time-column{flex:1;height:100%;position:relative}.period-column{flex:.8}.time-separator{font-size:2em;font-weight:700;color:#1a1a1a;align-self:center;padding:0 4px;z-index:1}.scroll-container{height:100%;overflow-y:scroll;scroll-snap-type:y mandatory;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none;cursor:grab;-webkit-user-select:none;user-select:none}.scroll-container:active{cursor:grabbing}.scroll-container::-webkit-scrollbar{display:none}.scroll-padding{height:8.3em;scroll-snap-align:start}.time-item{height:2.86em;display:flex;align-items:center;justify-content:center;font-size:1.5em;color:#1a1a1a;scroll-snap-align:center;scroll-snap-stop:always;transition:opacity .2s ease,font-weight .2s ease;-webkit-user-select:none;user-select:none}.time-item.selected{font-weight:700;opacity:1}.selection-indicator{position:absolute;top:50%;left:0;right:0;height:3.6em;transform:translateY(-50%);background:#f8f8f8;pointer-events:none;border-radius:.45em}.done-btn{width:100%;height:3rem;background:#25c7bc;color:#fff;border:none;border-radius:.4rem;font-weight:600;cursor:pointer;transition:background .2s ease}.done-btn p{font-size:1.4rem}.done-btn:hover{background:#159b92}.done-btn:active{transform:scale(.98)}@media (max-width: 480px){.time-picker-modal{min-width:90vw;max-width:90vw}}\n"], dependencies: [{ kind: "component", type: CustomAppErrorComponent, selector: "custom-app-error", inputs: ["control", "validation", "name", "showErrors"] }, { kind: "ngmodule", type: ReactiveFormsModule }, { kind: "ngmodule", type: FormsModule }, { kind: "directive", type: ClickOutsideDirective, selector: "[clickOutside]", inputs: ["clickOutside"], outputs: ["clickOutsideEmitter"] }, { kind: "ngmodule", type: TranslateModule }, { kind: "pipe", type: i1$1.TranslatePipe, name: "translate" }] });
 }
 i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.17", ngImport: i0, type: CustomTimeInputFormComponent, decorators: [{
             type: Component,
@@ -5078,7 +4950,7 @@ i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.17", ngImpo
                         FormsModule,
                         ClickOutsideDirective,
                         TranslateModule,
-                    ], template: "<div class=\"time-picker-container\" [style]=\"{ '--height': height }\">\n  @if (label) {\n    <label [for]=\"label\" [class]=\"'custom-label ' + labelClass\">\n      {{ label }}\n\n      @if (containRequiredError()) {\n        <span\n          style=\"\n            color: var(--vms-color-alert-error);\n            font-size: 0.95em;\n            font-weight: 500;\n          \"\n        >\n          *\n        </span>\n      } @else {\n        <span\n          style=\"\n            color: var(--vms-color-alert-error);\n            font-size: 0.95em;\n            font-weight: 500;\n          \"\n          >&nbsp;</span\n        >\n      }\n    </label>\n  }\n  <!--\n  {{ parentForm.controls[controlName].errors | json }}\n  {{ parentForm.controls[controlName].value }}\n   -->\n  <div class=\"time-picker__input\">\n    <div class=\"time-error-container\">\n      @if (\n        parentForm.controls[controlName].invalid &&\n        parentForm.controls[controlName].touched\n      ) {\n        <custom-app-error\n          [control]=\"parentForm.controls[controlName]\"\n          [validation]=\"validation\"\n          [name]=\"controlName\"\n        />\n      }\n    </div>\n    <input\n      type=\"text\"\n      readonly\n      [class]=\"'custom-input ' + inputClass\"\n      [value]=\"displayTime()\"\n      (click)=\"toggleDropdown()\"\n      [attr.name]=\"name\"\n      [attr.id]=\"name\"\n      [class.input-error]=\"\n        parentForm.controls[controlName].invalid &&\n        parentForm.controls[controlName].touched\n      \"\n    />\n    <span class=\"time-picker__input--time-icon\" (click)=\"toggleDropdown()\">\n      <svg\n        width=\"20\"\n        height=\"20\"\n        viewBox=\"0 0 20 20\"\n        fill=\"none\"\n        xmlns=\"http://www.w3.org/2000/svg\"\n      >\n        <g opacity=\"0.5\">\n          <path\n            d=\"M6.07512 7.64174C6.23125 7.48653 6.44246 7.39941 6.66262 7.39941C6.88277 7.39941 7.09398 7.48653 7.25012 7.64174L10.2418 10.5917L13.1918 7.64174C13.3479 7.48653 13.5591 7.39941 13.7793 7.39941C13.9994 7.39941 14.2106 7.48653 14.3668 7.64174C14.4449 7.71921 14.5069 7.81138 14.5492 7.91293C14.5915 8.01448 14.6133 8.1234 14.6133 8.23341C14.6133 8.34342 14.5915 8.45234 14.5492 8.55389C14.5069 8.65544 14.4449 8.74761 14.3668 8.82507L10.8334 12.3584C10.756 12.4365 10.6638 12.4985 10.5623 12.5408C10.4607 12.5831 10.3518 12.6049 10.2418 12.6049C10.1318 12.6049 10.0229 12.5831 9.9213 12.5408C9.81975 12.4985 9.72758 12.4365 9.65012 12.3584L6.07512 8.82507C5.99701 8.7476 5.93501 8.65544 5.89271 8.55389C5.8504 8.45234 5.82862 8.34342 5.82862 8.23341C5.82862 8.1234 5.8504 8.01448 5.89271 7.91293C5.93501 7.81138 5.99701 7.71921 6.07512 7.64174Z\"\n            fill=\"#4B4F55\"\n          />\n        </g>\n      </svg>\n    </span>\n  </div>\n\n  @if (dropdownOpen()) {\n    <div\n      #dropdownOptions\n      [clickOutside]=\"dropdownOptions\"\n      (clickOutsideEmitter)=\"toggleDropdown()\"\n      class=\"time-picker-modal\"\n    >\n      <div class=\"time-picker-header\">\n        <h3>{{ \"GENERAL.PICKUP_TIME\" | translate }}</h3>\n      </div>\n\n      <div class=\"time-picker-container\">\n        <!-- Selection Indicator -->\n        <div class=\"selection-indicator\"></div>\n        <!--  -->\n        <div class=\"time-picker-columns\">\n          <!--  -->\n          <!-- Hour Column -->\n          <div class=\"time-column\">\n            <div class=\"scroll-container\" #hourScroll>\n              <div class=\"scroll-padding\"></div>\n              @for (h of filteredHours; track $index) {\n                <div\n                  class=\"time-item\"\n                  id=\"#time-item\"\n                  [class.selected]=\"h === selectedHour\"\n                  [style.opacity]=\"\n                    getItemOpacity($index, hourScrollRef, filteredHours.length)\n                  \"\n                  [style.font-weight]=\"getItemFontWeight($index, hourScrollRef)\"\n                >\n                  {{ h < 10 ? \"0\" + h : h }}\n                </div>\n              }\n              <div class=\"scroll-padding\"></div>\n            </div>\n          </div>\n\n          <div class=\"time-separator\">:</div>\n\n          <!-- Minute Column -->\n          <div class=\"time-column\">\n            <div class=\"scroll-container\" #minuteScroll>\n              <div class=\"scroll-padding\"></div>\n              @for (m of filteredMinutes; track $index) {\n                <div\n                  class=\"time-item\"\n                  [class.selected]=\"m === selectedMinute\"\n                  [style.opacity]=\"\n                    getItemOpacity(\n                      $index,\n                      minuteScrollRef,\n                      filteredMinutes.length\n                    )\n                  \"\n                  [style.font-weight]=\"\n                    getItemFontWeight($index, minuteScrollRef)\n                  \"\n                >\n                  {{ m < 10 ? \"0\" + m : m }}\n                </div>\n              }\n              <div class=\"scroll-padding\"></div>\n            </div>\n          </div>\n\n          <!-- Period Column -->\n          <div class=\"time-column period-column\">\n            <div class=\"scroll-container\" #periodScroll>\n              <div class=\"scroll-padding\"></div>\n              @for (p of periods; track $index) {\n                <div\n                  class=\"time-item\"\n                  [class.selected]=\"p === selectedPeriod\"\n                  [style.opacity]=\"\n                    getItemOpacity($index, periodScrollRef, periods.length)\n                  \"\n                  [style.font-weight]=\"\n                    getItemFontWeight($index, periodScrollRef)\n                  \"\n                >\n                  {{ \"GENERAL.\" + p | translate }}\n                </div>\n              }\n              <div class=\"scroll-padding\"></div>\n            </div>\n          </div>\n        </div>\n      </div>\n\n      <button type=\"button\" (click)=\"confirmTime()\" class=\"done-btn\">\n        <p>\n          {{ \"GENERAL.DONE\" | translate }}\n        </p>\n      </button>\n    </div>\n  }\n</div>\n<!-- @if(dropdownOpen()){\n<div\n  #dropdownOptions\n  [clickOutside]=\"dropdownOptions\"\n  (clickOutsideEmitter)=\"toggleDropdown()\"\n  class=\"time-dropdown-container\"\n>\n  <select\n    [(ngModel)]=\"selectedHour\"\n    class=\"time-select\"\n    (ngModelChange)=\"onHourChange()\"\n  >\n    @for( h of filteredHours ;track $index){\n    <option [value]=\"h\">{{ h < 10 ? \"0\" + h : h }}</option>\n    }\n  </select>\n\n  <span>:</span>\n\n  <select [(ngModel)]=\"selectedMinute\" class=\"time-select\">\n    @for( m of filteredMinutes ;track $index){\n\n    <option [value]=\"m\">{{ m < 10 ? \"0\" + m : m }}</option>\n    }\n  </select>\n\n  <select [(ngModel)]=\"selectedPeriod\" class=\"time-select time-period\">\n    <option value=\"AM\">AM</option>\n    <option value=\"PM\">PM</option>\n  </select>\n\n  <button type=\"button\" (click)=\"confirmTime()\" class=\"confirm-btn\">\u2714</button>\n</div>\n} -->\n\n<!--\nWHEEL 1\n\nimport \"./styles.css\";\nimport React, { useState } from \"react\";\nimport styled from \"styled-components\";\nimport TimePicker from \"./TimePicker\";\n\nconst CustomTimePicker = styled(TimePicker)`\n  & {\n    font-family: \"Open Sans\";\n    font-size: 12px;\n\n    .picker-container .picker-column .picker-item.picker-item-selected {\n      color: #3f3f46;\n    }\n\n    .picker-container .picker-column .picker-item {\n      color: #7d7d7d;\n    }\n\n    & .picker-container .picker-inner {\n      padding: 0;\n    }\n\n    & .picker-highlight {\n      color: #212529;\n      &::before {\n        transform: scaleY(1);\n        background-color: #d1d1d1;\n      }\n      &::after {\n        transform: scaleY(1);\n        background-color: #d1d1d1;\n      }\n    }\n  }\n`;\n\nconst optionGroups = {\n  hour: [...Array(24).keys()].map((s) =>\n    s.toString().length === 1 ? \"0\" + s : s\n  ),\n  minute: [...Array(60).keys()].map((s) =>\n    s.toString().length === 1 ? \"0\" + s : s\n  ),\n};\n\nexport default () => {\n  const [valueGroups, setValueGroups] = useState({\n    hour: 12,\n    minute: 30,\n  });\n\n  // Update the value in response to user picking event\n  const handleChange = (name, value) => {\n    setValueGroups({\n      ...valueGroups,\n      [name]: value,\n    });\n  };\n\n  console.log(\"rerender\");\n\n  return (\n    <CustomTimePicker\n      optionGroups={optionGroups}\n      valueGroups={valueGroups}\n      onChange={handleChange}\n    />\n  );\n};\n\n\nwheel 2\nimport React from \"react\";\n\nimport Picker from \"time-picker-scroll\";\n\nexport default ({ className, optionGroups, valueGroups, onChange }) => {\n  return (\n    <div className={className}>\n      <div\n        style={{\n          textAlign: \"center\",\n          display: \"flex\",\n        }}\n      >\n        <span\n          style={{\n            display: \"inline-block\",\n            flex: \"1 1 150px\",\n            fontWeight: 600,\n            color: \"#676767\",\n          }}\n        >\n          Hour\n        </span>\n        <span\n          style={{\n            display: \"inline-block\",\n            flex: \"1 1 150px\",\n            fontWeight: 600,\n            color: \"#676767\",\n          }}\n        >\n          Minute\n        </span>\n      </div>\n\n      <div\n        style={{\n          position: \"relative\",\n        }}\n      >\n        <Picker\n          optionGroups={optionGroups}\n          valueGroups={valueGroups}\n          onChange={onChange}\n          itemHeight={44}\n          height={270}\n        />\n        <div\n          style={{\n            margin: 0,\n            position: \"absolute\",\n            top: \"50%\",\n            transform: \"translateY(-50%)\",\n            left: \"50%\",\n            fontSize: \"20px\",\n            textAlign: \"center\",\n            height: \"30px\",\n          }}\n        >\n          :\n        </div>\n      </div>\n\n      <div\n        style={{\n          width: \"100%\",\n          textAlign: \"center\",\n        }}\n      >\n        <button\n          style={{\n            width: \"75%\",\n            height: \"40px\",\n            backgroundColor: \"transparent\",\n            border: \"1px solid #D1D1D1\",\n            borderRadius: \"2px\",\n            color: \"#007BFF\",\n            fontWeight: 600,\n          }}\n        >\n          Set Time\n        </button>\n      </div>\n    </div>\n  );\n};\n\n-->\n", styles: [".time-picker-container{position:relative;width:100%;cursor:pointer;min-width:8em;height:100%}.custom-label{font-size:1.6em;font-weight:500;display:block;color:var(--vms-color-form-label);margin-bottom:.3em}.time-picker__input{position:relative}.custom-input{height:var(--height, 3em);width:100%;border-radius:.75em;border:1px solid #82828233;padding:0 1em;outline:none!important;box-shadow:none;font-size:1.6em;font-weight:400;cursor:pointer}.input-error-container{position:relative}.custom-input.input-error{border:1px solid #e55658;box-shadow:1px 0 6px #e5565826}.time-picker__input--time-icon{position:absolute;inset-inline-end:.5em;top:50%;transform:translateY(-50%);pointer-events:none}.time-error-container{position:absolute;top:100%;left:1.15em;width:100%}.time-error-container custom-app-error{pointer-events:none}.time-picker-modal{position:absolute;top:100%;inset-inline-end:0;background:#fff;border-radius:.6em;padding:24px;border:1px solid #82828233;z-index:1000;min-width:22.1em;max-width:100%;width:100%;height:33em;display:grid;grid-template-rows:1fr 20em auto;gap:.9em}.time-picker-header h3{font-size:1.5em;font-weight:600;margin:0;color:#1a1a1a}.time-picker-columns{display:flex;justify-content:center;align-items:center;gap:8px;height:100%}.time-column{flex:1;height:100%;position:relative}.period-column{flex:.8}.time-separator{font-size:2em;font-weight:700;color:#1a1a1a;align-self:center;padding:0 4px;z-index:1}.scroll-container{height:100%;overflow-y:scroll;scroll-snap-type:y mandatory;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none;cursor:grab;-webkit-user-select:none;user-select:none}.scroll-container:active{cursor:grabbing}.scroll-container::-webkit-scrollbar{display:none}.scroll-padding{height:8.3em;scroll-snap-align:start}.time-item{height:36px;display:flex;align-items:center;justify-content:center;font-size:1.5em;color:#1a1a1a;scroll-snap-align:start;transition:opacity .2s ease,font-weight .2s ease;-webkit-user-select:none;user-select:none}.time-item.selected{font-weight:700;opacity:1}.selection-indicator{position:absolute;top:50%;left:0;right:0;height:3.6em;transform:translateY(-50%);background:#f8f8f8;pointer-events:none;border-radius:.45em}.done-btn{width:100%;height:3rem;background:#25c7bc;color:#fff;border:none;border-radius:.4rem;font-weight:600;cursor:pointer;transition:background .2s ease}.done-btn p{font-size:1.4rem}.done-btn:hover{background:#159b92}.done-btn:active{transform:scale(.98)}@media (max-width: 480px){.time-picker-modal{min-width:90vw;max-width:90vw}}\n"] }]
+                    ], template: "<div class=\"time-picker-container\" [style]=\"{ '--height': height }\">\n  @if (label) {\n    <label [for]=\"label\" [class]=\"'custom-label ' + labelClass\">\n      {{ label }}\n\n      @if (containRequiredError()) {\n        <span\n          style=\"\n            color: var(--vms-color-alert-error);\n            font-size: 0.95em;\n            font-weight: 500;\n          \"\n        >\n          *\n        </span>\n      } @else {\n        <span\n          style=\"\n            color: var(--vms-color-alert-error);\n            font-size: 0.95em;\n            font-weight: 500;\n          \"\n          >&nbsp;</span\n        >\n      }\n    </label>\n  }\n  <!--\n  {{ parentForm.controls[controlName].errors | json }}\n  {{ parentForm.controls[controlName].value }}\n   -->\n  <div class=\"time-picker__input\">\n    <div class=\"time-error-container\">\n      @if (\n        parentForm.controls[controlName].invalid &&\n        parentForm.controls[controlName].touched\n      ) {\n        <custom-app-error\n          [control]=\"parentForm.controls[controlName]\"\n          [validation]=\"validation\"\n          [name]=\"controlName\"\n        />\n      }\n    </div>\n    <input\n      type=\"text\"\n      readonly\n      [class]=\"'custom-input ' + inputClass\"\n      [value]=\"displayTime()\"\n      (click)=\"toggleDropdown()\"\n      [attr.name]=\"name\"\n      [attr.id]=\"name\"\n      [class.input-error]=\"\n        parentForm.controls[controlName].invalid &&\n        parentForm.controls[controlName].touched\n      \"\n    />\n    <span class=\"time-picker__input--time-icon\" (click)=\"toggleDropdown()\">\n      <svg\n        width=\"20\"\n        height=\"20\"\n        viewBox=\"0 0 20 20\"\n        fill=\"none\"\n        xmlns=\"http://www.w3.org/2000/svg\"\n      >\n        <g opacity=\"0.5\">\n          <path\n            d=\"M6.07512 7.64174C6.23125 7.48653 6.44246 7.39941 6.66262 7.39941C6.88277 7.39941 7.09398 7.48653 7.25012 7.64174L10.2418 10.5917L13.1918 7.64174C13.3479 7.48653 13.5591 7.39941 13.7793 7.39941C13.9994 7.39941 14.2106 7.48653 14.3668 7.64174C14.4449 7.71921 14.5069 7.81138 14.5492 7.91293C14.5915 8.01448 14.6133 8.1234 14.6133 8.23341C14.6133 8.34342 14.5915 8.45234 14.5492 8.55389C14.5069 8.65544 14.4449 8.74761 14.3668 8.82507L10.8334 12.3584C10.756 12.4365 10.6638 12.4985 10.5623 12.5408C10.4607 12.5831 10.3518 12.6049 10.2418 12.6049C10.1318 12.6049 10.0229 12.5831 9.9213 12.5408C9.81975 12.4985 9.72758 12.4365 9.65012 12.3584L6.07512 8.82507C5.99701 8.7476 5.93501 8.65544 5.89271 8.55389C5.8504 8.45234 5.82862 8.34342 5.82862 8.23341C5.82862 8.1234 5.8504 8.01448 5.89271 7.91293C5.93501 7.81138 5.99701 7.71921 6.07512 7.64174Z\"\n            fill=\"#4B4F55\"\n          />\n        </g>\n      </svg>\n    </span>\n  </div>\n\n  @if (dropdownOpen()) {\n    <div\n      #dropdownOptions\n      [clickOutside]=\"dropdownOptions\"\n      (clickOutsideEmitter)=\"toggleDropdown()\"\n      class=\"time-picker-modal\"\n    >\n      <div class=\"time-picker-header\">\n        <h3>{{ \"GENERAL.PICKUP_TIME\" | translate }}</h3>\n      </div>\n\n      <div class=\"time-picker-container\">\n        <!-- Selection Indicator -->\n        <div class=\"selection-indicator\"></div>\n        <!--  -->\n        <div class=\"time-picker-columns\">\n          <!--  -->\n          <!-- Hour Column -->\n          <div class=\"time-column\">\n            <div class=\"scroll-container\" #hourScroll (scroll)=\"onHourScroll()\">\n              <div class=\"scroll-padding\"></div>\n              @for (h of filteredHours; track $index) {\n                <div\n                  class=\"time-item\"\n                  id=\"#time-item\"\n                  [class.selected]=\"h === selectedHour\"\n                  [style.opacity]=\"getItemOpacity($index, hourScrollRef)\"\n                  [style.font-weight]=\"getItemFontWeight($index, hourScrollRef)\"\n                >\n                  {{ h < 10 ? \"0\" + h : h }}\n                </div>\n              }\n              <div class=\"scroll-padding\"></div>\n            </div>\n          </div>\n\n          <div class=\"time-separator\">:</div>\n\n          <!-- Minute Column -->\n          <div class=\"time-column\">\n            <div\n              class=\"scroll-container\"\n              #minuteScroll\n              (scroll)=\"onMinuteScroll()\"\n            >\n              <div class=\"scroll-padding\"></div>\n              @for (m of filteredMinutes; track $index) {\n                <div\n                  class=\"time-item\"\n                  [class.selected]=\"m === selectedMinute\"\n                  [style.opacity]=\"getItemOpacity($index, minuteScrollRef)\"\n                  [style.font-weight]=\"\n                    getItemFontWeight($index, minuteScrollRef)\n                  \"\n                >\n                  {{ m < 10 ? \"0\" + m : m }}\n                </div>\n              }\n              <div class=\"scroll-padding\"></div>\n            </div>\n          </div>\n\n          <!-- Period Column -->\n          <div class=\"time-column period-column\">\n            <div\n              class=\"scroll-container\"\n              #periodScroll\n              (scroll)=\"onPeriodScroll()\"\n            >\n              <div class=\"scroll-padding\"></div>\n              @for (p of periods; track $index) {\n                <div\n                  class=\"time-item\"\n                  [class.selected]=\"p === selectedPeriod\"\n                  [style.opacity]=\"getItemOpacity($index, periodScrollRef)\"\n                  [style.font-weight]=\"\n                    getItemFontWeight($index, periodScrollRef)\n                  \"\n                >\n                  {{ \"GENERAL.\" + p | translate }}\n                </div>\n              }\n              <div class=\"scroll-padding\"></div>\n            </div>\n          </div>\n        </div>\n      </div>\n\n      <button type=\"button\" (click)=\"confirmTime()\" class=\"done-btn\">\n        <p>\n          {{ \"GENERAL.DONE\" | translate }}\n        </p>\n      </button>\n    </div>\n  }\n</div>\n<!-- @if(dropdownOpen()){\n<div\n  #dropdownOptions\n  [clickOutside]=\"dropdownOptions\"\n  (clickOutsideEmitter)=\"toggleDropdown()\"\n  class=\"time-dropdown-container\"\n>\n  <select\n    [(ngModel)]=\"selectedHour\"\n    class=\"time-select\"\n    (ngModelChange)=\"onHourChange()\"\n  >\n    @for( h of filteredHours ;track $index){\n    <option [value]=\"h\">{{ h < 10 ? \"0\" + h : h }}</option>\n    }\n  </select>\n\n  <span>:</span>\n\n  <select [(ngModel)]=\"selectedMinute\" class=\"time-select\">\n    @for( m of filteredMinutes ;track $index){\n\n    <option [value]=\"m\">{{ m < 10 ? \"0\" + m : m }}</option>\n    }\n  </select>\n\n  <select [(ngModel)]=\"selectedPeriod\" class=\"time-select time-period\">\n    <option value=\"AM\">AM</option>\n    <option value=\"PM\">PM</option>\n  </select>\n\n  <button type=\"button\" (click)=\"confirmTime()\" class=\"confirm-btn\">\u2714</button>\n</div>\n} -->\n\n<!--\nWHEEL 1\n\nimport \"./styles.css\";\nimport React, { useState } from \"react\";\nimport styled from \"styled-components\";\nimport TimePicker from \"./TimePicker\";\n\nconst CustomTimePicker = styled(TimePicker)`\n  & {\n    font-family: \"Open Sans\";\n    font-size: 12px;\n\n    .picker-container .picker-column .picker-item.picker-item-selected {\n      color: #3f3f46;\n    }\n\n    .picker-container .picker-column .picker-item {\n      color: #7d7d7d;\n    }\n\n    & .picker-container .picker-inner {\n      padding: 0;\n    }\n\n    & .picker-highlight {\n      color: #212529;\n      &::before {\n        transform: scaleY(1);\n        background-color: #d1d1d1;\n      }\n      &::after {\n        transform: scaleY(1);\n        background-color: #d1d1d1;\n      }\n    }\n  }\n`;\n\nconst optionGroups = {\n  hour: [...Array(24).keys()].map((s) =>\n    s.toString().length === 1 ? \"0\" + s : s\n  ),\n  minute: [...Array(60).keys()].map((s) =>\n    s.toString().length === 1 ? \"0\" + s : s\n  ),\n};\n\nexport default () => {\n  const [valueGroups, setValueGroups] = useState({\n    hour: 12,\n    minute: 30,\n  });\n\n  // Update the value in response to user picking event\n  const handleChange = (name, value) => {\n    setValueGroups({\n      ...valueGroups,\n      [name]: value,\n    });\n  };\n\n  console.log(\"rerender\");\n\n  return (\n    <CustomTimePicker\n      optionGroups={optionGroups}\n      valueGroups={valueGroups}\n      onChange={handleChange}\n    />\n  );\n};\n\n\nwheel 2\nimport React from \"react\";\n\nimport Picker from \"time-picker-scroll\";\n\nexport default ({ className, optionGroups, valueGroups, onChange }) => {\n  return (\n    <div className={className}>\n      <div\n        style={{\n          textAlign: \"center\",\n          display: \"flex\",\n        }}\n      >\n        <span\n          style={{\n            display: \"inline-block\",\n            flex: \"1 1 150px\",\n            fontWeight: 600,\n            color: \"#676767\",\n          }}\n        >\n          Hour\n        </span>\n        <span\n          style={{\n            display: \"inline-block\",\n            flex: \"1 1 150px\",\n            fontWeight: 600,\n            color: \"#676767\",\n          }}\n        >\n          Minute\n        </span>\n      </div>\n\n      <div\n        style={{\n          position: \"relative\",\n        }}\n      >\n        <Picker\n          optionGroups={optionGroups}\n          valueGroups={valueGroups}\n          onChange={onChange}\n          itemHeight={44}\n          height={270}\n        />\n        <div\n          style={{\n            margin: 0,\n            position: \"absolute\",\n            top: \"50%\",\n            transform: \"translateY(-50%)\",\n            left: \"50%\",\n            fontSize: \"20px\",\n            textAlign: \"center\",\n            height: \"30px\",\n          }}\n        >\n          :\n        </div>\n      </div>\n\n      <div\n        style={{\n          width: \"100%\",\n          textAlign: \"center\",\n        }}\n      >\n        <button\n          style={{\n            width: \"75%\",\n            height: \"40px\",\n            backgroundColor: \"transparent\",\n            border: \"1px solid #D1D1D1\",\n            borderRadius: \"2px\",\n            color: \"#007BFF\",\n            fontWeight: 600,\n          }}\n        >\n          Set Time\n        </button>\n      </div>\n    </div>\n  );\n};\n\n-->\n", styles: [".time-picker-container{position:relative;width:100%;cursor:pointer;min-width:8em;height:100%}.custom-label{font-size:1.6em;font-weight:500;display:block;color:var(--vms-color-form-label);margin-bottom:.3em}.time-picker__input{position:relative}.custom-input{height:var(--height, 3em);width:100%;border-radius:.75em;border:1px solid #82828233;padding:0 1em;outline:none!important;box-shadow:none;font-size:1.6em;font-weight:400;cursor:pointer}.input-error-container{position:relative}.custom-input.input-error{border:1px solid #e55658;box-shadow:1px 0 6px #e5565826}.time-picker__input--time-icon{position:absolute;inset-inline-end:.5em;top:50%;transform:translateY(-50%);pointer-events:none}.time-error-container{position:absolute;top:100%;left:1.15em;width:100%}.time-error-container custom-app-error{pointer-events:none}.time-picker-modal{position:absolute;top:100%;inset-inline-end:0;background:#fff;border-radius:.6em;padding:24px;border:1px solid #82828233;z-index:1000;min-width:22.1em;max-width:100%;width:100%;height:33em;display:grid;grid-template-rows:1fr 20em auto;gap:.9em}.time-picker-header h3{font-size:1.5em;font-weight:600;margin:0;color:#1a1a1a}.time-picker-columns{display:flex;justify-content:center;align-items:center;gap:8px;height:100%}.time-column{flex:1;height:100%;position:relative}.period-column{flex:.8}.time-separator{font-size:2em;font-weight:700;color:#1a1a1a;align-self:center;padding:0 4px;z-index:1}.scroll-container{height:100%;overflow-y:scroll;scroll-snap-type:y mandatory;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none;cursor:grab;-webkit-user-select:none;user-select:none}.scroll-container:active{cursor:grabbing}.scroll-container::-webkit-scrollbar{display:none}.scroll-padding{height:8.3em;scroll-snap-align:start}.time-item{height:2.86em;display:flex;align-items:center;justify-content:center;font-size:1.5em;color:#1a1a1a;scroll-snap-align:center;scroll-snap-stop:always;transition:opacity .2s ease,font-weight .2s ease;-webkit-user-select:none;user-select:none}.time-item.selected{font-weight:700;opacity:1}.selection-indicator{position:absolute;top:50%;left:0;right:0;height:3.6em;transform:translateY(-50%);background:#f8f8f8;pointer-events:none;border-radius:.45em}.done-btn{width:100%;height:3rem;background:#25c7bc;color:#fff;border:none;border-radius:.4rem;font-weight:600;cursor:pointer;transition:background .2s ease}.done-btn p{font-size:1.4rem}.done-btn:hover{background:#159b92}.done-btn:active{transform:scale(.98)}@media (max-width: 480px){.time-picker-modal{min-width:90vw;max-width:90vw}}\n"] }]
         }], propDecorators: { parentForm: [{
                 type: Input,
                 args: [{ required: true }]
@@ -5105,15 +4977,6 @@ i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.17", ngImpo
                 type: Input
             }], timeChange: [{
                 type: Output
-            }], hourScrollRef: [{
-                type: ViewChild,
-                args: ['hourScroll']
-            }], minuteScrollRef: [{
-                type: ViewChild,
-                args: ['minuteScroll']
-            }], periodScrollRef: [{
-                type: ViewChild,
-                args: ['periodScroll']
             }] } });
 
 class CustomSearchInputComponent {
@@ -8446,7 +8309,7 @@ i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.17", ngImpo
                 type: Output
             }] } });
 
-class CustomTimeInputComponent {
+class CustomTimeInputComponent extends CustomTimeBaseComponent {
     value = null;
     valueChange = new EventEmitter();
     label = '';
@@ -8457,18 +8320,8 @@ class CustomTimeInputComponent {
     rangeMax = '';
     required = false;
     defaultTime = '';
-    hourScrollRef;
-    minuteScrollRef;
-    periodScrollRef;
     translate = inject(TranslateService);
     dropdownOpen = signal(false);
-    hours = hours;
-    minutes = minutes;
-    periods = ['AM', 'PM'];
-    selectedHour;
-    selectedMinute;
-    selectedPeriod = 'AM';
-    itemHeight = 36;
     ngOnInit() {
         if (this.defaultTime) {
             this.setTimeFromString(this.defaultTime);
@@ -8478,11 +8331,7 @@ class CustomTimeInputComponent {
         }
     }
     ngAfterViewInit() {
-        // Initialize scroll positions after view is ready
-        this.scrollToSelectedValues();
-    }
-    ngOnDestroy() {
-        // Clean up event listeners
+        super.ngAfterViewInit();
     }
     toggleDropdown() {
         this.dropdownOpen.set(!this.dropdownOpen());
@@ -8500,108 +8349,6 @@ class CustomTimeInputComponent {
             }
             this.confirmTime();
         }
-    }
-    setTimeFromString(timeStr) {
-        const match = timeStr.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
-        if (match) {
-            this.selectedHour = parseInt(match[1], 10);
-            this.selectedMinute = parseInt(match[2], 10);
-            this.selectedPeriod = match[3].toUpperCase();
-        }
-    }
-    scrollToSelectedValues() {
-        if (this.hourScrollRef) {
-            console.log('Scrolling to hour: ', this.hourScrollRef, this.selectedHour);
-            const hourIndex = this.filteredHours.indexOf(Number(this.selectedHour));
-            if (hourIndex !== -1) {
-                this.hourScrollRef.nativeElement.scrollTop =
-                    hourIndex * this.itemHeight;
-            }
-        }
-        if (this.minuteScrollRef) {
-            const minuteIndex = this.filteredMinutes.indexOf(Number(this.selectedMinute));
-            if (minuteIndex !== -1) {
-                this.minuteScrollRef.nativeElement.scrollTop =
-                    minuteIndex * this.itemHeight;
-            }
-        }
-        if (this.periodScrollRef) {
-            const periodIndex = this.periods.indexOf(this.selectedPeriod);
-            if (periodIndex !== -1) {
-                this.periodScrollRef.nativeElement.scrollTop =
-                    periodIndex * this.itemHeight;
-            }
-        }
-    }
-    onHourSelect(event) {
-        const el = event.target;
-        if (!el)
-            return;
-        this.selectedHour = Number(el.value);
-        this.onHourChange();
-    }
-    onMinuteSelect(event) {
-        const el = event.target;
-        if (!el)
-            return;
-        this.selectedMinute = Number(el.value);
-    }
-    onPeriodSelect(event) {
-        const el = event.target;
-        if (!el)
-            return;
-        this.selectedPeriod = el.value;
-        this.onHourChange();
-    }
-    get filteredHours() {
-        const hoursList = this.rangeMin || this.rangeMax ? this.getFilteredHoursList() : this.hours;
-        // Move 12 to the top
-        const filtered = hoursList.filter((h) => h !== 12);
-        if (hoursList.includes(12)) {
-            return [12, ...filtered];
-        }
-        return filtered;
-    }
-    getFilteredHoursList() {
-        return this.hours.filter((h) => {
-            let hour24 = h;
-            if (this.selectedPeriod === 'PM' && h !== 12) {
-                hour24 = h + 12;
-            }
-            else if (this.selectedPeriod === 'AM' && h === 12) {
-                hour24 = 0;
-            }
-            if (this.rangeMin) {
-                const [minH] = this.rangeMin.split(':').map(Number);
-                if (hour24 < minH)
-                    return false;
-            }
-            if (this.rangeMax) {
-                const [maxH] = this.rangeMax.split(':').map(Number);
-                if (hour24 > maxH)
-                    return false;
-            }
-            return true;
-        });
-    }
-    get filteredMinutes() {
-        if (this.selectedHour == null || (!this.rangeMin && !this.rangeMax)) {
-            return this.minutes;
-        }
-        const hour24 = this.to24Hour(this.selectedHour, this.selectedPeriod);
-        return this.minutes.filter((m) => {
-            if (this.rangeMin) {
-                const [minH, minM] = this.rangeMin.split(':').map(Number);
-                if (hour24 === minH && m < minM)
-                    return false;
-            }
-            if (this.rangeMax) {
-                const [maxH, maxM] = this.rangeMax.split(':').map(Number);
-                if (hour24 === maxH && m > maxM)
-                    return false;
-            }
-            return true;
-        });
     }
     onHourChange() {
         const mins = this.filteredMinutes;
@@ -8658,13 +8405,6 @@ class CustomTimeInputComponent {
         }
         this.selectedMinute = Number(minute);
     }
-    to24Hour(hour, period) {
-        if (period === 'PM' && hour !== 12)
-            return hour + 12;
-        if (period === 'AM' && hour === 12)
-            return 0;
-        return hour;
-    }
     isTimeInRange() {
         if (!this.rangeMin && !this.rangeMax)
             return true;
@@ -8682,53 +8422,12 @@ class CustomTimeInputComponent {
         }
         return true;
     }
-    getItemOpacity(index, scrollElement) {
-        if (!scrollElement)
-            return 0.3;
-        const scrollTop = scrollElement.nativeElement.scrollTop;
-        const centerIndex = Math.round(scrollTop / this.itemHeight);
-        const distance = Math.abs(index - centerIndex);
-        if (distance === 0)
-            return 1;
-        if (distance === 1)
-            return 0.6;
-        return 0.3;
-    }
-    getItemFontWeight(index, scrollElement) {
-        if (!scrollElement)
-            return 'normal';
-        const scrollTop = scrollElement.nativeElement.scrollTop;
-        const centerIndex = Math.round(scrollTop / this.itemHeight);
-        return index === centerIndex ? 'bold' : 'normal';
-    }
-    // SCROLL LISTENERS
-    onHourScroll() {
-        const scrollTop = this.hourScrollRef.nativeElement.scrollTop;
-        const index = Math.round(scrollTop / this.itemHeight);
-        if (this.filteredHours[index] !== undefined) {
-            this.selectedHour = this.filteredHours[index];
-        }
-    }
-    onMinuteScroll() {
-        const scrollTop = this.minuteScrollRef.nativeElement.scrollTop;
-        const index = Math.round(scrollTop / this.itemHeight);
-        if (this.filteredMinutes[index] !== undefined) {
-            this.selectedMinute = this.filteredMinutes[index];
-        }
-    }
-    onPeriodScroll() {
-        const scrollTop = this.periodScrollRef.nativeElement.scrollTop;
-        const index = Math.round(scrollTop / this.itemHeight);
-        if (this.periods[index] !== undefined) {
-            this.selectedPeriod = this.periods[index];
-        }
-    }
-    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.17", ngImport: i0, type: CustomTimeInputComponent, deps: [], target: i0.ɵɵFactoryTarget.Component });
-    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "17.0.0", version: "19.2.17", type: CustomTimeInputComponent, isStandalone: true, selector: "custom-time-input", inputs: { value: "value", label: "label", labelClass: "labelClass", inputClass: "inputClass", height: "height", rangeMin: "rangeMin", rangeMax: "rangeMax", required: "required", defaultTime: "defaultTime" }, outputs: { valueChange: "valueChange" }, viewQueries: [{ propertyName: "hourScrollRef", first: true, predicate: ["hourScroll"], descendants: true }, { propertyName: "minuteScrollRef", first: true, predicate: ["minuteScroll"], descendants: true }, { propertyName: "periodScrollRef", first: true, predicate: ["periodScroll"], descendants: true }], ngImport: i0, template: "<div class=\"time-picker-container\" [style]=\"{ '--height': height }\">\n  @if (label) {\n    <label class=\"custom-label {{ labelClass }}\">\n      {{ label }}\n      @if (required) {\n        <span class=\"required\">*</span>\n      }\n    </label>\n  }\n\n  <div class=\"time-picker__input\">\n    <input\n      type=\"text\"\n      readonly\n      class=\"custom-input {{ inputClass }}\"\n      [value]=\"displayTime()\"\n      (click)=\"toggleDropdown()\"\n    />\n\n    <span class=\"time-picker__input--time-icon\" (click)=\"toggleDropdown()\">\n      <svg\n        width=\"16\"\n        height=\"16\"\n        viewBox=\"0 0 16 16\"\n        fill=\"none\"\n        xmlns=\"http://www.w3.org/2000/svg\"\n      >\n        <path\n          d=\"M14.6663 7.9987C14.6663 11.6787 11.6797 14.6654 7.99967 14.6654C4.31967 14.6654 1.33301 11.6787 1.33301 7.9987C1.33301 4.3187 4.31967 1.33203 7.99967 1.33203C11.6797 1.33203 14.6663 4.3187 14.6663 7.9987Z\"\n          stroke=\"#120710\"\n          stroke-linecap=\"round\"\n          stroke-linejoin=\"round\"\n        />\n        <path\n          d=\"M10.4729 10.1211L8.40626 8.88781C8.04626 8.67448 7.75293 8.16115 7.75293 7.74115V5.00781\"\n          stroke=\"#120710\"\n          stroke-linecap=\"round\"\n          stroke-linejoin=\"round\"\n        />\n      </svg>\n    </span>\n  </div>\n\n  @if (dropdownOpen()) {\n    <div\n      #dropdownOptions\n      [clickOutside]=\"dropdownOptions\"\n      (clickOutsideEmitter)=\"toggleDropdown()\"\n      class=\"time-picker-modal\"\n    >\n      <div class=\"time-picker-header\">\n        <h3>{{ \"GENERAL.PICKUP_TIME\" | translate }}</h3>\n      </div>\n\n      <div class=\"time-picker-container\">\n        <!-- Selection Indicator -->\n        <div class=\"selection-indicator\"></div>\n        <!--  -->\n        <div class=\"time-picker-columns\">\n          <!--  -->\n          <!-- Hour Column -->\n          <div class=\"time-column\">\n            <div class=\"scroll-container\" #hourScroll (scroll)=\"onHourScroll()\">\n              <div class=\"scroll-padding\"></div>\n              @for (h of filteredHours; track $index) {\n                <div\n                  class=\"time-item\"\n                  id=\"#time-item\"\n                  [class.selected]=\"h === selectedHour\"\n                  [style.opacity]=\"getItemOpacity($index, hourScrollRef)\"\n                  [style.font-weight]=\"getItemFontWeight($index, hourScrollRef)\"\n                >\n                  {{ h < 10 ? \"0\" + h : h }}\n                </div>\n              }\n              <div class=\"scroll-padding\"></div>\n            </div>\n          </div>\n\n          <div class=\"time-separator\">:</div>\n\n          <!-- Minute Column -->\n          <div class=\"time-column\">\n            <div class=\"scroll-container\" #minuteScroll (scroll)=\"onMinuteScroll()\">\n              <div class=\"scroll-padding\"></div>\n              @for (m of filteredMinutes; track $index) {\n                <div\n                  class=\"time-item\"\n                  [class.selected]=\"m === selectedMinute\"\n                  [style.opacity]=\"getItemOpacity($index, minuteScrollRef)\"\n                  [style.font-weight]=\"\n                    getItemFontWeight($index, minuteScrollRef)\n                  \"\n                >\n                  {{ m < 10 ? \"0\" + m : m }}\n                </div>\n              }\n              <div class=\"scroll-padding\"></div>\n            </div>\n          </div>\n\n          <!-- Period Column -->\n          <div class=\"time-column period-column\">\n            <div class=\"scroll-container\" #periodScroll (scroll)=\"onPeriodScroll()\">\n              <div class=\"scroll-padding\"></div>\n              @for (p of periods; track $index) {\n                <div\n                  class=\"time-item\"\n                  [class.selected]=\"p === selectedPeriod\"\n                  [style.opacity]=\"getItemOpacity($index, periodScrollRef)\"\n                  [style.font-weight]=\"\n                    getItemFontWeight($index, periodScrollRef)\n                  \"\n                >\n                  {{ \"GENERAL.\" + p | translate }}\n                </div>\n              }\n              <div class=\"scroll-padding\"></div>\n            </div>\n          </div>\n        </div>\n      </div>\n\n      <button type=\"button\" (click)=\"confirmTime()\" class=\"done-btn\">\n        <p>\n          {{ \"GENERAL.DONE\" | translate }}\n        </p>\n      </button>\n    </div>\n  }\n</div>\n", styles: [".time-picker-container{position:relative;width:100%;cursor:pointer;min-width:8rem;height:100%}.custom-label{font-size:1.6rem;display:block;color:var(--vms-color-form-label);margin-bottom:.3rem}.time-picker__input{position:relative}.custom-input{height:var(--height, 3em);width:100%;border-radius:.29rem;border:1px solid #82828233;padding:0 2rem 0 1rem;outline:none!important;box-shadow:none;font-size:1.4rem;cursor:pointer}.time-picker__input--time-icon{position:absolute;inset-inline-end:.5rem;top:0;pointer-events:none;height:100%;display:flex;justify-content:center;align-items:center}.time-error-container{position:absolute;top:100%;left:1.15rem;width:100%}.time-error-container custom-app-error{pointer-events:none}.time-picker-modal{position:absolute;top:100%;inset-inline-end:0;background:#fff;border-radius:.6rem;padding:24px;border:1px solid #82828233;z-index:1000;min-width:20rem;max-width:100%;width:100%;height:30rem;display:grid;grid-template-rows:1fr 18.4rem auto;gap:.9rem}.time-picker-header h3{font-size:1.5rem;font-weight:600;margin:0;color:#1a1a1a}.time-picker-columns{display:flex;justify-content:center;align-items:center;gap:8px;height:100%}.time-column{flex:1;height:100%;position:relative}.period-column{flex:.8}.time-separator{font-size:2rem;font-weight:700;color:#1a1a1a;align-self:center;padding:0 4px;z-index:1}.scroll-container{height:100%;overflow-y:scroll;scroll-snap-type:y mandatory;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none;cursor:grab;-webkit-user-select:none;user-select:none}.scroll-container:active{cursor:grabbing}.scroll-container::-webkit-scrollbar{display:none}.scroll-padding{height:7.4rem;scroll-snap-align:start}.time-item{height:36px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;color:#1a1a1a;scroll-snap-align:start;transition:opacity .2s ease,font-weight .2s ease;-webkit-user-select:none;user-select:none}.time-item.selected{font-weight:700;opacity:1}.selection-indicator{position:absolute;top:50%;left:0;right:0;height:3.6rem;transform:translateY(-50%);background:#f8f8f8;pointer-events:none;border-radius:.45rem}.done-btn{width:100%;height:3rem;background:#25c7bc;color:#fff;border:none;border-radius:.4rem;font-weight:600;cursor:pointer;transition:background .2s ease}.done-btn p{font-size:1.4rem}.done-btn:hover{background:#159b92}.done-btn:active{transform:scale(.98)}@media (max-width: 480px){.time-picker-modal{min-width:90vw;max-width:90vw}}\n"], dependencies: [{ kind: "ngmodule", type: TranslateModule }, { kind: "pipe", type: i1$1.TranslatePipe, name: "translate" }, { kind: "directive", type: ClickOutsideDirective, selector: "[clickOutside]", inputs: ["clickOutside"], outputs: ["clickOutsideEmitter"] }] });
+    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.17", ngImport: i0, type: CustomTimeInputComponent, deps: null, target: i0.ɵɵFactoryTarget.Component });
+    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "17.0.0", version: "19.2.17", type: CustomTimeInputComponent, isStandalone: true, selector: "custom-time-input", inputs: { value: "value", label: "label", labelClass: "labelClass", inputClass: "inputClass", height: "height", rangeMin: "rangeMin", rangeMax: "rangeMax", required: "required", defaultTime: "defaultTime" }, outputs: { valueChange: "valueChange" }, usesInheritance: true, ngImport: i0, template: "<div #timeInput class=\"time-picker-container\" [style]=\"{ '--height': height }\">\n  @if (label) {\n    <label class=\"custom-label {{ labelClass }}\">\n      {{ label }}\n      @if (required) {\n        <span class=\"required\">*</span>\n      }\n    </label>\n  }\n\n  <div class=\"time-picker__input\">\n    <input\n      type=\"text\"\n      readonly\n      class=\"custom-input {{ inputClass }}\"\n      [value]=\"displayTime()\"\n      (click)=\"toggleDropdown()\"\n    />\n\n    <span class=\"time-picker__input--time-icon\" (click)=\"toggleDropdown()\">\n      <svg\n        width=\"16\"\n        height=\"16\"\n        viewBox=\"0 0 16 16\"\n        fill=\"none\"\n        xmlns=\"http://www.w3.org/2000/svg\"\n      >\n        <path\n          d=\"M14.6663 7.9987C14.6663 11.6787 11.6797 14.6654 7.99967 14.6654C4.31967 14.6654 1.33301 11.6787 1.33301 7.9987C1.33301 4.3187 4.31967 1.33203 7.99967 1.33203C11.6797 1.33203 14.6663 4.3187 14.6663 7.9987Z\"\n          stroke=\"#120710\"\n          stroke-linecap=\"round\"\n          stroke-linejoin=\"round\"\n        />\n        <path\n          d=\"M10.4729 10.1211L8.40626 8.88781C8.04626 8.67448 7.75293 8.16115 7.75293 7.74115V5.00781\"\n          stroke=\"#120710\"\n          stroke-linecap=\"round\"\n          stroke-linejoin=\"round\"\n        />\n      </svg>\n    </span>\n  </div>\n\n  @if (dropdownOpen()) {\n    <div\n      #dropdownOptions\n      [clickOutside]=\"dropdownOptions\"\n      (clickOutsideEmitter)=\"toggleDropdown()\"\n      class=\"time-picker-modal\"\n    >\n      <div class=\"time-picker-header\">\n        <h3>{{ \"GENERAL.PICKUP_TIME\" | translate }}</h3>\n      </div>\n\n      <div class=\"time-picker-container\">\n        <!-- Selection Indicator -->\n        <div class=\"selection-indicator\"></div>\n        <!--  -->\n        <div class=\"time-picker-columns\">\n          <!--  -->\n          <!-- Hour Column -->\n          <div class=\"time-column\">\n            <div class=\"scroll-container\" #hourScroll (scroll)=\"onHourScroll()\">\n              <div class=\"scroll-padding\"></div>\n              @for (h of filteredHours; track $index) {\n                <div\n                  class=\"time-item\"\n                  id=\"#time-item\"\n                  [class.selected]=\"h === selectedHour\"\n                  [style.opacity]=\"getItemOpacity($index, hourScrollRef)\"\n                  [style.font-weight]=\"getItemFontWeight($index, hourScrollRef)\"\n                >\n                  {{ h < 10 ? \"0\" + h : h }}\n                </div>\n              }\n              <div class=\"scroll-padding\"></div>\n            </div>\n          </div>\n\n          <div class=\"time-separator\">:</div>\n\n          <!-- Minute Column -->\n          <div class=\"time-column\">\n            <div\n              class=\"scroll-container\"\n              #minuteScroll\n              (scroll)=\"onMinuteScroll()\"\n            >\n              <div class=\"scroll-padding\"></div>\n              @for (m of filteredMinutes; track $index) {\n                <div\n                  class=\"time-item\"\n                  [class.selected]=\"m === selectedMinute\"\n                  [style.opacity]=\"getItemOpacity($index, minuteScrollRef)\"\n                  [style.font-weight]=\"\n                    getItemFontWeight($index, minuteScrollRef)\n                  \"\n                >\n                  {{ m < 10 ? \"0\" + m : m }}\n                </div>\n              }\n              <div class=\"scroll-padding\"></div>\n            </div>\n          </div>\n\n          <!-- Period Column -->\n          <div class=\"time-column period-column\">\n            <div\n              class=\"scroll-container\"\n              #periodScroll\n              (scroll)=\"onPeriodScroll()\"\n            >\n              <div class=\"scroll-padding\"></div>\n              @for (p of periods; track $index) {\n                <div\n                  class=\"time-item\"\n                  [class.selected]=\"p === selectedPeriod\"\n                  [style.opacity]=\"getItemOpacity($index, periodScrollRef)\"\n                  [style.font-weight]=\"\n                    getItemFontWeight($index, periodScrollRef)\n                  \"\n                >\n                  {{ \"GENERAL.\" + p | translate }}\n                </div>\n              }\n              <div class=\"scroll-padding\"></div>\n            </div>\n          </div>\n        </div>\n      </div>\n\n      <button type=\"button\" (click)=\"confirmTime()\" class=\"done-btn\">\n        <p>\n          {{ \"GENERAL.DONE\" | translate }}\n        </p>\n      </button>\n    </div>\n  }\n</div>\n", styles: [".time-picker-container{position:relative;width:100%;cursor:pointer;min-width:8rem;height:100%}.custom-label{font-size:1.6rem;display:block;color:var(--vms-color-form-label);margin-bottom:.3rem}.time-picker__input{position:relative}.custom-input{height:var(--height, 3em);width:100%;border-radius:.29rem;border:1px solid #82828233;padding:0 2rem 0 1rem;outline:none!important;box-shadow:none;font-size:1.4rem;cursor:pointer}.time-picker__input--time-icon{position:absolute;inset-inline-end:.5rem;top:0;pointer-events:none;height:100%;display:flex;justify-content:center;align-items:center}.time-error-container{position:absolute;top:100%;left:1.15rem;width:100%}.time-error-container custom-app-error{pointer-events:none}.time-picker-modal{position:absolute;top:100%;inset-inline-end:0;background:#fff;border-radius:.6rem;padding:24px;border:1px solid #82828233;z-index:1000;min-width:20rem;max-width:100%;width:100%;height:30rem;display:grid;grid-template-rows:1fr 18.4rem auto;gap:.9rem}.time-picker-header h3{font-size:1.5rem;font-weight:600;margin:0;color:#1a1a1a}.time-picker-columns{display:flex;justify-content:center;align-items:center;gap:8px;height:100%}.time-column{flex:1;height:100%;position:relative}.period-column{flex:.8}.time-separator{font-size:2rem;font-weight:700;color:#1a1a1a;align-self:center;padding:0 4px;z-index:1}.scroll-container{height:100%;overflow-y:scroll;scroll-snap-type:y mandatory;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none;cursor:grab;-webkit-user-select:none;user-select:none}.scroll-container:active{cursor:grabbing}.scroll-container::-webkit-scrollbar{display:none}.scroll-padding{height:7.4rem;scroll-snap-align:start}.time-item{height:2.86em;display:flex;align-items:center;justify-content:center;font-size:1.5rem;color:#1a1a1a;scroll-snap-align:center;scroll-snap-stop:always;transition:opacity .2s ease,font-weight .2s ease;-webkit-user-select:none;user-select:none}.time-item.selected{font-weight:700;opacity:1}.selection-indicator{position:absolute;top:50%;left:0;right:0;height:3.6rem;transform:translateY(-50%);background:#f8f8f8;pointer-events:none;border-radius:.45rem}.done-btn{width:100%;height:3rem;background:#25c7bc;color:#fff;border:none;border-radius:.4rem;font-weight:600;cursor:pointer;transition:background .2s ease}.done-btn p{font-size:1.4rem}.done-btn:hover{background:#159b92}.done-btn:active{transform:scale(.98)}@media (max-width: 480px){.time-picker-modal{min-width:90vw;max-width:90vw}}\n"], dependencies: [{ kind: "ngmodule", type: TranslateModule }, { kind: "pipe", type: i1$1.TranslatePipe, name: "translate" }, { kind: "directive", type: ClickOutsideDirective, selector: "[clickOutside]", inputs: ["clickOutside"], outputs: ["clickOutsideEmitter"] }] });
 }
 i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.17", ngImport: i0, type: CustomTimeInputComponent, decorators: [{
             type: Component,
-            args: [{ selector: 'custom-time-input', imports: [TranslateModule, ClickOutsideDirective], template: "<div class=\"time-picker-container\" [style]=\"{ '--height': height }\">\n  @if (label) {\n    <label class=\"custom-label {{ labelClass }}\">\n      {{ label }}\n      @if (required) {\n        <span class=\"required\">*</span>\n      }\n    </label>\n  }\n\n  <div class=\"time-picker__input\">\n    <input\n      type=\"text\"\n      readonly\n      class=\"custom-input {{ inputClass }}\"\n      [value]=\"displayTime()\"\n      (click)=\"toggleDropdown()\"\n    />\n\n    <span class=\"time-picker__input--time-icon\" (click)=\"toggleDropdown()\">\n      <svg\n        width=\"16\"\n        height=\"16\"\n        viewBox=\"0 0 16 16\"\n        fill=\"none\"\n        xmlns=\"http://www.w3.org/2000/svg\"\n      >\n        <path\n          d=\"M14.6663 7.9987C14.6663 11.6787 11.6797 14.6654 7.99967 14.6654C4.31967 14.6654 1.33301 11.6787 1.33301 7.9987C1.33301 4.3187 4.31967 1.33203 7.99967 1.33203C11.6797 1.33203 14.6663 4.3187 14.6663 7.9987Z\"\n          stroke=\"#120710\"\n          stroke-linecap=\"round\"\n          stroke-linejoin=\"round\"\n        />\n        <path\n          d=\"M10.4729 10.1211L8.40626 8.88781C8.04626 8.67448 7.75293 8.16115 7.75293 7.74115V5.00781\"\n          stroke=\"#120710\"\n          stroke-linecap=\"round\"\n          stroke-linejoin=\"round\"\n        />\n      </svg>\n    </span>\n  </div>\n\n  @if (dropdownOpen()) {\n    <div\n      #dropdownOptions\n      [clickOutside]=\"dropdownOptions\"\n      (clickOutsideEmitter)=\"toggleDropdown()\"\n      class=\"time-picker-modal\"\n    >\n      <div class=\"time-picker-header\">\n        <h3>{{ \"GENERAL.PICKUP_TIME\" | translate }}</h3>\n      </div>\n\n      <div class=\"time-picker-container\">\n        <!-- Selection Indicator -->\n        <div class=\"selection-indicator\"></div>\n        <!--  -->\n        <div class=\"time-picker-columns\">\n          <!--  -->\n          <!-- Hour Column -->\n          <div class=\"time-column\">\n            <div class=\"scroll-container\" #hourScroll (scroll)=\"onHourScroll()\">\n              <div class=\"scroll-padding\"></div>\n              @for (h of filteredHours; track $index) {\n                <div\n                  class=\"time-item\"\n                  id=\"#time-item\"\n                  [class.selected]=\"h === selectedHour\"\n                  [style.opacity]=\"getItemOpacity($index, hourScrollRef)\"\n                  [style.font-weight]=\"getItemFontWeight($index, hourScrollRef)\"\n                >\n                  {{ h < 10 ? \"0\" + h : h }}\n                </div>\n              }\n              <div class=\"scroll-padding\"></div>\n            </div>\n          </div>\n\n          <div class=\"time-separator\">:</div>\n\n          <!-- Minute Column -->\n          <div class=\"time-column\">\n            <div class=\"scroll-container\" #minuteScroll (scroll)=\"onMinuteScroll()\">\n              <div class=\"scroll-padding\"></div>\n              @for (m of filteredMinutes; track $index) {\n                <div\n                  class=\"time-item\"\n                  [class.selected]=\"m === selectedMinute\"\n                  [style.opacity]=\"getItemOpacity($index, minuteScrollRef)\"\n                  [style.font-weight]=\"\n                    getItemFontWeight($index, minuteScrollRef)\n                  \"\n                >\n                  {{ m < 10 ? \"0\" + m : m }}\n                </div>\n              }\n              <div class=\"scroll-padding\"></div>\n            </div>\n          </div>\n\n          <!-- Period Column -->\n          <div class=\"time-column period-column\">\n            <div class=\"scroll-container\" #periodScroll (scroll)=\"onPeriodScroll()\">\n              <div class=\"scroll-padding\"></div>\n              @for (p of periods; track $index) {\n                <div\n                  class=\"time-item\"\n                  [class.selected]=\"p === selectedPeriod\"\n                  [style.opacity]=\"getItemOpacity($index, periodScrollRef)\"\n                  [style.font-weight]=\"\n                    getItemFontWeight($index, periodScrollRef)\n                  \"\n                >\n                  {{ \"GENERAL.\" + p | translate }}\n                </div>\n              }\n              <div class=\"scroll-padding\"></div>\n            </div>\n          </div>\n        </div>\n      </div>\n\n      <button type=\"button\" (click)=\"confirmTime()\" class=\"done-btn\">\n        <p>\n          {{ \"GENERAL.DONE\" | translate }}\n        </p>\n      </button>\n    </div>\n  }\n</div>\n", styles: [".time-picker-container{position:relative;width:100%;cursor:pointer;min-width:8rem;height:100%}.custom-label{font-size:1.6rem;display:block;color:var(--vms-color-form-label);margin-bottom:.3rem}.time-picker__input{position:relative}.custom-input{height:var(--height, 3em);width:100%;border-radius:.29rem;border:1px solid #82828233;padding:0 2rem 0 1rem;outline:none!important;box-shadow:none;font-size:1.4rem;cursor:pointer}.time-picker__input--time-icon{position:absolute;inset-inline-end:.5rem;top:0;pointer-events:none;height:100%;display:flex;justify-content:center;align-items:center}.time-error-container{position:absolute;top:100%;left:1.15rem;width:100%}.time-error-container custom-app-error{pointer-events:none}.time-picker-modal{position:absolute;top:100%;inset-inline-end:0;background:#fff;border-radius:.6rem;padding:24px;border:1px solid #82828233;z-index:1000;min-width:20rem;max-width:100%;width:100%;height:30rem;display:grid;grid-template-rows:1fr 18.4rem auto;gap:.9rem}.time-picker-header h3{font-size:1.5rem;font-weight:600;margin:0;color:#1a1a1a}.time-picker-columns{display:flex;justify-content:center;align-items:center;gap:8px;height:100%}.time-column{flex:1;height:100%;position:relative}.period-column{flex:.8}.time-separator{font-size:2rem;font-weight:700;color:#1a1a1a;align-self:center;padding:0 4px;z-index:1}.scroll-container{height:100%;overflow-y:scroll;scroll-snap-type:y mandatory;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none;cursor:grab;-webkit-user-select:none;user-select:none}.scroll-container:active{cursor:grabbing}.scroll-container::-webkit-scrollbar{display:none}.scroll-padding{height:7.4rem;scroll-snap-align:start}.time-item{height:36px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;color:#1a1a1a;scroll-snap-align:start;transition:opacity .2s ease,font-weight .2s ease;-webkit-user-select:none;user-select:none}.time-item.selected{font-weight:700;opacity:1}.selection-indicator{position:absolute;top:50%;left:0;right:0;height:3.6rem;transform:translateY(-50%);background:#f8f8f8;pointer-events:none;border-radius:.45rem}.done-btn{width:100%;height:3rem;background:#25c7bc;color:#fff;border:none;border-radius:.4rem;font-weight:600;cursor:pointer;transition:background .2s ease}.done-btn p{font-size:1.4rem}.done-btn:hover{background:#159b92}.done-btn:active{transform:scale(.98)}@media (max-width: 480px){.time-picker-modal{min-width:90vw;max-width:90vw}}\n"] }]
+            args: [{ selector: 'custom-time-input', imports: [TranslateModule, ClickOutsideDirective], template: "<div #timeInput class=\"time-picker-container\" [style]=\"{ '--height': height }\">\n  @if (label) {\n    <label class=\"custom-label {{ labelClass }}\">\n      {{ label }}\n      @if (required) {\n        <span class=\"required\">*</span>\n      }\n    </label>\n  }\n\n  <div class=\"time-picker__input\">\n    <input\n      type=\"text\"\n      readonly\n      class=\"custom-input {{ inputClass }}\"\n      [value]=\"displayTime()\"\n      (click)=\"toggleDropdown()\"\n    />\n\n    <span class=\"time-picker__input--time-icon\" (click)=\"toggleDropdown()\">\n      <svg\n        width=\"16\"\n        height=\"16\"\n        viewBox=\"0 0 16 16\"\n        fill=\"none\"\n        xmlns=\"http://www.w3.org/2000/svg\"\n      >\n        <path\n          d=\"M14.6663 7.9987C14.6663 11.6787 11.6797 14.6654 7.99967 14.6654C4.31967 14.6654 1.33301 11.6787 1.33301 7.9987C1.33301 4.3187 4.31967 1.33203 7.99967 1.33203C11.6797 1.33203 14.6663 4.3187 14.6663 7.9987Z\"\n          stroke=\"#120710\"\n          stroke-linecap=\"round\"\n          stroke-linejoin=\"round\"\n        />\n        <path\n          d=\"M10.4729 10.1211L8.40626 8.88781C8.04626 8.67448 7.75293 8.16115 7.75293 7.74115V5.00781\"\n          stroke=\"#120710\"\n          stroke-linecap=\"round\"\n          stroke-linejoin=\"round\"\n        />\n      </svg>\n    </span>\n  </div>\n\n  @if (dropdownOpen()) {\n    <div\n      #dropdownOptions\n      [clickOutside]=\"dropdownOptions\"\n      (clickOutsideEmitter)=\"toggleDropdown()\"\n      class=\"time-picker-modal\"\n    >\n      <div class=\"time-picker-header\">\n        <h3>{{ \"GENERAL.PICKUP_TIME\" | translate }}</h3>\n      </div>\n\n      <div class=\"time-picker-container\">\n        <!-- Selection Indicator -->\n        <div class=\"selection-indicator\"></div>\n        <!--  -->\n        <div class=\"time-picker-columns\">\n          <!--  -->\n          <!-- Hour Column -->\n          <div class=\"time-column\">\n            <div class=\"scroll-container\" #hourScroll (scroll)=\"onHourScroll()\">\n              <div class=\"scroll-padding\"></div>\n              @for (h of filteredHours; track $index) {\n                <div\n                  class=\"time-item\"\n                  id=\"#time-item\"\n                  [class.selected]=\"h === selectedHour\"\n                  [style.opacity]=\"getItemOpacity($index, hourScrollRef)\"\n                  [style.font-weight]=\"getItemFontWeight($index, hourScrollRef)\"\n                >\n                  {{ h < 10 ? \"0\" + h : h }}\n                </div>\n              }\n              <div class=\"scroll-padding\"></div>\n            </div>\n          </div>\n\n          <div class=\"time-separator\">:</div>\n\n          <!-- Minute Column -->\n          <div class=\"time-column\">\n            <div\n              class=\"scroll-container\"\n              #minuteScroll\n              (scroll)=\"onMinuteScroll()\"\n            >\n              <div class=\"scroll-padding\"></div>\n              @for (m of filteredMinutes; track $index) {\n                <div\n                  class=\"time-item\"\n                  [class.selected]=\"m === selectedMinute\"\n                  [style.opacity]=\"getItemOpacity($index, minuteScrollRef)\"\n                  [style.font-weight]=\"\n                    getItemFontWeight($index, minuteScrollRef)\n                  \"\n                >\n                  {{ m < 10 ? \"0\" + m : m }}\n                </div>\n              }\n              <div class=\"scroll-padding\"></div>\n            </div>\n          </div>\n\n          <!-- Period Column -->\n          <div class=\"time-column period-column\">\n            <div\n              class=\"scroll-container\"\n              #periodScroll\n              (scroll)=\"onPeriodScroll()\"\n            >\n              <div class=\"scroll-padding\"></div>\n              @for (p of periods; track $index) {\n                <div\n                  class=\"time-item\"\n                  [class.selected]=\"p === selectedPeriod\"\n                  [style.opacity]=\"getItemOpacity($index, periodScrollRef)\"\n                  [style.font-weight]=\"\n                    getItemFontWeight($index, periodScrollRef)\n                  \"\n                >\n                  {{ \"GENERAL.\" + p | translate }}\n                </div>\n              }\n              <div class=\"scroll-padding\"></div>\n            </div>\n          </div>\n        </div>\n      </div>\n\n      <button type=\"button\" (click)=\"confirmTime()\" class=\"done-btn\">\n        <p>\n          {{ \"GENERAL.DONE\" | translate }}\n        </p>\n      </button>\n    </div>\n  }\n</div>\n", styles: [".time-picker-container{position:relative;width:100%;cursor:pointer;min-width:8rem;height:100%}.custom-label{font-size:1.6rem;display:block;color:var(--vms-color-form-label);margin-bottom:.3rem}.time-picker__input{position:relative}.custom-input{height:var(--height, 3em);width:100%;border-radius:.29rem;border:1px solid #82828233;padding:0 2rem 0 1rem;outline:none!important;box-shadow:none;font-size:1.4rem;cursor:pointer}.time-picker__input--time-icon{position:absolute;inset-inline-end:.5rem;top:0;pointer-events:none;height:100%;display:flex;justify-content:center;align-items:center}.time-error-container{position:absolute;top:100%;left:1.15rem;width:100%}.time-error-container custom-app-error{pointer-events:none}.time-picker-modal{position:absolute;top:100%;inset-inline-end:0;background:#fff;border-radius:.6rem;padding:24px;border:1px solid #82828233;z-index:1000;min-width:20rem;max-width:100%;width:100%;height:30rem;display:grid;grid-template-rows:1fr 18.4rem auto;gap:.9rem}.time-picker-header h3{font-size:1.5rem;font-weight:600;margin:0;color:#1a1a1a}.time-picker-columns{display:flex;justify-content:center;align-items:center;gap:8px;height:100%}.time-column{flex:1;height:100%;position:relative}.period-column{flex:.8}.time-separator{font-size:2rem;font-weight:700;color:#1a1a1a;align-self:center;padding:0 4px;z-index:1}.scroll-container{height:100%;overflow-y:scroll;scroll-snap-type:y mandatory;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none;cursor:grab;-webkit-user-select:none;user-select:none}.scroll-container:active{cursor:grabbing}.scroll-container::-webkit-scrollbar{display:none}.scroll-padding{height:7.4rem;scroll-snap-align:start}.time-item{height:2.86em;display:flex;align-items:center;justify-content:center;font-size:1.5rem;color:#1a1a1a;scroll-snap-align:center;scroll-snap-stop:always;transition:opacity .2s ease,font-weight .2s ease;-webkit-user-select:none;user-select:none}.time-item.selected{font-weight:700;opacity:1}.selection-indicator{position:absolute;top:50%;left:0;right:0;height:3.6rem;transform:translateY(-50%);background:#f8f8f8;pointer-events:none;border-radius:.45rem}.done-btn{width:100%;height:3rem;background:#25c7bc;color:#fff;border:none;border-radius:.4rem;font-weight:600;cursor:pointer;transition:background .2s ease}.done-btn p{font-size:1.4rem}.done-btn:hover{background:#159b92}.done-btn:active{transform:scale(.98)}@media (max-width: 480px){.time-picker-modal{min-width:90vw;max-width:90vw}}\n"] }]
         }], propDecorators: { value: [{
                 type: Input
             }], valueChange: [{
@@ -8749,15 +8448,6 @@ i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.17", ngImpo
                 type: Input
             }], defaultTime: [{
                 type: Input
-            }], hourScrollRef: [{
-                type: ViewChild,
-                args: ['hourScroll']
-            }], minuteScrollRef: [{
-                type: ViewChild,
-                args: ['minuteScroll']
-            }], periodScrollRef: [{
-                type: ViewChild,
-                args: ['periodScroll']
             }] } });
 
 class CustomCheckBoxComponent {
