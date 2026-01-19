@@ -27,8 +27,8 @@ export declare class CustomCalendarComponent {
     viewMode: 'days' | 'months' | 'years';
     currentMonth: Date;
     days: Date[];
+    weekdays: string[];
     translationService: TranslationService;
-    get weekdays(): string[];
     months: {
         monthEn: string;
         monthAr: string;
