@@ -1364,8 +1364,14 @@ class CustomCalendarComponent {
     viewMode = 'days';
     currentMonth = new Date();
     days = [];
-    weekdays = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
     translationService = inject(TranslationService);
+    get weekdays() {
+        const lang = this.translationService.currentLang() || 'en';
+        if (lang === 'ar') {
+            return ['أح', 'ن', 'أث', 'أر', 'خ', 'ج', 'س'];
+        }
+        return ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+    }
     months = [
         { monthEn: 'January', monthAr: 'يناير' },
         { monthEn: 'February', monthAr: 'فبراير' },
