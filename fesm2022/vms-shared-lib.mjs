@@ -1331,7 +1331,12 @@ class LocalizePipe {
         if (!value)
             return '';
         const suffix = lang.charAt(0).toUpperCase() + lang.slice(1);
-        return value[`${field}${suffix}`] || '';
+        const localizedValue = value[`${field}${suffix}`];
+        if (localizedValue) {
+            return localizedValue;
+        }
+        const fallbackValue = value[`${field}En`];
+        return fallbackValue || '';
     }
     static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.17", ngImport: i0, type: LocalizePipe, deps: [{ token: i1$1.TranslateService }], target: i0.ɵɵFactoryTarget.Pipe });
     static ɵpipe = i0.ɵɵngDeclarePipe({ minVersion: "14.0.0", version: "19.2.17", ngImport: i0, type: LocalizePipe, isStandalone: true, name: "localize" });
