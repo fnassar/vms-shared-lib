@@ -4,6 +4,7 @@ import * as i0 from "@angular/core";
 export declare class OverlayPanelComponent {
     private overlayManager;
     overlayClass: string;
+    maxHeight: string;
     targetTemplate: TemplateRef<any>;
     overlayTemplate: TemplateRef<any>;
     isOpen: boolean;
@@ -13,5 +14,5 @@ export declare class OverlayPanelComponent {
     toggleDropdown(event: Event): void;
     closeDropdown(): void;
     static ɵfac: i0.ɵɵFactoryDeclaration<OverlayPanelComponent, never>;
-    static ɵcmp: i0.ɵɵComponentDeclaration<OverlayPanelComponent, "overlay-panel", never, { "overlayClass": { "alias": "overlayClass"; "required": false; }; "expandSide": { "alias": "expandSide"; "required": false; }; }, {}, ["targetTemplate", "overlayTemplate"], never, true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<OverlayPanelComponent, "overlay-panel", never, { "overlayClass": { "alias": "overlayClass"; "required": false; }; "maxHeight": { "alias": "maxHeight"; "required": false; }; "expandSide": { "alias": "expandSide"; "required": false; }; }, {}, ["targetTemplate", "overlayTemplate"], never, true, never>;
 }
