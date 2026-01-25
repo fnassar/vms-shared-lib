@@ -10,9 +10,10 @@ export declare class CustomRadioGroupFormComponent implements OnInit {
     parentForm: FormGroup;
     validation: IComponentFormError[];
     options: IRadioInputOption[];
+    column: boolean;
     onChange: EventEmitter<IRadioInputOption>;
     ngOnInit(): void;
     onRadioChange(event: IRadioInputOption): void;
     static ɵfac: i0.ɵɵFactoryDeclaration<CustomRadioGroupFormComponent, never>;
-    static ɵcmp: i0.ɵɵComponentDeclaration<CustomRadioGroupFormComponent, "custom-radio-group-form", never, { "setFirstAsDefaultValue": { "alias": "setFirstAsDefaultValue"; "required": false; }; "name": { "alias": "name"; "required": true; }; "controlName": { "alias": "controlName"; "required": true; }; "parentForm": { "alias": "parentForm"; "required": true; }; "validation": { "alias": "validation"; "required": true; }; "options": { "alias": "options"; "required": true; }; }, { "onChange": "onChange"; }, never, never, true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CustomRadioGroupFormComponent, "custom-radio-group-form", never, { "setFirstAsDefaultValue": { "alias": "setFirstAsDefaultValue"; "required": false; }; "name": { "alias": "name"; "required": true; }; "controlName": { "alias": "controlName"; "required": true; }; "parentForm": { "alias": "parentForm"; "required": true; }; "validation": { "alias": "validation"; "required": true; }; "options": { "alias": "options"; "required": true; }; "column": { "alias": "column"; "required": false; }; }, { "onChange": "onChange"; }, never, never, true, never>;
 }
