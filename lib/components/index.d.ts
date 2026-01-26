@@ -66,3 +66,4 @@ export * from './custom-single-file-upload/custom-single-file-upload.component';
 export * from './custom-input/custom-input.component';
 export * from './custom-time-input/custom-time-input.component';
 export * from './custom-check-box/custom-check-box.component';
+export * from './custom-dropdown-with-add/custom-dropdown-with-add.component';

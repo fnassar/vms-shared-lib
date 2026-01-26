@@ -1,0 +1,47 @@
+import { EventEmitter } from '@angular/core';
+import { IDropdownOption } from '../../interfaces';
+import { TranslationService } from '../../services';
+import * as i0 from "@angular/core";
+export declare class CustomDropdownWithAddComponent {
+    label?: string;
+    labelClass: string;
+    dropdownOptionsClass: string;
+    dropdownHeaderClass: string;
+    selectedClass: string;
+    dropdownContainerClass: string;
+    placeholder: string;
+    enableFilter: boolean;
+    showClear: boolean;
+    isRequired: boolean;
+    vmsFlexDesignMood: boolean;
+    options: IDropdownOption[];
+    name?: string;
+    value: any;
+    customId?: string;
+    height: string;
+    enableOtherOption: boolean;
+    otherOptionLabel: string;
+    otherInputPlaceholder: string;
+    otherButtonText: string;
+    valueChange: EventEmitter<{
+        type: "option" | "other";
+        value: IDropdownOption | string | null;
+    }>;
+    isOpen: boolean;
+    filteredOptions: IDropdownOption[];
+    filterText: string;
+    translationService: TranslationService;
+    otherCustomValue: string;
+    selectedOtherValue: string;
+    ngOnInit(): void;
+    get selectedOption(): IDropdownOption | null;
+    get displayValue(): string;
+    toggleDropdown(): void;
+    selectOption(option: IDropdownOption): void;
+    clearSelection(event: Event): void;
+    filterOptions(): void;
+    confirmOtherValue(event: Event): void;
+    set reset(value: boolean);
+    static ɵfac: i0.ɵɵFactoryDeclaration<CustomDropdownWithAddComponent, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CustomDropdownWithAddComponent, "custom-dropdown-with-add", never, { "label": { "alias": "label"; "required": false; }; "labelClass": { "alias": "labelClass"; "required": false; }; "dropdownOptionsClass": { "alias": "dropdownOptionsClass"; "required": false; }; "dropdownHeaderClass": { "alias": "dropdownHeaderClass"; "required": false; }; "selectedClass": { "alias": "selectedClass"; "required": false; }; "dropdownContainerClass": { "alias": "dropdownContainerClass"; "required": false; }; "placeholder": { "alias": "placeholder"; "required": false; }; "enableFilter": { "alias": "enableFilter"; "required": false; }; "showClear": { "alias": "showClear"; "required": false; }; "isRequired": { "alias": "isRequired"; "required": false; }; "vmsFlexDesignMood": { "alias": "vmsFlexDesignMood"; "required": false; }; "options": { "alias": "options"; "required": true; }; "name": { "alias": "name"; "required": true; }; "value": { "alias": "value"; "required": true; }; "customId": { "alias": "customId"; "required": false; }; "height": { "alias": "height"; "required": false; }; "enableOtherOption": { "alias": "enableOtherOption"; "required": false; }; "otherOptionLabel": { "alias": "otherOptionLabel"; "required": false; }; "otherInputPlaceholder": { "alias": "otherInputPlaceholder"; "required": false; }; "otherButtonText": { "alias": "otherButtonText"; "required": false; }; "reset": { "alias": "reset"; "required": false; }; }, { "valueChange": "valueChange"; }, never, never, true, never>;
+}
