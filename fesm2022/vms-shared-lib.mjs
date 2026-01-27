@@ -2410,6 +2410,9 @@ class CustomInputSearchFormComponent extends CustomInputBase {
             this.searching.set(true);
             this.onInput();
         }
+        else {
+            this.searching.set(true);
+        }
     }
     closeDropdown() {
         this.searching.set(false);
