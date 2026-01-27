@@ -26,8 +26,10 @@ export declare class CustomInputSearchFormComponent<T extends IDropdownOption = 
     selectedOption: import("@angular/core").WritableSignal<T | null>;
     private inputSubject;
     translationService: TranslationService;
+    private uniqueId;
     constructor();
     ngOnInit(): void;
+    get inputId(): string;
     onKeyDown(event: KeyboardEvent): void;
     onInput(): void;
     toggleAllowSearch(): void;
