@@ -21,6 +21,7 @@ export declare abstract class CustomTimeBaseComponent implements AfterViewInit {
     get filteredMinutes(): number[];
     protected scrollToSelectedValues(): void;
     protected to24Hour(hour: number, period: 'AM' | 'PM'): number;
+    protected getCenteredIndex(scrollTop: number): number;
     getItemOpacity(index: number, scrollElement: ElementRef<HTMLDivElement> | undefined): number;
     getItemFontWeight(index: number, scrollElement: ElementRef<HTMLDivElement> | undefined): string;
     onHourScroll(): void;
