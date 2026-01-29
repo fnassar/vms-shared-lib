@@ -4838,7 +4838,7 @@ class CustomTimeBaseComponent {
     ngAfterViewInit() {
         this.updateItemHeight();
         this.scrollToSelectedValues();
-        // window.addEventListener('resize', this.updateItemHeight);
+        window.addEventListener('resize', this.updateItemHeight);
     }
     updateItemHeight = () => {
         const hostElem = this.timeInputRef.nativeElement.parentElement.parentElement;
@@ -4846,8 +4846,6 @@ class CustomTimeBaseComponent {
             .getComputedStyle(hostElem)
             .getPropertyValue('font-size');
         this.itemHeight = (parseFloat(fontSize) * 4.4) / 1.4; // 4.4rem as per CSS
-        console.log('Calculated item height from font-size:', this.itemHeight);
-        console.log('Final item height set to:', this.itemHeight);
     };
     get filteredHours() {
         const hoursList = this.rangeMin || this.rangeMax ? this.getFilteredHoursList() : this.hours;
