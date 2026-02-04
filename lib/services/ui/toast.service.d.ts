@@ -4,6 +4,7 @@ export type ToastPosition = 'top-right' | 'top-left' | 'bottom-right' | 'bottom-
 export interface ToastItem {
     id: string;
     message: string;
+    subText: string;
     position: ToastPosition;
     type: ToastType;
     duration: number;
@@ -12,13 +13,14 @@ export interface ToastItem {
 }
 export declare class ToastService {
     message: import("@angular/core").WritableSignal<string>;
+    subText: import("@angular/core").WritableSignal<string>;
     type: import("@angular/core").WritableSignal<ToastType>;
     position: import("@angular/core").WritableSignal<ToastPosition>;
     show: import("@angular/core").WritableSignal<boolean>;
     readonly visibleToasts: import("@angular/core").WritableSignal<ToastItem[]>;
     private readonly maxStackPerPosition;
     private readonly leaveMs;
-    toast(message: string, position: ToastPosition, ToastType?: ToastType, duration?: number): void;
+    toast(message: string, position: ToastPosition, ToastType?: ToastType, duration?: number, subText?: string): void;
     close(id: string): void;
     private normalizeDuration;
     private pushIntoStack;
