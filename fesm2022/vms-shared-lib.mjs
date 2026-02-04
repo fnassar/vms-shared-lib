@@ -7051,6 +7051,10 @@ class CustomPhoneFormComponent {
         if (this.disabled)
             this.parentControl()?.disable({ emitEvent: false });
     }
+    ngAfterViewInit() {
+        this.onNumberInput('');
+        this.parentForm.get(this.controlName).markAsUntouched();
+    }
     ngOnChanges(changes) {
         if (changes['countries'] && this.countries?.length) {
             this.filteredCountries = [...this.countries];
@@ -7227,6 +7231,10 @@ class CustomPhoneFormComponent {
             if (isRequired)
                 errors['required'] = true;
             ctrl.setErrors(Object.keys(errors).length ? errors : null);
+            // Mark as touched so errors are immediately visible
+            if (Object.keys(errors).length) {
+                ctrl.markAsTouched();
+            }
             return;
         }
         // Build full international number from the selected dial code + entered digits.
@@ -7241,6 +7249,10 @@ class CustomPhoneFormComponent {
             };
         }
         ctrl.setErrors(Object.keys(errors).length ? errors : null);
+        // Mark as touched so errors are immediately visible
+        if (Object.keys(errors).length) {
+            ctrl.markAsTouched();
+        }
     }
     resolveRules(dialCode) {
         const fromInput = this.phoneRules ? this.phoneRules[dialCode] : undefined;

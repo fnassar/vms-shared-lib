@@ -51,6 +51,7 @@ export declare class CustomPhoneFormComponent {
     numberInputRef: ElementRef<HTMLInputElement>;
     translationService: TranslationService;
     ngOnInit(): void;
+    ngAfterViewInit(): void;
     ngOnChanges(changes: SimpleChanges): void;
     private parentControl;
     private setupFormControlBinding;
