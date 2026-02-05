@@ -408,13 +408,13 @@ class ToastService {
         requestAnimationFrame(() => {
             this.setState(item.id, 'shown');
             // schedule auto-hide
-            // const timer = setTimeout(() => {
-            //   this.setState(item.id, 'leaving');
-            //   setTimeout(() => {
-            //     this.remove(item.id);
-            //     clearTimeout(timer);
-            //   }, this.leaveMs);
-            // }, item.duration);
+            const timer = setTimeout(() => {
+                this.setState(item.id, 'leaving');
+                setTimeout(() => {
+                    this.remove(item.id);
+                    clearTimeout(timer);
+                }, this.leaveMs);
+            }, item.duration);
         });
     }
     setState(id, state) {
@@ -4036,128 +4036,38 @@ i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.17", ngImpo
             }] } });
 
 const infoIcon = `
-<svg
-  width="30"
-  height="30"
-  viewBox="0 0 30 30"
-  fill="none"
-  xmlns="http://www.w3.org/2000/svg"
->
-  <path
-    fill-rule="evenodd"
-    clip-rule="evenodd"
-    d="M15 3.75C8.7868 3.75 3.75 8.7868 3.75 15C3.75 21.2132 8.7868 26.25 15 26.25C21.2132 26.25 26.25 21.2132 26.25 15C26.25 8.7868 21.2132 3.75 15 3.75ZM1.25 15C1.25 7.40608 7.40608 1.25 15 1.25C22.5939 1.25 28.75 7.40608 28.75 15C28.75 22.5939 22.5939 28.75 15 28.75C7.40608 28.75 1.25 22.5939 1.25 15Z"
-    fill="white"
-  />
-  <path
-    fill-rule="evenodd"
-    clip-rule="evenodd"
-    d="M15 13.75C15.6904 13.75 16.25 14.3096 16.25 15V20C16.25 20.6904 15.6904 21.25 15 21.25C14.3096 21.25 13.75 20.6904 13.75 20V15C13.75 14.3096 14.3096 13.75 15 13.75Z"
-    fill="white"
-  />
-  <path
-    fill-rule="evenodd"
-    clip-rule="evenodd"
-    d="M13.75 10C13.75 9.30964 14.3096 8.75 15 8.75H15.0125C15.7029 8.75 16.2625 9.30964 16.2625 10C16.2625 10.6904 15.7029 11.25 15.0125 11.25H15C14.3096 11.25 13.75 10.6904 13.75 10Z"
-    fill="white"
-  />
-</svg>`;
+<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M9.57586 9.79263C9.51798 9.7917 9.45106 9.79167 9.36849 9.79167C9.02331 9.79167 8.74349 9.51185 8.74349 9.16667C8.74349 8.82149 9.02331 8.54167 9.36849 8.54167L9.3972 8.54166C9.56812 8.5416 9.75295 8.54152 9.90897 8.5625C10.0917 8.58707 10.3252 8.65027 10.5217 8.84677C10.7182 9.04327 10.7814 9.27676 10.806 9.45953C10.827 9.61554 10.8269 9.80037 10.8268 9.9713L10.8268 14.1667C10.8268 14.5118 10.547 14.7917 10.2018 14.7917C9.85665 14.7917 9.57682 14.5118 9.57682 14.1667V10C9.57682 9.91744 9.5768 9.85051 9.57586 9.79263Z" fill="#121214"/>
+<path d="M9.99349 5.83332C9.53325 5.83332 9.16016 6.20642 9.16016 6.66666C9.16016 7.12689 9.53325 7.49999 9.99349 7.49999H10.001C10.4612 7.49999 10.8343 7.12689 10.8343 6.66666C10.8343 6.20642 10.4612 5.83332 10.001 5.83332H9.99349Z" fill="#121214"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M1.04167 9.99999C1.04167 14.9475 5.05245 18.9583 10 18.9583C14.9476 18.9583 18.9583 14.9475 18.9583 9.99999C18.9583 5.05244 14.9476 1.04166 10 1.04166C5.05245 1.04166 1.04167 5.05244 1.04167 9.99999ZM10 17.7083C5.74281 17.7083 2.29167 14.2572 2.29167 9.99999C2.29167 5.74279 5.74281 2.29166 10 2.29166C14.2572 2.29166 17.7083 5.74279 17.7083 9.99999C17.7083 14.2572 14.2572 17.7083 10 17.7083Z" fill="#121214"/>
+</svg>
+`;
 const successIcon = `
-<svg
-  width="30"
-  height="30"
-  viewBox="0 0 30 30"
-  fill="none"
-  xmlns="http://www.w3.org/2000/svg"
->
-  <path
-    fill-rule="evenodd"
-    clip-rule="evenodd"
-    d="M19.5788 4.7168C17.3628 3.72943 14.887 3.48482 12.5207 4.01946C10.1544 4.5541 8.02427 5.83935 6.44807 7.68351C4.87186 9.52767 3.93401 11.8319 3.77439 14.2527C3.61477 16.6734 4.24193 19.0808 5.56233 21.116C6.88274 23.1512 8.82564 24.705 11.1013 25.5457C13.3769 26.3864 15.8634 26.469 18.1898 25.7812C20.5162 25.0933 22.5579 23.6719 24.0105 21.7289C25.4631 19.7858 26.2486 17.4253 26.25 14.9993V13.85C26.25 13.1597 26.8097 12.6 27.5 12.6C28.1904 12.6 28.75 13.1597 28.75 13.85V15C28.7483 17.9651 27.7882 20.8509 26.0128 23.2257C24.2375 25.6006 21.742 27.3379 18.8986 28.1786C16.0552 29.0193 13.0162 28.9183 10.2349 27.8908C7.45356 26.8632 5.0789 24.9641 3.46507 22.4767C1.85124 19.9893 1.08471 17.0468 1.27981 14.0882C1.4749 11.1295 2.62116 8.31318 4.54763 6.0592C6.47411 3.80523 9.07758 2.23438 11.9698 1.58093C14.8619 0.92748 17.8879 1.22644 20.5963 2.43323C21.2268 2.7142 21.5103 3.45317 21.2293 4.08377C20.9483 4.71436 20.2093 4.99777 19.5788 4.7168Z"
-    fill="white"
-  />
-  <path
-    fill-rule="evenodd"
-    clip-rule="evenodd"
-    d="M28.3834 4.11567C28.8718 4.60359 28.8722 5.39504 28.3843 5.88344L15.8843 18.3959C15.6499 18.6306 15.3319 18.7624 15.0003 18.7625C14.6687 18.7626 14.3506 18.6309 14.1161 18.3964L10.3661 14.6464C9.87796 14.1582 9.87796 13.3668 10.3661 12.8786C10.8543 12.3905 11.6457 12.3905 12.1339 12.8786L14.9996 15.7443L26.6157 4.11656C27.1036 3.62816 27.895 3.62776 28.3834 4.11567Z"
-    fill="white"
-  />
-</svg>`;
+<svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M12.7524 6.88066C12.9856 6.62622 12.9684 6.23086 12.714 5.99762C12.4595 5.76437 12.0642 5.78156 11.8309 6.03601L7.6887 10.5548L6.06694 8.93306C5.82286 8.68898 5.42714 8.68898 5.18306 8.93306C4.93898 9.17714 4.93898 9.57287 5.18306 9.81695L7.26639 11.9003C7.38693 12.0208 7.55148 12.0869 7.72191 12.0832C7.89234 12.0795 8.05386 12.0063 8.16905 11.8807L12.7524 6.88066Z" fill="#1B8354"/>
+  <path fill-rule="evenodd" clip-rule="evenodd" d="M8.95833 17.9167C4.01078 17.9167 0 13.9059 0 8.95833C0 4.01078 4.01078 0 8.95833 0C13.9059 0 17.9167 4.01078 17.9167 8.95833C17.9167 13.9059 13.9059 17.9167 8.95833 17.9167ZM1.25 8.95833C1.25 13.2155 4.70114 16.6667 8.95833 16.6667C13.2155 16.6667 16.6667 13.2155 16.6667 8.95833C16.6667 4.70114 13.2155 1.25 8.95833 1.25C4.70114 1.25 1.25 4.70114 1.25 8.95833Z" fill="#1B8354"/>
+</svg>
+`;
 const warningIcon = `
-<svg
-  width="30"
-  height="30"
-  viewBox="0 0 30 30"
-  fill="none"
-  xmlns="http://www.w3.org/2000/svg"
->
-  <path
-    fill-rule="evenodd"
-    clip-rule="evenodd"
-    d="M13.1603 2.85388C13.7219 2.53769 14.3555 2.37158 15 2.37158C15.6445 2.37158 16.2782 2.53769 16.8398 2.85388C17.4014 3.17008 17.872 3.62568 18.2063 4.17673L18.2099 4.18266L28.7974 21.8577L28.8075 21.8749C29.1349 22.442 29.3082 23.0849 29.31 23.7397C29.3119 24.3944 29.1422 25.0383 28.818 25.6072C28.4937 26.176 28.0262 26.6501 27.4618 26.9822C26.8975 27.3142 26.256 27.4927 25.6013 27.4999L25.5875 27.5001L4.39879 27.5C3.74403 27.4928 3.10258 27.3142 2.53824 26.9822C1.9739 26.6501 1.50634 26.176 1.18209 25.6072C0.857833 25.0383 0.688184 24.3944 0.690017 23.7397C0.691851 23.0849 0.865103 22.442 1.19254 21.8749L1.20269 21.8577L11.7938 4.17672C12.128 3.62567 12.5987 3.17008 13.1603 2.85388ZM15 4.87158C14.7852 4.87158 14.574 4.92695 14.3868 5.03235C14.2004 5.13727 14.0441 5.28824 13.9328 5.47081L3.35338 23.1323C3.24691 23.3195 3.19061 23.5312 3.19001 23.7467C3.1894 23.9649 3.24595 24.1795 3.35403 24.3692C3.46212 24.5588 3.61797 24.7168 3.80608 24.8275C3.99255 24.9372 4.20427 24.9966 4.42052 25H25.5795C25.7958 24.9966 26.0075 24.9372 26.194 24.8275C26.3821 24.7168 26.5379 24.5588 26.646 24.3692C26.7541 24.1795 26.8107 23.9649 26.81 23.7467C26.8094 23.5312 26.7532 23.3196 26.6467 23.1324L16.0688 5.4733C16.0683 5.47247 16.0678 5.47164 16.0673 5.47081C15.9559 5.28824 15.7996 5.13727 15.6133 5.03235C15.4261 4.92695 15.2149 4.87158 15 4.87158Z"
-    fill="white"
-  />
-  <path
-    fill-rule="evenodd"
-    clip-rule="evenodd"
-    d="M15 10C15.6904 10 16.25 10.5596 16.25 11.25V16.25C16.25 16.9404 15.6904 17.5 15 17.5C14.3096 17.5 13.75 16.9404 13.75 16.25V11.25C13.75 10.5596 14.3096 10 15 10Z"
-    fill="white"
-  />
-  <path
-    fill-rule="evenodd"
-    clip-rule="evenodd"
-    d="M13.75 21.25C13.75 20.5596 14.3096 20 15 20H15.0125C15.7029 20 16.2625 20.5596 16.2625 21.25C16.2625 21.9404 15.7029 22.5 15.0125 22.5H15C14.3096 22.5 13.75 21.9404 13.75 21.25Z"
-    fill="white"
-  />
-</svg>`;
+<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M9.16024 12.5C9.16024 12.0398 9.53333 11.6667 9.99357 11.6667H10.0011C10.4613 11.6667 10.8344 12.0398 10.8344 12.5C10.8344 12.9602 10.4613 13.3333 10.0011 13.3333H9.99357C9.53333 13.3333 9.16024 12.9602 9.16024 12.5Z" fill="#B54708"/>
+  <path d="M9.37508 9.99999C9.37508 10.3452 9.6549 10.625 10.0001 10.625C10.3453 10.625 10.6251 10.3452 10.6251 9.99999V6.66666C10.6251 6.32148 10.3453 6.04166 10.0001 6.04166C9.6549 6.04166 9.37508 6.32148 9.37508 6.66666V9.99999Z" fill="#B54708"/>
+  <path fill-rule="evenodd" clip-rule="evenodd" d="M1.04175 9.99999C1.04175 5.05244 5.05253 1.04166 10.0001 1.04166C14.9476 1.04166 18.9584 5.05244 18.9584 9.99999C18.9584 14.9475 14.9476 18.9583 10.0001 18.9583C5.05253 18.9583 1.04175 14.9475 1.04175 9.99999ZM10.0001 2.29166C5.74289 2.29166 2.29175 5.74279 2.29175 9.99999C2.29175 14.2572 5.74289 17.7083 10.0001 17.7083C14.2573 17.7083 17.7084 14.2572 17.7084 9.99999C17.7084 5.74279 14.2573 2.29166 10.0001 2.29166Z" fill="#B54708"/>
+</svg>
+`;
 const errorIcon = `
-<svg
-  width="30"
-  height="30"
-  viewBox="0 0 30 30"
-  fill="none"
-  xmlns="http://www.w3.org/2000/svg"
->
-  <path
-    fill-rule="evenodd"
-    clip-rule="evenodd"
-    d="M8.94112 1.61612C9.17554 1.3817 9.49348 1.25 9.825 1.25H20.175C20.5065 1.25 20.8245 1.3817 21.0589 1.61612L28.3839 8.94112C28.6183 9.17554 28.75 9.49348 28.75 9.825V20.175C28.75 20.5065 28.6183 20.8245 28.3839 21.0589L21.0589 28.3839C20.8245 28.6183 20.5065 28.75 20.175 28.75H9.825C9.49348 28.75 9.17554 28.6183 8.94112 28.3839L1.61612 21.0589C1.3817 20.8245 1.25 20.5065 1.25 20.175V9.825C1.25 9.49348 1.3817 9.17554 1.61612 8.94112L8.94112 1.61612ZM10.3428 3.75L3.75 10.3428V19.6572L10.3428 26.25H19.6572L26.25 19.6572V10.3428L19.6572 3.75H10.3428Z"
-    fill="white"
-  />
-  <path
-    fill-rule="evenodd"
-    clip-rule="evenodd"
-    d="M19.6339 10.3661C20.122 10.8543 20.122 11.6457 19.6339 12.1339L12.1339 19.6339C11.6457 20.122 10.8543 20.122 10.3661 19.6339C9.87796 19.1457 9.87796 18.3543 10.3661 17.8661L17.8661 10.3661C18.3543 9.87796 19.1457 9.87796 19.6339 10.3661Z"
-    fill="white"
-  />
-  <path
-    fill-rule="evenodd"
-    clip-rule="evenodd"
-    d="M10.3661 10.3661C10.8543 9.87796 11.6457 9.87796 12.1339 10.3661L19.6339 17.8661C20.122 18.3543 20.122 19.1457 19.6339 19.6339C19.1457 20.122 18.3543 20.122 17.8661 19.6339L10.3661 12.1339C9.87796 11.6457 9.87796 10.8543 10.3661 10.3661Z"
-    fill="white"
-  />
-</svg>`;
+<svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M8.11849 11.875C8.11849 11.4148 8.49159 11.0417 8.95182 11.0417H8.95931C9.41955 11.0417 9.79264 11.4148 9.79264 11.875C9.79264 12.3352 9.41955 12.7083 8.95931 12.7083H8.95182C8.49159 12.7083 8.11849 12.3352 8.11849 11.875Z" fill="#D92D20"/>
+  <path d="M8.33333 9.375C8.33333 9.72018 8.61316 10 8.95833 10C9.30351 10 9.58333 9.72018 9.58333 9.375V6.04167C9.58333 5.69649 9.30351 5.41667 8.95833 5.41667C8.61316 5.41667 8.33333 5.69649 8.33333 6.04167V9.375Z" fill="#D92D20"/>
+  <path fill-rule="evenodd" clip-rule="evenodd" d="M7.59332 0.220834C8.48037 -0.0736114 9.43631 -0.0736114 10.3234 0.220834C11.2067 0.514062 11.9003 1.20951 12.5971 2.18662C13.2916 3.1605 14.059 4.51838 15.0482 6.26875L15.087 6.33747C16.0764 8.0881 16.8437 9.44592 17.322 10.5471C17.8025 11.6536 18.0418 12.609 17.8509 13.5268C17.6586 14.4509 17.1845 15.2912 16.494 15.9264C15.8052 16.56 14.8673 16.8273 13.6863 16.9557C12.5121 17.0833 10.976 17.0833 8.99896 17.0833H8.91771C6.94068 17.0833 5.40462 17.0833 4.23035 16.9557C3.04939 16.8273 2.11149 16.56 1.42268 15.9264C0.732186 15.2912 0.258066 14.4509 0.0657941 13.5268C-0.125168 12.609 0.114167 11.6536 0.594712 10.5471C1.07293 9.44592 1.84029 8.0881 2.82965 6.33746L2.86848 6.26875C3.85767 4.51839 4.62507 3.1605 5.31956 2.18662C6.01636 1.20951 6.70995 0.514061 7.59332 0.220834ZM9.92956 1.40718C9.29818 1.19761 8.61849 1.19761 7.98712 1.40718C7.49046 1.57204 6.99119 1.99542 6.33728 2.91239C5.68563 3.82619 4.94999 5.1262 3.93721 6.91828C2.92451 8.71023 2.19021 10.0112 1.74126 11.045C1.29153 12.0806 1.17886 12.74 1.28959 13.2721C1.42926 13.9434 1.77295 14.5502 2.26893 15.0064C2.65846 15.3647 3.26543 15.5934 4.36545 15.713C5.46414 15.8325 6.93217 15.8333 8.95834 15.8333C10.9845 15.8333 12.4525 15.8325 13.5512 15.713C14.6512 15.5934 15.2582 15.3647 15.6477 15.0064C16.1437 14.5502 16.4874 13.9434 16.6271 13.2721C16.7378 12.74 16.6251 12.0806 16.1754 11.045C15.7265 10.0112 14.9922 8.71023 13.9795 6.91828C12.9667 5.1262 12.231 3.82619 11.5794 2.91239C10.9255 1.99542 10.4262 1.57204 9.92956 1.40718Z" fill="#D92D20"/>
+</svg>
+`;
 const closeIcon = `
-<svg
-  width="20"
-  height="20"
-  viewBox="0 0 20 20"
-  fill="none"
-  xmlns="http://www.w3.org/2000/svg"
->
-  <path
-    fill-rule="evenodd"
-    clip-rule="evenodd"
-    d="M15.5893 4.41073C15.9147 4.73617 15.9147 5.26381 15.5893 5.58925L5.58928 15.5892C5.26384 15.9147 4.7362 15.9147 4.41076 15.5892C4.08533 15.2638 4.08533 14.7362 4.41076 14.4107L14.4108 4.41073C14.7362 4.0853 15.2638 4.0853 15.5893 4.41073Z"
-    fill="white"
-  />
-  <path
-    fill-rule="evenodd"
-    clip-rule="evenodd"
-    d="M4.41076 4.41073C4.7362 4.0853 5.26384 4.0853 5.58928 4.41073L15.5893 14.4107C15.9147 14.7362 15.9147 15.2638 15.5893 15.5892C15.2638 15.9147 14.7362 15.9147 14.4108 15.5892L4.41076 5.58925C4.08533 5.26381 4.08533 4.73617 4.41076 4.41073Z"
-    fill="white"
-  />
-</svg>`;
+<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path fill-rule="evenodd" clip-rule="evenodd" d="M4.55806 4.55806C4.80214 4.31398 5.19786 4.31398 5.44194 4.55806L10 9.11612L14.5581 4.55806C14.8021 4.31398 15.1979 4.31398 15.4419 4.55806C15.686 4.80214 15.686 5.19786 15.4419 5.44194L10.8839 10L15.4419 14.5581C15.686 14.8021 15.686 15.1979 15.4419 15.4419C15.1979 15.686 14.8021 15.686 14.5581 15.4419L10 10.8839L5.44194 15.4419C5.19786 15.686 4.80214 15.686 4.55806 15.4419C4.31398 15.1979 4.31398 14.8021 4.55806 14.5581L9.11612 10L4.55806 5.44194C4.31398 5.19786 4.31398 4.80214 4.55806 4.55806Z" fill="#121214"/>
+</svg>
+
+`;
 
 class CustomToastComponent {
     toastService;
@@ -4235,11 +4145,11 @@ class CustomToastComponent {
         this.toastService.hideToast();
     }
     static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.17", ngImport: i0, type: CustomToastComponent, deps: [{ token: ToastService }, { token: i1$4.DomSanitizer }], target: i0.ɵɵFactoryTarget.Component });
-    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "17.0.0", version: "19.2.17", type: CustomToastComponent, isStandalone: true, selector: "custom-toast", ngImport: i0, template: "@if (toastService.show()) {\n  <div [class]=\"'custom-toast ' + positionClass + ' ' + colorClass\">\n    @if (toastService.type() === \"info\" || toastService.type() === \"black\") {\n      <div class=\"info\" [innerHTML]=\"infoSvg\"></div>\n    } @else if (toastService.type() === \"success\") {\n      <div class=\"success\" [innerHTML]=\"successSvg\"></div>\n    } @else if (toastService.type() === \"warning\") {\n      <div class=\"warning\" [innerHTML]=\"warningSvg\"></div>\n    } @else if (toastService.type() === \"error\") {\n      <div class=\"error\" [innerHTML]=\"errorSvg\"></div>\n    }\n\n    <p class=\"custom-toast-message\">{{ toastService.message() | translate }}</p>\n\n    <div class=\"close-toast\" (click)=\"hideToast()\" [innerHTML]=\"closeSvg\"></div>\n  </div>\n}\n", styles: [".custom-toast{width:500px;min-height:60px;display:flex;justify-content:space-between;align-items:center;gap:20px;padding:20px;border-radius:10px}.toast-top-right{position:fixed;z-index:9999;top:20px;right:20px}.toast-top-left{position:fixed;z-index:9999;top:20px;left:20px}.toast-bottom-right{position:fixed;z-index:9999;bottom:20px;right:20px}.toast-bottom-left{position:fixed;z-index:9999;bottom:20px;left:20px}.toast-top-center{position:fixed;z-index:9999;top:20px;left:50%;transform:translate(-50%)}.toast-bottom-center{position:fixed;z-index:9999;bottom:20px;left:50%;transform:translate(-50%)}.toast-success{background-color:#19af66;color:#fff}.toast-error{background-color:#ff4d4f;color:#fff}.toast-warning{background-color:#ffbf00;color:#fff}.toast-info{background-color:#9d67aa;color:#fff}.toast-black{background-color:#000;color:#fff}.custom-toast-message{font-weight:500;font-size:16px;text-align:start;width:100%;text-wrap:wrap}.close-toast{cursor:pointer}\n"], dependencies: [{ kind: "ngmodule", type: TranslateModule }, { kind: "pipe", type: i1$1.TranslatePipe, name: "translate" }] });
+    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "17.0.0", version: "19.2.17", type: CustomToastComponent, isStandalone: true, selector: "custom-toast", ngImport: i0, template: "@if (toastService.show()) {\n  <div [class]=\"'custom-toast ' + positionClass + ' ' + colorClass\">\n    <div class=\"toast-content\">\n      <div [class]=\"'toast-color ' + colorClass\"></div>\n      <!-- icon -->\n      <div [class]=\"'icon-container ' + colorClass\">\n        @if (\n          toastService.type() === \"info\" || toastService.type() === \"black\"\n        ) {\n          <div class=\"toast-icon info\" [innerHTML]=\"infoSvg\"></div>\n        } @else if (toastService.type() === \"success\") {\n          <div class=\"toast-icon success\" [innerHTML]=\"successSvg\"></div>\n        } @else if (toastService.type() === \"warning\") {\n          <div class=\"toast-icon warning\" [innerHTML]=\"warningSvg\"></div>\n        } @else if (toastService.type() === \"error\") {\n          <div class=\"toast-icon error\" [innerHTML]=\"errorSvg\"></div>\n        }\n      </div>\n\n      <div class=\"context\">\n        <p class=\"custom-toast-message\">\n          {{ toastService.message() | translate }}\n        </p>\n        @if (toastService.subText()) {\n          <p class=\"custom-toast-subtext\">\n            {{ toastService.subText() | translate }}\n          </p>\n        }\n      </div>\n      <div\n        class=\"close-toast\"\n        (click)=\"hideToast()\"\n        [innerHTML]=\"closeSvg\"\n      ></div>\n    </div>\n  </div>\n}\n", styles: [".custom-toast{width:500px;min-height:60px;display:flex;justify-content:space-between;align-items:center;gap:20px;border-radius:10px;color:var(--vms-color-black);background-color:var(--vms-color-white);box-shadow:0 32px 64px -12px #10182824}.custom-toast.toast-top-right{position:fixed;z-index:9999;top:20px;right:20px}.custom-toast.toast-top-left{position:fixed;z-index:9999;top:20px;left:20px}.custom-toast.toast-bottom-right{position:fixed;z-index:9999;bottom:20px;right:20px}.custom-toast.toast-bottom-left{position:fixed;z-index:9999;bottom:20px;left:20px}.custom-toast.toast-top-center{position:fixed;z-index:9999;top:20px;left:50%;transform:translate(-50%)}.custom-toast.toast-bottom-center{position:fixed;z-index:9999;bottom:20px;left:50%;transform:translate(-50%)}.custom-toast .toast-content{position:relative;width:100%;display:grid;grid-template-columns:auto 1fr auto;justify-content:space-between;padding:1.6rem 1.6rem 1.6rem 2.4rem;gap:1.2rem}.custom-toast .toast-content .toast-color{position:absolute;left:0;top:0;width:.8rem;height:100%;border-top-left-radius:.8rem;border-bottom-left-radius:.8rem}.custom-toast .toast-content .toast-color.toast-success{background-color:var(--vms-green-normal)}.custom-toast .toast-content .toast-color.toast-error{background-color:var(--vms-red-normal-hover)}.custom-toast .toast-content .toast-color.toast-warning{background-color:var(--vms-yellow-normal-hover)}.custom-toast .toast-content .toast-color.toast-info{background-color:var(--vms-neutral-light-active)}.custom-toast .toast-content .toast-color.toast-black{background-color:var(--vms-color-black)}.custom-toast .toast-content .icon-container{width:4rem;height:4rem;display:flex;align-items:center;justify-content:center;border-radius:50%;aspect-ratio:1/1}.custom-toast .toast-content .icon-container.toast-success{background-color:var(--vms-green-lightest-active)}.custom-toast .toast-content .icon-container.toast-error{background-color:var(--vms-red-lightest-hover)}.custom-toast .toast-content .icon-container.toast-warning{background-color:var(--vms-yellow-lightest-hover)}.custom-toast .toast-content .icon-container.toast-info{background-color:var(--vms-neutral-lightest-active)}.custom-toast .toast-content .icon-container.toast-black{background-color:var(--vms-color-black)}.custom-toast .toast-content .icon-container .toast-icon{width:1.8rem;height:1.8rem}.custom-toast .toast-content .context{display:flex;flex-direction:column;gap:.4rem;justify-content:center;align-items:start}.custom-toast .toast-content .context .custom-toast-message{font-weight:600;font-size:1.6rem;line-height:2.4rem;letter-spacing:0%}.custom-toast .toast-content .context .custom-toast-subtext{font-weight:400;font-size:1.4rem;line-height:2rem;letter-spacing:0%}.custom-toast-message{font-weight:500;font-size:16px;text-align:start;width:100%;text-wrap:wrap}.close-toast{cursor:pointer}\n"], dependencies: [{ kind: "ngmodule", type: TranslateModule }, { kind: "pipe", type: i1$1.TranslatePipe, name: "translate" }] });
 }
 i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.17", ngImport: i0, type: CustomToastComponent, decorators: [{
             type: Component,
-            args: [{ selector: 'custom-toast', standalone: true, imports: [TranslateModule], template: "@if (toastService.show()) {\n  <div [class]=\"'custom-toast ' + positionClass + ' ' + colorClass\">\n    @if (toastService.type() === \"info\" || toastService.type() === \"black\") {\n      <div class=\"info\" [innerHTML]=\"infoSvg\"></div>\n    } @else if (toastService.type() === \"success\") {\n      <div class=\"success\" [innerHTML]=\"successSvg\"></div>\n    } @else if (toastService.type() === \"warning\") {\n      <div class=\"warning\" [innerHTML]=\"warningSvg\"></div>\n    } @else if (toastService.type() === \"error\") {\n      <div class=\"error\" [innerHTML]=\"errorSvg\"></div>\n    }\n\n    <p class=\"custom-toast-message\">{{ toastService.message() | translate }}</p>\n\n    <div class=\"close-toast\" (click)=\"hideToast()\" [innerHTML]=\"closeSvg\"></div>\n  </div>\n}\n", styles: [".custom-toast{width:500px;min-height:60px;display:flex;justify-content:space-between;align-items:center;gap:20px;padding:20px;border-radius:10px}.toast-top-right{position:fixed;z-index:9999;top:20px;right:20px}.toast-top-left{position:fixed;z-index:9999;top:20px;left:20px}.toast-bottom-right{position:fixed;z-index:9999;bottom:20px;right:20px}.toast-bottom-left{position:fixed;z-index:9999;bottom:20px;left:20px}.toast-top-center{position:fixed;z-index:9999;top:20px;left:50%;transform:translate(-50%)}.toast-bottom-center{position:fixed;z-index:9999;bottom:20px;left:50%;transform:translate(-50%)}.toast-success{background-color:#19af66;color:#fff}.toast-error{background-color:#ff4d4f;color:#fff}.toast-warning{background-color:#ffbf00;color:#fff}.toast-info{background-color:#9d67aa;color:#fff}.toast-black{background-color:#000;color:#fff}.custom-toast-message{font-weight:500;font-size:16px;text-align:start;width:100%;text-wrap:wrap}.close-toast{cursor:pointer}\n"] }]
+            args: [{ selector: 'custom-toast', standalone: true, imports: [TranslateModule], template: "@if (toastService.show()) {\n  <div [class]=\"'custom-toast ' + positionClass + ' ' + colorClass\">\n    <div class=\"toast-content\">\n      <div [class]=\"'toast-color ' + colorClass\"></div>\n      <!-- icon -->\n      <div [class]=\"'icon-container ' + colorClass\">\n        @if (\n          toastService.type() === \"info\" || toastService.type() === \"black\"\n        ) {\n          <div class=\"toast-icon info\" [innerHTML]=\"infoSvg\"></div>\n        } @else if (toastService.type() === \"success\") {\n          <div class=\"toast-icon success\" [innerHTML]=\"successSvg\"></div>\n        } @else if (toastService.type() === \"warning\") {\n          <div class=\"toast-icon warning\" [innerHTML]=\"warningSvg\"></div>\n        } @else if (toastService.type() === \"error\") {\n          <div class=\"toast-icon error\" [innerHTML]=\"errorSvg\"></div>\n        }\n      </div>\n\n      <div class=\"context\">\n        <p class=\"custom-toast-message\">\n          {{ toastService.message() | translate }}\n        </p>\n        @if (toastService.subText()) {\n          <p class=\"custom-toast-subtext\">\n            {{ toastService.subText() | translate }}\n          </p>\n        }\n      </div>\n      <div\n        class=\"close-toast\"\n        (click)=\"hideToast()\"\n        [innerHTML]=\"closeSvg\"\n      ></div>\n    </div>\n  </div>\n}\n", styles: [".custom-toast{width:500px;min-height:60px;display:flex;justify-content:space-between;align-items:center;gap:20px;border-radius:10px;color:var(--vms-color-black);background-color:var(--vms-color-white);box-shadow:0 32px 64px -12px #10182824}.custom-toast.toast-top-right{position:fixed;z-index:9999;top:20px;right:20px}.custom-toast.toast-top-left{position:fixed;z-index:9999;top:20px;left:20px}.custom-toast.toast-bottom-right{position:fixed;z-index:9999;bottom:20px;right:20px}.custom-toast.toast-bottom-left{position:fixed;z-index:9999;bottom:20px;left:20px}.custom-toast.toast-top-center{position:fixed;z-index:9999;top:20px;left:50%;transform:translate(-50%)}.custom-toast.toast-bottom-center{position:fixed;z-index:9999;bottom:20px;left:50%;transform:translate(-50%)}.custom-toast .toast-content{position:relative;width:100%;display:grid;grid-template-columns:auto 1fr auto;justify-content:space-between;padding:1.6rem 1.6rem 1.6rem 2.4rem;gap:1.2rem}.custom-toast .toast-content .toast-color{position:absolute;left:0;top:0;width:.8rem;height:100%;border-top-left-radius:.8rem;border-bottom-left-radius:.8rem}.custom-toast .toast-content .toast-color.toast-success{background-color:var(--vms-green-normal)}.custom-toast .toast-content .toast-color.toast-error{background-color:var(--vms-red-normal-hover)}.custom-toast .toast-content .toast-color.toast-warning{background-color:var(--vms-yellow-normal-hover)}.custom-toast .toast-content .toast-color.toast-info{background-color:var(--vms-neutral-light-active)}.custom-toast .toast-content .toast-color.toast-black{background-color:var(--vms-color-black)}.custom-toast .toast-content .icon-container{width:4rem;height:4rem;display:flex;align-items:center;justify-content:center;border-radius:50%;aspect-ratio:1/1}.custom-toast .toast-content .icon-container.toast-success{background-color:var(--vms-green-lightest-active)}.custom-toast .toast-content .icon-container.toast-error{background-color:var(--vms-red-lightest-hover)}.custom-toast .toast-content .icon-container.toast-warning{background-color:var(--vms-yellow-lightest-hover)}.custom-toast .toast-content .icon-container.toast-info{background-color:var(--vms-neutral-lightest-active)}.custom-toast .toast-content .icon-container.toast-black{background-color:var(--vms-color-black)}.custom-toast .toast-content .icon-container .toast-icon{width:1.8rem;height:1.8rem}.custom-toast .toast-content .context{display:flex;flex-direction:column;gap:.4rem;justify-content:center;align-items:start}.custom-toast .toast-content .context .custom-toast-message{font-weight:600;font-size:1.6rem;line-height:2.4rem;letter-spacing:0%}.custom-toast .toast-content .context .custom-toast-subtext{font-weight:400;font-size:1.4rem;line-height:2rem;letter-spacing:0%}.custom-toast-message{font-weight:500;font-size:16px;text-align:start;width:100%;text-wrap:wrap}.close-toast{cursor:pointer}\n"] }]
         }], ctorParameters: () => [{ type: ToastService }, { type: i1$4.DomSanitizer }] });
 
 class CustomModalComponent {
