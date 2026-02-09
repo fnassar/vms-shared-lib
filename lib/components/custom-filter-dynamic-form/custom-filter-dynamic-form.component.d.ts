@@ -8,6 +8,7 @@ export interface IDynamicFilterConfig {
     label: string;
     type: 'text' | 'date' | 'multiselect' | 'singleselect';
     placeholder?: string;
+    enableFilter?: boolean;
     options?: IDropdownOption[];
     collapsed?: boolean;
     icon?: string;
