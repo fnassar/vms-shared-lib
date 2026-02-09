@@ -1,7 +1,7 @@
 import { ElementRef, EventEmitter, OnInit, TemplateRef } from '@angular/core';
 import { IDropdownOption } from '../../interfaces';
 import { CustomInputBase } from '../custom-input-form/custom-input-base';
-import { LoadingService, TranslationService } from '../../services';
+import { TranslationService } from '../../services';
 import * as i0 from "@angular/core";
 interface IPageSearch {
     nameEn: string;
@@ -26,11 +26,8 @@ export declare class CustomInputSearchFormComponent<T extends IDropdownOption = 
     selectedOption: import("@angular/core").WritableSignal<T | null>;
     private inputSubject;
     translationService: TranslationService;
-    loadingService: LoadingService;
-    private uniqueId;
     constructor();
     ngOnInit(): void;
-    get inputId(): string;
     onKeyDown(event: KeyboardEvent): void;
     onInput(): void;
     toggleAllowSearch(): void;
