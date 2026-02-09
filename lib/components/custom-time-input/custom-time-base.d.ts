@@ -13,6 +13,9 @@ export declare abstract class CustomTimeBaseComponent implements AfterViewInit {
     selectedPeriod: 'AM' | 'PM';
     rangeMin: string;
     rangeMax: string;
+    private isDragging;
+    private startY;
+    private startScrollTop;
     protected itemHeight: number;
     ngAfterViewInit(): void;
     updateItemHeight: () => void;
@@ -27,6 +30,9 @@ export declare abstract class CustomTimeBaseComponent implements AfterViewInit {
     onHourScroll(): void;
     onMinuteScroll(): void;
     onPeriodScroll(): void;
+    onMouseDown(event: MouseEvent, el: HTMLDivElement): void;
+    onMouseMove(event: MouseEvent, el: HTMLDivElement): void;
+    onMouseUp(el: HTMLDivElement): void;
     protected setTimeFromString(timeStr: string): void;
     static ɵfac: i0.ɵɵFactoryDeclaration<CustomTimeBaseComponent, never>;
     static ɵdir: i0.ɵɵDirectiveDeclaration<CustomTimeBaseComponent, never, never, {}, {}, never, never, true, never>;

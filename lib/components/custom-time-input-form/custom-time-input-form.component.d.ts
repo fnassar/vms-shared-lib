@@ -1,9 +1,9 @@
-import { EventEmitter, OnInit, OnDestroy } from '@angular/core';
+import { EventEmitter, OnInit, OnDestroy, OnChanges, SimpleChanges } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { IComponentFormError } from '../../interfaces';
 import { CustomTimeBaseComponent } from '../custom-time-input/custom-time-base';
 import * as i0 from "@angular/core";
-export declare class CustomTimeInputFormComponent extends CustomTimeBaseComponent implements OnInit, OnDestroy {
+export declare class CustomTimeInputFormComponent extends CustomTimeBaseComponent implements OnInit, OnDestroy, OnChanges {
     parentForm: FormGroup;
     name: string;
     controlName: string;
@@ -21,6 +21,7 @@ export declare class CustomTimeInputFormComponent extends CustomTimeBaseComponen
     }>;
     private translate;
     dropdownOpen: import("@angular/core").WritableSignal<boolean>;
+    ngOnChanges(simple: SimpleChanges): void;
     ngOnInit(): void;
     ngAfterViewInit(): void;
     ngOnDestroy(): void;
