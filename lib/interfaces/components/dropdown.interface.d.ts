@@ -10,6 +10,7 @@ export interface IDropdownOption {
     employeeId?: string;
     email?: string;
     needsRoom?: boolean;
+    disabled?: boolean;
 }
 export interface IFunctionDropdown extends IDropdownOption {
     iconPath?: string;
