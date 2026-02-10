@@ -26,7 +26,7 @@ export interface IUserLookup {
 export type StatusType = 'ACTIVE' | 'INACTIVE';
 export interface ITabDropdownOption extends IDropdownOption {
     disabled: boolean;
-    color?: string;
+    countColor?: string;
     count?: number;
 }
 export interface ListData {
