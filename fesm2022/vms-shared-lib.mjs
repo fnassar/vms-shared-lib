@@ -9658,6 +9658,9 @@ class SidenavService {
         const newVal = !this._hidden();
         this._hidden.set(newVal);
     }
+    hide() {
+        this._hidden.set(true);
+    }
     collapse() {
         this._isCollapsed.set(true);
         sessionStorage.setItem('isCollapsed', 'true');

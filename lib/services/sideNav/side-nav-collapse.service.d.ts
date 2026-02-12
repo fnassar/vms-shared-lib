@@ -9,6 +9,7 @@ export declare class SidenavService {
     get isMobileView(): boolean;
     toggle(): void;
     toggleHide(): void;
+    hide(): void;
     collapse(): void;
     expand(): void;
     private listenToWindowResize;
