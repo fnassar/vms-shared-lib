@@ -6,6 +6,7 @@ export declare class CustomPaginationComponent {
     maxVisiblePages: number;
     set page(value: number);
     _page: import("@angular/core").WritableSignal<number>;
+    hideOnResize: import("@angular/core").WritableSignal<boolean>;
     get page(): number;
     pageSize: import("@angular/core").InputSignal<number>;
     totalCount: import("@angular/core").InputSignal<number>;
@@ -16,6 +17,7 @@ export declare class CustomPaginationComponent {
     pageSizeOptions: import("@angular/core").Signal<number[]>;
     totalPageCount: import("@angular/core").Signal<number>;
     totalPages: import("@angular/core").Signal<number[]>;
+    constructor();
     translationService: TranslationService;
     loadingService: LoadingService;
     prevPage(): void;
