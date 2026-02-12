@@ -9631,6 +9631,7 @@ i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.17", ngImpo
 class SidenavService {
     _isCollapsed = signal(false);
     _hidden = signal(false); // only for mobile view
+    _isMobileView = signal(false);
     constructor() {
         // Initialize from sessionStorage on service creation
         const storedState = sessionStorage.getItem('isCollapsed');
@@ -9644,6 +9645,9 @@ class SidenavService {
     }
     get hidden() {
         return this._hidden();
+    }
+    get isMobileView() {
+        return this._isMobileView();
     }
     toggle() {
         const newVal = !this._isCollapsed();
@@ -9669,17 +9673,20 @@ class SidenavService {
             if (width < 640) {
                 this._isCollapsed.set(false);
                 this._hidden.set(true);
+                this._isMobileView.set(true);
                 sessionStorage.setItem('isCollapsed', 'false');
             }
             else if (width < 1025) {
                 this._isCollapsed.set(true);
                 this._hidden.set(false);
+                this._isMobileView.set(false);
                 sessionStorage.setItem('isCollapsed', 'true');
             }
             // Always expand when >= 700px
             else {
                 this._isCollapsed.set(false);
                 this._hidden.set(false);
+                this._isMobileView.set(false);
                 sessionStorage.setItem('isCollapsed', 'false');
             }
         };

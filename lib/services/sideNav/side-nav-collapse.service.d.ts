@@ -2,9 +2,11 @@ import * as i0 from "@angular/core";
 export declare class SidenavService {
     private _isCollapsed;
     private _hidden;
+    private _isMobileView;
     constructor();
     get isCollapsed(): boolean;
     get hidden(): boolean;
+    get isMobileView(): boolean;
     toggle(): void;
     toggleHide(): void;
     collapse(): void;
