@@ -9798,11 +9798,15 @@ class SidenavService {
         this._isCollapsed.set(newVal);
     }
     toggleHide() {
-        const newVal = !this._hidden();
-        this._hidden.set(newVal);
+        if (this.isMobileView) {
+            const newVal = !this._hidden();
+            this._hidden.set(newVal);
+        }
     }
     hide() {
-        this._hidden.set(true);
+        if (this.isMobileView) {
+            this._hidden.set(true);
+        }
     }
     collapse() {
         this._isCollapsed.set(true);
