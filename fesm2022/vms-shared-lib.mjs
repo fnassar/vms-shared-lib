@@ -2921,8 +2921,8 @@ class CustomPlateNumberInputComponent extends CustomInputBase {
     onLettersInput(event) {
         const input = event.target;
         let value = input.value.toUpperCase();
-        // Remove any non-letter characters
-        value = value.replace(/[^A-Z]/g, '');
+        // Remove any non-letter characters (allow English and Arabic letters)
+        value = value.replace(/[^A-Z\u0621-\u064A]/g, '');
         // Enforce max length
         if (value.length > this.maxLetters) {
             value = value.substring(0, this.maxLetters);
@@ -2934,8 +2934,8 @@ class CustomPlateNumberInputComponent extends CustomInputBase {
     onDigitsInput(event) {
         const input = event.target;
         let value = input.value;
-        // Remove any non-digit characters
-        value = value.replace(/[^0-9]/g, '');
+        // Remove any non-digit characters (allow English and Arabic digits)
+        value = value.replace(/[^0-9\u0660-\u0669]/g, '');
         // Enforce max length
         if (value.length > this.maxDigits) {
             value = value.substring(0, this.maxDigits);
@@ -2946,14 +2946,14 @@ class CustomPlateNumberInputComponent extends CustomInputBase {
     }
     preventInvalidInput(event, type) {
         if (type === 'letters') {
-            // Allow only letters and control keys
-            if (!/[a-zA-Z]/.test(event.key) && !this.isControlKey(event)) {
+            // Allow English and Arabic letters and control keys
+            if (!/[a-zA-Z\u0621-\u064A]/.test(event.key) && !this.isControlKey(event)) {
                 event.preventDefault();
             }
         }
         else if (type === 'digits') {
-            // Allow only numbers and control keys
-            if (!/[0-9]/.test(event.key) && !this.isControlKey(event)) {
+            // Allow English and Arabic digits and control keys
+            if (!/[0-9\u0660-\u0669]/.test(event.key) && !this.isControlKey(event)) {
                 event.preventDefault();
             }
         }
@@ -9925,6 +9925,10 @@ function getErrorValidation(fieldLabelKey, errorTypes, translate) {
             case 'duplicate':
                 message =
                     fieldLabelKey + translate.instant('GENERAL.VALIDATION.DUPLICATE');
+                break;
+            case 'pattern':
+                message =
+                    fieldLabelKey + translate.instant('GENERAL.VALIDATION.PATTERN');
                 break;
             default:
                 message = fieldLabelKey;
