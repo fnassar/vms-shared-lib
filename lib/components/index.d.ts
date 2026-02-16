@@ -9,7 +9,7 @@ export * from './custom-input-form/custom-input-form.component';
 export * from './custom-input-form/custom-input-search-form/custom-input-search-form.component';
 export * from './custom-input-form/custom-input-search-form-expanded/custom-input-search-form-expanded.component';
 export * from './custom-input-form/custom-input-number-form/custom-input-number-form.component';
-export * from './custom-plate-number-input/custom-plate-number-input.component';
+export * from './custom-input-form/custom-plate-number-input/custom-plate-number-input.component';
 export * from './custom-multi-select/custom-multi-select.component';
 export * from './custom-multi-select-form/custom-multi-select-form.component';
 export * from './custom-multi-select-expanded-form/custom-multi-select-expanded-form.component';
