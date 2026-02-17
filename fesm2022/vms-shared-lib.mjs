@@ -7006,15 +7006,18 @@ class CustomFilterDynamicFormComponent {
                 // console.log('Form Values Changed:', val);
                 const payload = this.buildEmittableValues(this.config(), val);
                 const baseline = this.buildEmittableValues(this.config(), this.values() ?? {});
-                if (!this.isSame(payload, baseline))
+                if (!this.isSame(payload, baseline) && !this.resetting()) {
                     this.formChanged.emit(payload);
+                }
             }
         });
     }
     toggleCollapse(id) {
+        this.resetting.set(true);
         const state = { ...this.collapseState() };
         state[id] = !state[id];
         this.collapseState.set(state);
+        setTimeout(() => this.resetting.set(false), 0);
     }
     buildForm(config, initialValues) {
         const group = this.fb.group({});
@@ -7081,8 +7084,8 @@ class CustomFilterDynamicFormComponent {
         return this.filterForm;
     }
     reset() {
-        this.form.reset();
         this.resetting.set(true);
+        this.form.reset();
         this.formReset.emit(true);
         setTimeout(() => this.resetting.set(false), 0);
     }
