@@ -8,8 +8,9 @@ export declare class CustomAvatarsComponent {
     size: number;
     overlapOffset: number;
     removeOutline: boolean;
+    removeBorder: boolean;
     getInitials(name: string): string;
     getRandomColor(): string;
     static ɵfac: i0.ɵɵFactoryDeclaration<CustomAvatarsComponent, never>;
-    static ɵcmp: i0.ɵɵComponentDeclaration<CustomAvatarsComponent, "custom-avatars", never, { "items": { "alias": "items"; "required": false; }; "size": { "alias": "size"; "required": false; }; "overlapOffset": { "alias": "overlapOffset"; "required": false; }; "removeOutline": { "alias": "removeOutline"; "required": false; }; }, {}, never, never, true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CustomAvatarsComponent, "custom-avatars", never, { "items": { "alias": "items"; "required": false; }; "size": { "alias": "size"; "required": false; }; "overlapOffset": { "alias": "overlapOffset"; "required": false; }; "removeOutline": { "alias": "removeOutline"; "required": false; }; "removeBorder": { "alias": "removeBorder"; "required": false; }; }, {}, never, never, true, never>;
 }

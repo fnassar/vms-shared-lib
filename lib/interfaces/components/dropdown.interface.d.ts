@@ -27,6 +27,7 @@ export type StatusType = 'ACTIVE' | 'INACTIVE';
 export interface ITabDropdownOption extends IDropdownOption {
     disabled: boolean;
     countColor?: string;
+    icon?: string;
     count?: number;
 }
 export interface ListData {

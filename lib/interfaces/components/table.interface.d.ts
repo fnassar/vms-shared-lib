@@ -5,6 +5,7 @@ export interface ITableHeader<T> {
     htmlRef?: string;
     sort: boolean;
     type?: 'Status' | 'Actions' | undefined;
+    aligned?: 'Center' | 'Start' | 'End';
     inputTransform?: (item: any) => any;
 }
 export interface ITableCategory<T> {
