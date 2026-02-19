@@ -8,8 +8,8 @@ export declare abstract class CustomTimeBaseComponent implements AfterViewInit {
     hours: number[];
     minutes: number[];
     periods: string[];
-    selectedHour?: number;
-    selectedMinute?: number;
+    selectedHour?: number | null;
+    selectedMinute?: number | null;
     selectedPeriod: 'AM' | 'PM';
     rangeMin: string;
     rangeMax: string;
