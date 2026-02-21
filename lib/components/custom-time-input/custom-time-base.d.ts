@@ -7,7 +7,7 @@ export declare abstract class CustomTimeBaseComponent implements AfterViewInit {
     timeInputRef: ElementRef<HTMLInputElement>;
     hours: number[];
     minutes: number[];
-    periods: string[];
+    periods: ('AM' | 'PM')[];
     selectedHour?: number | null;
     selectedMinute?: number | null;
     selectedPeriod: 'AM' | 'PM';
@@ -20,6 +20,7 @@ export declare abstract class CustomTimeBaseComponent implements AfterViewInit {
     ngAfterViewInit(): void;
     updateItemHeight: () => void;
     get filteredHours(): number[];
+    get filteredPeriods(): ('AM' | 'PM')[];
     protected getFilteredHoursList(): number[];
     get filteredMinutes(): number[];
     protected scrollToSelectedValues(): void;
