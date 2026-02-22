@@ -5,6 +5,7 @@ export declare class OverlayPanelComponent {
     private overlayManager;
     overlayClass: string;
     maxHeight: string;
+    closeOnClick: boolean;
     targetTemplate: TemplateRef<any>;
     overlayTemplate: TemplateRef<any>;
     isOpen: boolean;
@@ -13,6 +14,7 @@ export declare class OverlayPanelComponent {
     ngAfterContentInit(): void;
     toggleDropdown(event: Event): void;
     closeDropdown(): void;
+    onOverlayClick(event: Event): void;
     static ɵfac: i0.ɵɵFactoryDeclaration<OverlayPanelComponent, never>;
-    static ɵcmp: i0.ɵɵComponentDeclaration<OverlayPanelComponent, "overlay-panel", never, { "overlayClass": { "alias": "overlayClass"; "required": false; }; "maxHeight": { "alias": "maxHeight"; "required": false; }; "expandSide": { "alias": "expandSide"; "required": false; }; }, {}, ["targetTemplate", "overlayTemplate"], never, true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<OverlayPanelComponent, "overlay-panel", never, { "overlayClass": { "alias": "overlayClass"; "required": false; }; "maxHeight": { "alias": "maxHeight"; "required": false; }; "closeOnClick": { "alias": "closeOnClick"; "required": false; }; "expandSide": { "alias": "expandSide"; "required": false; }; }, {}, ["targetTemplate", "overlayTemplate"], never, true, never>;
 }
