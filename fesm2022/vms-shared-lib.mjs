@@ -7083,7 +7083,7 @@ class CustomFilterDynamicFormComponent {
         this.filterForm.valueChanges
             .pipe(takeUntil(this.destroy$))
             .subscribe((val) => {
-            if (this.update < 1) {
+            if (this.update < 0) {
                 this.update++;
             }
             else {
@@ -7097,11 +7097,9 @@ class CustomFilterDynamicFormComponent {
         });
     }
     toggleCollapse(id) {
-        this.resetting.set(true);
         const state = { ...this.collapseState() };
         state[id] = !state[id];
         this.collapseState.set(state);
-        setTimeout(() => this.resetting.set(false), 0);
     }
     buildForm(config, initialValues) {
         const group = this.fb.group({});
