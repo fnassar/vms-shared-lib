@@ -7110,7 +7110,7 @@ class CustomFilterDynamicFormComponent {
         this.collapseState.set(state);
         this.filterForm = this.buildForm(this.config(), this.values());
         this.filterForm.valueChanges
-            .pipe(debounceTime(600), takeUntil(this.destroy$))
+            .pipe(debounceTime(500), takeUntil(this.destroy$))
             .subscribe((val) => {
             if (this.update < 0) {
                 this.update++;
