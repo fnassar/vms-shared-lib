@@ -2,7 +2,6 @@ import { EventEmitter, ModelSignal } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { IComponentFormError, IDropdownOption } from '../../interfaces';
 import { ComponentFormErrorConstant } from '../../enums';
-import { TranslationService } from '../../services';
 import * as i0 from "@angular/core";
 export type FilterType = 'multiselect' | 'date' | 'text' | 'dateRange';
 export interface FilterConfig extends IDropdownOption {
@@ -34,7 +33,6 @@ export declare class CustomFilterDropdownComponent {
         main: FilterRow[];
         filteredValues: FilterValues;
     }>;
-    translationService: TranslationService;
     filterOptions: IDropdownOption[];
     filterForm: FormGroup;
     emptyOptions: IDropdownOption[];
@@ -42,7 +40,7 @@ export declare class CustomFilterDropdownComponent {
     protected readonly errorConstant: typeof ComponentFormErrorConstant;
     constructor(fb: FormBuilder);
     ngOnInit(): void;
-    getDefaultInitialValue(type: FilterType): never[] | "" | null;
+    getDefaultInitialValue(type: FilterType): "" | never[] | null;
     getValidatorsFromConfig(validations?: IComponentFormError[]): (typeof Validators.required)[];
     getAvailableOptions(activeIndex: number): IDropdownOption[];
     addFilterRow(): void;
