@@ -4940,7 +4940,11 @@ class CustomSearchInputComponent {
     searchSubject = new Subject();
     ngOnInit() {
         this.searchSubject.pipe(debounceTime$1(300)).subscribe((value) => {
-            const val = (value?.trim() || '').replace(/[^a-zA-Z]/g, (char) => '%' + char.charCodeAt(0).toString(16).toUpperCase());
+            const val = (value?.trim() || '');
+            // .replace(
+            //   /[^a-zA-Z]/g,
+            //   (char) => '%' + char.charCodeAt(0).toString(16).toUpperCase(),
+            // );
             if (!(val.length <= 0 && this.value?.length > 0)) {
                 this.valueChange.emit(val);
             }
