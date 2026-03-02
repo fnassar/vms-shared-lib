@@ -1,4 +1,4 @@
-import { EventEmitter } from '@angular/core';
+import { EventEmitter, SimpleChanges } from '@angular/core';
 import { CustomInputBase } from '../custom-input-base';
 import * as i0 from "@angular/core";
 export declare class CustomInputNumberFormComponent extends CustomInputBase {
@@ -7,6 +7,7 @@ export declare class CustomInputNumberFormComponent extends CustomInputBase {
     max: number;
     numberValueChange: EventEmitter<number>;
     ngOnInit(): void;
+    ngOnChanges(changes: SimpleChanges): void;
     showPassword: boolean;
     togglePasswordVisibility(): void;
     preventInvalidNumberInput(event: KeyboardEvent): void;
