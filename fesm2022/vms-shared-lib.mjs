@@ -4735,6 +4735,7 @@ class CustomTimeInputFormComponent extends CustomTimeBaseComponent {
     translate = inject(TranslateService);
     dropdownOpen = signal(false);
     ngOnChanges(simple) {
+        console.log('Range changed, validating current time value');
         if (simple['rangeMax'] || simple['rangeMin']) {
             if (this.parentForm.get(this.controlName)?.value &&
                 this.parentForm.get(this.controlName)?.value.length > 0) {
@@ -4879,6 +4880,13 @@ class CustomTimeInputFormComponent extends CustomTimeBaseComponent {
         this.selectedMinute = Number(minute);
     }
     displayTime() {
+        if (this.parentForm.get(this.controlName)?.value == null ||
+            this.parentForm.get(this.controlName)?.value.length === 0) {
+            this.selectedHour = null;
+            this.selectedMinute = null;
+            this.selectedPeriod = this.filteredPeriods[0] || 'AM';
+            return `--:-- ${this.translate.instant('GENERAL.' + this.selectedPeriod)}`;
+        }
         const hour = Number(this.selectedHour) > 12
             ? (Number(this.selectedHour) - 12).toString().padStart(2, '0')
             : this.selectedHour?.toString().padStart(2, '0') || '--';
