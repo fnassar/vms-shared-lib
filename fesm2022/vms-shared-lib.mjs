@@ -4573,10 +4573,12 @@ class CustomTimeBaseComponent {
         });
     }
     get filteredMinutes() {
-        if (this.selectedHour == null || (!this.rangeMin && !this.rangeMax)) {
+        if (!this.rangeMin && !this.rangeMax) {
             return this.minutes;
         }
-        const hour24 = this.to24Hour(this.selectedHour, this.selectedPeriod);
+        const hour24 = this.to24Hour(this.selectedHour || this.filteredHours[0], this.filteredPeriods.includes(this.selectedPeriod)
+            ? this.selectedPeriod
+            : this.filteredPeriods[0]);
         return this.minutes.filter((m) => {
             if (this.rangeMin) {
                 const [minH, minM] = this.rangeMin.split(':').map(Number);
