@@ -4221,8 +4221,8 @@ class CustomToastComponent {
         this.toastService = toastService;
         this.sanitizer = sanitizer;
         effect(() => {
-            // this.updatePositionClass(this.toastService.position());
-            // this.updateColorClass(this.toastService.type());
+            this.updatePositionClass(this.toastService.position());
+            this.updateColorClass(this.toastService.type());
         });
         //
         this.infoSvg = this.sanitizer.bypassSecurityTrustHtml(infoIcon);
