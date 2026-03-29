@@ -1,0 +1,33 @@
+import { OnInit } from '@angular/core';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { MainTab, SubTab } from '../../enums/tabData';
+import { Router } from '@angular/router';
+import { AuthService, SidenavService } from '../../../../services';
+import { PERMISSIONS } from '../../../../enums';
+import * as i0 from "@angular/core";
+export declare class SideBarListComponent implements OnInit {
+    private authService;
+    protected sidenav: SidenavService;
+    private router;
+    private sanitizer;
+    protected readonly Permissions: typeof PERMISSIONS;
+    readonly arrowDownSvg: SafeHtml;
+    filteredTabs: MainTab[];
+    activeTab: MainTab | null;
+    activeSubTab: SubTab | null;
+    private readonly _safeHtmlCache;
+    constructor(authService: AuthService, sidenav: SidenavService, router: Router, sanitizer: DomSanitizer);
+    safeHtml(svg: string): SafeHtml;
+    ngOnInit(): void;
+    filterTabs(): void;
+    onMainTabClick(tab: MainTab): void;
+    onSubTabClick(subTab: SubTab): void;
+    toggleTab(tab: MainTab): void;
+    isExpanded(tab: MainTab): boolean;
+    isActiveTab(tab: MainTab): boolean;
+    isActiveSubTab(tab: MainTab, subTab: SubTab): boolean;
+    routeModules(link: string): void;
+    private getCurrentUrl;
+    static ɵfac: i0.ɵɵFactoryDeclaration<SideBarListComponent, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<SideBarListComponent, "app-side-bar-list", never, {}, {}, never, never, true, never>;
+}
