@@ -2,9 +2,11 @@ import { ComponentRef, EventEmitter, Provider, Type, ViewContainerRef } from '@a
 import * as i0 from "@angular/core";
 export declare class CustomModalComponent {
     modalTitle: string;
+    modalSubTitle: string;
     modalIcon: string;
     overlayClickClose: boolean;
     showHeader: boolean;
+    headerBgImg: string;
     hideEvent: EventEmitter<void>;
     closed: EventEmitter<void>;
     isVisible: boolean;
@@ -21,5 +23,5 @@ export declare class CustomModalComponent {
     attachContent<T>(component: Type<T>, extraProviders?: Provider[]): ComponentRef<T>;
     private clearDynamicContent;
     static ɵfac: i0.ɵɵFactoryDeclaration<CustomModalComponent, never>;
-    static ɵcmp: i0.ɵɵComponentDeclaration<CustomModalComponent, "modal", never, { "modalTitle": { "alias": "modalTitle"; "required": false; }; "modalIcon": { "alias": "modalIcon"; "required": false; }; "overlayClickClose": { "alias": "overlayClickClose"; "required": false; }; "showHeader": { "alias": "showHeader"; "required": false; }; }, { "hideEvent": "hideEvent"; "closed": "closed"; }, never, ["*"], true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CustomModalComponent, "modal", never, { "modalTitle": { "alias": "modalTitle"; "required": false; }; "modalSubTitle": { "alias": "modalSubTitle"; "required": false; }; "modalIcon": { "alias": "modalIcon"; "required": false; }; "overlayClickClose": { "alias": "overlayClickClose"; "required": false; }; "showHeader": { "alias": "showHeader"; "required": false; }; "headerBgImg": { "alias": "headerBgImg"; "required": false; }; }, { "hideEvent": "hideEvent"; "closed": "closed"; }, never, ["*"], true, never>;
 }

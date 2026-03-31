@@ -12,6 +12,8 @@ export interface ModalOpenOptions<TInputs = unknown> {
     iconSrc?: string;
     overlayClickClose?: boolean;
     showHeader?: boolean;
+    headerBgImg?: string;
+    subtitle?: string;
 }
 export interface ModalRef<TChild> {
     modalComponentRef: ComponentRef<CustomModalComponent>;
