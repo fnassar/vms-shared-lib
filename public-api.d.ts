@@ -9,4 +9,3 @@ export * from './lib/guards/index';
 export * from './lib/dispatching-fe-components.service';
 export * from './lib/utilities/http-context';
 export * from './lib/pipes';
-export * from './lib/layout/index';
