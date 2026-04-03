@@ -18,6 +18,7 @@ export declare class CustomSingleFileUploadComponent {
     validation: IComponentFormError[];
     disabled: boolean;
     maxFileCount: number;
+    height: string;
     fileInput: ElementRef<HTMLInputElement>;
     uniqueFileInputId: string;
     private clearFileInput;
@@ -42,5 +43,5 @@ export declare class CustomSingleFileUploadComponent {
     isImageFile(mimeType: string): boolean;
     onImageError(event: any): void;
     static ɵfac: i0.ɵɵFactoryDeclaration<CustomSingleFileUploadComponent, never>;
-    static ɵcmp: i0.ɵɵComponentDeclaration<CustomSingleFileUploadComponent, "custom-single-file-upload", never, { "parentForm": { "alias": "parentForm"; "required": true; }; "FileTypes": { "alias": "FileTypes"; "required": true; }; "maxFileSize": { "alias": "maxFileSize"; "required": true; }; "controlName": { "alias": "controlName"; "required": true; }; "label": { "alias": "label"; "required": true; }; "labelClass": { "alias": "labelClass"; "required": false; }; "newSmpResponse": { "alias": "newSmpResponse"; "required": false; }; "FileTypesMessage": { "alias": "FileTypesMessage"; "required": false; }; "placeholder": { "alias": "placeholder"; "required": false; }; "gridCols": { "alias": "gridCols"; "required": false; }; "validation": { "alias": "validation"; "required": true; }; "disabled": { "alias": "disabled"; "required": false; }; "maxFileCount": { "alias": "maxFileCount"; "required": false; }; }, {}, never, never, true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CustomSingleFileUploadComponent, "custom-single-file-upload", never, { "parentForm": { "alias": "parentForm"; "required": true; }; "FileTypes": { "alias": "FileTypes"; "required": true; }; "maxFileSize": { "alias": "maxFileSize"; "required": true; }; "controlName": { "alias": "controlName"; "required": true; }; "label": { "alias": "label"; "required": true; }; "labelClass": { "alias": "labelClass"; "required": false; }; "newSmpResponse": { "alias": "newSmpResponse"; "required": false; }; "FileTypesMessage": { "alias": "FileTypesMessage"; "required": false; }; "placeholder": { "alias": "placeholder"; "required": false; }; "gridCols": { "alias": "gridCols"; "required": false; }; "validation": { "alias": "validation"; "required": true; }; "disabled": { "alias": "disabled"; "required": false; }; "maxFileCount": { "alias": "maxFileCount"; "required": false; }; "height": { "alias": "height"; "required": false; }; }, {}, never, never, true, never>;
 }
