@@ -5,6 +5,7 @@ export * from './custom-calender-form/custom-calender-form.component';
 export * from './custom-check-box-form/custom-check-box-form.component';
 export * from './custom-dropdown/custom-dropdown.component';
 export * from './custom-dropdown-form/custom-dropdown-form.component';
+export * from './custom-dropdown-multiselect-form/custom-dropdown-multiselect-form.component';
 export * from './custom-input-form/custom-input-form.component';
 export * from './custom-input-form/custom-input-search-form/custom-input-search-form.component';
 export * from './custom-input-form/custom-input-search-form-expanded/custom-input-search-form-expanded.component';

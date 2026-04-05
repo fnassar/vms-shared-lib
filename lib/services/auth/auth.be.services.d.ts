@@ -16,7 +16,7 @@ export declare class AuthBeService {
         password: string;
     }): Observable<IGlobalAuthResponse<ILoginData>>;
     logout(): Observable<IGlobalAuthResponse<any>>;
-    refreshToken(refreshToken: {
+    refreshToken(param: {
         refreshToken: string;
     }): Observable<IGlobalAuthResponse<ILoginData>>;
     validateToken(): Observable<IGlobalAuthResponse<any>>;
