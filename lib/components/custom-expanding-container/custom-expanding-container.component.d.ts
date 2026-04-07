@@ -6,6 +6,7 @@ export declare class CustomExpandingContainerComponent {
     padding: string;
     borderRadius: string;
     backgroundColor: string;
+    borderColor: string;
     showBorderBottom: boolean;
     minMaxHeight: string;
     minExpandingHeight: string;
@@ -19,5 +20,5 @@ export declare class CustomExpandingContainerComponent {
     open(): void;
     close(): void;
     static ɵfac: i0.ɵɵFactoryDeclaration<CustomExpandingContainerComponent, never>;
-    static ɵcmp: i0.ɵɵComponentDeclaration<CustomExpandingContainerComponent, "custom-expanding-container", never, { "expanded": { "alias": "expanded"; "required": false; }; "showIcon1": { "alias": "showIcon1"; "required": false; }; "padding": { "alias": "padding"; "required": false; }; "borderRadius": { "alias": "borderRadius"; "required": false; }; "backgroundColor": { "alias": "backgroundColor"; "required": false; }; "showBorderBottom": { "alias": "showBorderBottom"; "required": false; }; "minMaxHeight": { "alias": "minMaxHeight"; "required": false; }; "minExpandingHeight": { "alias": "minExpandingHeight"; "required": false; }; }, { "toggled": "toggled"; }, never, ["[target]", "[content]"], true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CustomExpandingContainerComponent, "custom-expanding-container", never, { "expanded": { "alias": "expanded"; "required": false; }; "showIcon1": { "alias": "showIcon1"; "required": false; }; "padding": { "alias": "padding"; "required": false; }; "borderRadius": { "alias": "borderRadius"; "required": false; }; "backgroundColor": { "alias": "backgroundColor"; "required": false; }; "borderColor": { "alias": "borderColor"; "required": false; }; "showBorderBottom": { "alias": "showBorderBottom"; "required": false; }; "minMaxHeight": { "alias": "minMaxHeight"; "required": false; }; "minExpandingHeight": { "alias": "minExpandingHeight"; "required": false; }; }, { "toggled": "toggled"; }, never, ["[target]", "[content]"], true, never>;
 }

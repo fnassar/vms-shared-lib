@@ -1,4 +1,4 @@
-import { ComponentRef, Type, InjectionToken } from '@angular/core';
+import { ComponentRef, Type, InjectionToken, TemplateRef } from '@angular/core';
 import { CustomModalComponent } from '../../components';
 import { TranslateService } from '@ngx-translate/core';
 import * as i0 from "@angular/core";
@@ -9,6 +9,7 @@ export declare const MODAL_REF: InjectionToken<ModalRefApi<unknown>>;
 export declare function injectModalRef<T = unknown>(): ModalRefApi<T>;
 export interface ModalOpenOptions<TInputs = unknown> {
     title?: string;
+    titleTemplate?: TemplateRef<any>;
     iconSrc?: string;
     overlayClickClose?: boolean;
     showHeader?: boolean;
