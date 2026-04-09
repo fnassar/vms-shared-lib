@@ -65,6 +65,8 @@ export declare class CustomCalenderOpenFormComponent {
     formatDisplayDate(): string;
     containRequiredError(): boolean;
     dayClick(event: Event, day: Date): void;
+    toggleCalendar(): void;
+    clearDate(event: Event): void;
     static ɵfac: i0.ɵɵFactoryDeclaration<CustomCalenderOpenFormComponent, never>;
     static ɵcmp: i0.ɵɵComponentDeclaration<CustomCalenderOpenFormComponent, "custom-calender-open-form", never, { "label": { "alias": "label"; "required": false; }; "placeholder": { "alias": "placeholder"; "required": false; }; "minDate": { "alias": "minDate"; "required": false; }; "maxDate": { "alias": "maxDate"; "required": false; }; "controlName": { "alias": "controlName"; "required": true; }; "parentForm": { "alias": "parentForm"; "required": true; }; "validation": { "alias": "validation"; "required": true; }; "name": { "alias": "name"; "required": true; }; "disabled": { "alias": "disabled"; "required": false; }; "calendarPopUpClass": { "alias": "calendarPopUpClass"; "required": false; }; "calendarInputClass": { "alias": "calendarInputClass"; "required": false; }; "calendarContainerClass": { "alias": "calendarContainerClass"; "required": false; }; "componentClass": { "alias": "componentClass"; "required": false; }; "filterDesign": { "alias": "filterDesign"; "required": false; }; "labelClass": { "alias": "labelClass"; "required": false; }; }, { "valueChange": "valueChange"; }, never, never, true, never>;
 }
