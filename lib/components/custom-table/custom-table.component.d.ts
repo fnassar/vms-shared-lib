@@ -12,18 +12,22 @@ export declare class CustomTableComponent<T> {
     showActionHeader: boolean;
     actionsItems: IActions[];
     actionDotsTemplate?: TemplateRef<{
-        $implicit: any;
+        $implicit: T;
     }>;
     hasActionTemplate: boolean;
     actionsTemplate?: TemplateRef<{
-        $implicit: any;
+        $implicit: T;
     }>;
     tableCategories: ITableCategory<T>[] | null;
     cellTemplates: {
-        [key: string]: TemplateRef<any>;
+        [key: string]: TemplateRef<{
+            $implicit: T;
+        }>;
     };
     templates: {
-        [key: string]: TemplateRef<any>;
+        [key: string]: TemplateRef<{
+            $implicit: T;
+        }>;
     };
     showNumberCol: boolean;
     pagination: any;
