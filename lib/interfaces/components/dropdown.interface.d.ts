@@ -2,6 +2,7 @@ export interface IDropdownOption {
     id: number | string;
     nameAr: string;
     nameEn: string;
+    iconPath?: string;
     value?: number;
     serialNumber?: string;
     status?: string;

@@ -14,6 +14,7 @@ export interface ModalOpenOptions<TInputs = unknown> {
     overlayClickClose?: boolean;
     showHeader?: boolean;
     headerBgImg?: string;
+    overflowScroll?: boolean;
     subtitle?: string;
 }
 export interface ModalRef<TChild> {
