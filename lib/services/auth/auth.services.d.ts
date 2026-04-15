@@ -12,6 +12,8 @@ export declare class AuthService {
     private router;
     private storageService;
     private toastService;
+    private readonly refreshLockKey;
+    private readonly refreshLockTtlMs;
     Roles: typeof Roles;
     PERMISSIONS: typeof PERMISSIONS;
     constructor(authContextService: AuthContextService, authBeService: AuthBeService, router: Router, storageService: StorageService, toastService: ToastService);
@@ -19,6 +21,8 @@ export declare class AuthService {
     logOutUser(): void;
     logout(): void;
     handleRefreshToken(): void;
+    private tryAcquireRefreshLock;
+    private releaseRefreshLock;
     handlePermissionConfig(): void;
     isLoggedIn(): boolean;
     getToken(): string;
