@@ -1,7 +1,7 @@
-import { EventEmitter, OnInit } from '@angular/core';
+import { EventEmitter, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { CustomTimeBaseComponent } from './custom-time-base';
 import * as i0 from "@angular/core";
-export declare class CustomTimeInputComponent extends CustomTimeBaseComponent implements OnInit {
+export declare class CustomTimeInputComponent extends CustomTimeBaseComponent implements OnInit, OnChanges {
     value: string | null;
     valueChange: EventEmitter<string | null>;
     label: string;
@@ -15,6 +15,7 @@ export declare class CustomTimeInputComponent extends CustomTimeBaseComponent im
     private translate;
     dropdownOpen: import("@angular/core").WritableSignal<boolean>;
     ngOnInit(): void;
+    ngOnChanges(changes: SimpleChanges): void;
     ngAfterViewInit(): void;
     toggleDropdown(): void;
     onHourChange(): void;

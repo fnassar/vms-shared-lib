@@ -28,7 +28,7 @@ export declare class CustomTimeInputFormComponent extends CustomTimeBaseComponen
     containRequiredError(): boolean;
     toggleDropdown(): void;
     confirmTime(): void;
-    setFormValue(): void;
+    setFormValue(hour24?: number, minute?: number): void;
     setExcistValue(): void;
     displayTime(): string | null;
     private isTimeInRange;
