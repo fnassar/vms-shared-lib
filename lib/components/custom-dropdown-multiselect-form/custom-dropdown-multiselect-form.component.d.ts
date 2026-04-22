@@ -42,6 +42,7 @@ export declare class CustomDropdownMultiselectFormComponent {
     getSelectedLabel(option: IDropdownOption): string;
     isSelected(id: any): boolean;
     toggleDropdown(): void;
+    sortOptions(): void;
     closeDropdown(): void;
     toggleOptionSelection(option: IDropdownOption): void;
     removeChip(id: string | number, event?: Event): void;

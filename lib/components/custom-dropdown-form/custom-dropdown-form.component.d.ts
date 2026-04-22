@@ -42,6 +42,7 @@ export declare class CustomDropdownFormComponent {
     private setupFormControlSubscription;
     private updateSelectedOptionFromFormValue;
     toggleDropdown(): void;
+    sortOptions(): void;
     closeDropdown(): void;
     writeValue(value: any): void;
     selectOption(option: IDropdownOption): void;

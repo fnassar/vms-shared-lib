@@ -2210,6 +2210,15 @@ class CustomDropdownFormComponent {
         else {
             this.parentForm.get(this.controlName)?.markAsTouched();
         }
+        this.sortOptions();
+    }
+    sortOptions() {
+        this.filteredOptions = [
+            ...(this.selectedOption ? [this.selectedOption] : []),
+            ...this.options.filter((option) => {
+                return option.id !== this.selectedOption?.id;
+            }),
+        ];
     }
     closeDropdown() {
         this.isOpen = false;
@@ -2419,7 +2428,7 @@ class CustomDropdownMultiselectFormComponent {
     }
     ngOnChanges(changes) {
         if (changes['options'] && changes['options'].currentValue) {
-            this.filteredOptions = [...this.options];
+            this.filteredOptions = this.options;
         }
     }
     get selectedOptions() {
@@ -2446,6 +2455,23 @@ class CustomDropdownMultiselectFormComponent {
         else {
             this.parentForm.get(this.controlName)?.markAsTouched();
         }
+        this.sortOptions();
+    }
+    sortOptions() {
+        this.filteredOptions = [
+            ...this.options.sort((a, b) => {
+                const value = this.parentForm.get(this.controlName)?.value || [];
+                const aSelected = value.includes(a.id);
+                const bSelected = value.includes(b.id);
+                if (aSelected && !bSelected)
+                    return -1;
+                if (!aSelected && bSelected)
+                    return 1;
+                const nameA = this.translationService.currentLang() === 'en' ? a.nameEn : a.nameAr;
+                const nameB = this.translationService.currentLang() === 'en' ? b.nameEn : b.nameAr;
+                return nameA.localeCompare(nameB);
+            }),
+        ];
     }
     closeDropdown() {
         this.isOpen = false;
