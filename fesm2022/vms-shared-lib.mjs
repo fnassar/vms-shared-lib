@@ -462,10 +462,12 @@ class AuthService {
         this.toastService = toastService;
     }
     login(data) {
+        localStorage.setItem('is-logging-in', 'true');
         this.authBeService.login(data).subscribe({
             next: (res) => {
                 if (res.success) {
                     this.authContextService.saveTokens(res.data);
+                    localStorage.removeItem('is-logging-in');
                     //window.dispatchEvent(new CustomEvent('auth-login'));
                     //           window.history.pushState({}, '', window.location.pathname);
                     // window.dispatchEvent(new PopStateEvent('popstate', {}));
@@ -477,6 +479,7 @@ class AuthService {
     }
     logOutUser() {
         this.authContextService.clearData();
+        localStorage.removeItem('is-logging-in');
         // window.dispatchEvent(new CustomEvent('auth-logout'));
         this.router.navigate(['/auth']);
         window.location.reload();
@@ -553,6 +556,9 @@ class AuthService {
     isLoggedIn() {
         return localStorage.getItem(AuthConstant.TOKEN) !== null;
     }
+    isLoggingIn() {
+        return localStorage.getItem('is-logging-in') !== null;
+    }
     getToken() {
         return this.storageService.getLocalStorageItem(AuthConstant.TOKEN);
     }
@@ -608,6 +614,9 @@ class AuthService {
             const hasPermission = requiredPermissions.some((permission) => permissionSet.has(permission));
             return hasPermission;
         }
+        if (requiredPermissions.includes(PERMISSIONS.all) && this.isLoggedIn()) {
+            return true;
+        }
         return false;
     }
     hasRoles(route) {
@@ -633,6 +642,39 @@ class AuthService {
             return requiredAction.some((action) => rolesSet.has(action));
         }
         return false;
+    }
+    // should return true when user logs in and permission are loaded if user is not logged in but is logging in it should wait till permissions are stored in local storage -- roles/permissions should not be empty in getRoles() var
+    hasPermissionOrRole(route) {
+        return new Promise((resolve) => {
+            // If user is fully logged in and permissions are already loaded
+            if (this.isLoggedIn() && this.getCurrentRoles().length > 0) {
+                const hasPermission = this.hasCategory(route);
+                const hasRole = this.hasRoles(route);
+                return resolve(hasPermission || hasRole);
+            }
+            // If user is not logged in at all and route requires auth → deny immediately
+            if (!this.isLoggedIn() && this.isLoggingIn()) {
+                return resolve(false);
+            }
+            // User is in the process of logging in → poll until permissions are stored
+            const maxWaitMs = 10000; // 10 second timeout
+            const intervalMs = 100;
+            let elapsed = 0;
+            const poll = setInterval(() => {
+                elapsed += intervalMs;
+                const roles = this.getCurrentRoles();
+                if (roles.length > 0) {
+                    clearInterval(poll);
+                    const hasPermission = this.hasCategory(route);
+                    const hasRole = this.hasRoles(route);
+                    return resolve(hasPermission || hasRole);
+                }
+                if (elapsed >= maxWaitMs) {
+                    clearInterval(poll);
+                    return resolve(false); // Timed out waiting for permissions
+                }
+            }, intervalMs);
+        });
     }
     static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.20", ngImport: i0, type: AuthService, deps: [{ token: AuthContextService }, { token: AuthBeService }, { token: i3.Router }, { token: StorageService }, { token: ToastService }], target: i0.ɵɵFactoryTarget.Injectable });
     static ɵprov = i0.ɵɵngDeclareInjectable({ minVersion: "12.0.0", version: "19.2.20", ngImport: i0, type: AuthService, providedIn: 'root' });
@@ -8913,9 +8955,7 @@ const PermissionGuard = (route, state) => {
         return true;
     }
     else {
-        setTimeout(() => {
-            toastService.toast(`You don't have permission`, 'top-center', 'error', 2000, 'Please contact your administrator if you think this is a mistake.');
-        }, 500);
+        toastService.toast(`You don't have permission`, 'top-center', 'error', 2000, 'Please contact your administrator if you think this is a mistake.');
         // router.navigate(['/403']);
         return false;
     }
