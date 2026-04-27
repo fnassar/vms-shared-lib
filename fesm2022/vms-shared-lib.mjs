@@ -685,6 +685,7 @@ class AuthService {
             return Promise.resolve();
         }
         // Otherwise, return a promise that resolves when permissions are loaded
+        window.location.reload();
         return new Promise((resolve) => {
             window.addEventListener('permissions-changed', () => resolve(), {
                 once: true,
