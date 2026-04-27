@@ -452,7 +452,6 @@ class AuthService {
     toastService;
     refreshLockKey = 'vms_auth_refresh_lock';
     refreshLockTtlMs = 15000;
-    permissionsLoaded = false;
     permissionsLoadedResolvers = [];
     Roles = Roles;
     PERMISSIONS = PERMISSIONS;
@@ -482,7 +481,6 @@ class AuthService {
         // window.dispatchEvent(new CustomEvent('auth-logout'));
         this.router.navigate(['/auth']);
         window.location.reload();
-        this.permissionsLoaded = false;
     }
     logout() {
         this.authBeService.logout().subscribe({
@@ -545,7 +543,6 @@ class AuthService {
                 if (res.success) {
                     this.authContextService.savePermissionsAndRoles(res.data);
                     window.dispatchEvent(new CustomEvent('permissions-changed'));
-                    this.permissionsLoaded = true;
                     this.resolvePermissionsWaiters(); // ← ADD THIS
                 }
                 else {
@@ -650,6 +647,10 @@ class AuthService {
         return new Promise((resolve) => {
             this.permissionsLoadedResolvers.push(resolve); // Queue it
         });
+    }
+    get permissionsLoaded() {
+        const permissions = this.storageService.getsessionItem(AuthConstant.USER_PERMISSIONS);
+        return !!permissions && permissions !== '[]';
     }
     static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.20", ngImport: i0, type: AuthService, deps: [{ token: AuthContextService }, { token: AuthBeService }, { token: i3.Router }, { token: StorageService }, { token: ToastService }], target: i0.ɵɵFactoryTarget.Injectable });
     static ɵprov = i0.ɵɵngDeclareInjectable({ minVersion: "12.0.0", version: "19.2.20", ngImport: i0, type: AuthService, providedIn: 'root' });

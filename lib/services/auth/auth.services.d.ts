@@ -14,7 +14,6 @@ export declare class AuthService {
     private toastService;
     private readonly refreshLockKey;
     private readonly refreshLockTtlMs;
-    permissionsLoaded: boolean;
     private permissionsLoadedResolvers;
     Roles: typeof Roles;
     PERMISSIONS: typeof PERMISSIONS;
@@ -39,6 +38,7 @@ export declare class AuthService {
     canDoAction(action: string[]): boolean;
     private resolvePermissionsWaiters;
     permissionsReady(): Promise<void>;
+    get permissionsLoaded(): boolean;
     static ɵfac: i0.ɵɵFactoryDeclaration<AuthService, never>;
     static ɵprov: i0.ɵɵInjectableDeclaration<AuthService>;
 }
