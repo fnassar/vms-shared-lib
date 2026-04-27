@@ -537,34 +537,6 @@ class AuthService {
         localStorage.removeItem(this.refreshLockKey);
     }
     handlePermissionConfig() {
-        // this.authContextService.savePermissionsAndRoles({
-        // rolesDetails: [],
-        // roles: [Roles.ADMIN],
-        //   permissions: [
-        //     PERMISSIONS.USER_READ_SELF,
-        //     PERMISSIONS.TASK_CREATE_TEAM,
-        //     PERMISSIONS.TASK_VIEW_LIST_SELF,
-        //     PERMISSIONS.TASK_VIEW_DETAILS_SELF,
-        //     PERMISSIONS.PLAN_CREATE_DRAFT_TEAM,
-        //     PERMISSIONS.PLAN_CREATE_PUBLISH_TEAM,
-        //     PERMISSIONS.PLAN_VIEW_GANTT_CHART_SELF,
-        //     PERMISSIONS.PLAN_VIEW_DETAILS_SELF,
-        //     PERMISSIONS.PLAN_UPDATE_SELF,
-        //     PERMISSIONS.VEHICLE_CREATE_ORGANIZATION,
-        //     PERMISSIONS.VEHICLE_VIEW_LIST_ORGANIZATION,
-        //     PERMISSIONS.EQUIPMENT_CREATE_ORGANIZATION,
-        //     PERMISSIONS.EQUIPMENT_VIEW_LIST_ORGANIZATION,
-        //     PERMISSIONS.MOBILE_USER_VIEW_PROFILE_SELF,
-        //     PERMISSIONS.MOBILE_LANDING_VIEW_LANDING_SELF,
-        //     PERMISSIONS.MOBILE_TASK_VIEW_LIST_SELF,
-        //     PERMISSIONS.MOBILE_TASK_VIEW_DETAILS_SELF,
-        //     PERMISSIONS.MOBILE_TASK_START_SELF,
-        //     PERMISSIONS.MOBILE_TASK_PAUSE_SELF,
-        //     PERMISSIONS.MOBILE_TASK_RESUME_SELF,
-        //     PERMISSIONS.MOBILE_TASK_STOP_SELF,
-        //   ],
-        // } as ISessionData);
-        // window.dispatchEvent(new CustomEvent('permissions-changed')); // remove when fixing permissions from backend
         this.authBeService.validateToken().subscribe({
             next: (res) => {
                 if (res.success) {
@@ -576,20 +548,6 @@ class AuthService {
                 }
             },
         });
-        // const dummySessionData: ISessionData = {
-        //   roles: [Roles.ADMIN],
-        //   permissions: [
-        //     PERMISSIONS.PARKING_ZONE_VIEW,
-        //     PERMISSIONS.PARKING_ZONE_CREATE,
-        //     PERMISSIONS.PARKING_ZONE_UPDATE,
-        //     PERMISSIONS.PARKING_ZONE_DELETE,
-        //   ],
-        // };
-        // setTimeout(() => {
-        //   this.authContextService.savePermissionsAndRoles(
-        //     dummySessionData as ISessionData
-        //   );
-        // }, 500);
     }
     // Get Auth Data
     isLoggedIn() {
