@@ -452,6 +452,7 @@ class AuthService {
     toastService;
     refreshLockKey = 'vms_auth_refresh_lock';
     refreshLockTtlMs = 15000;
+    permissionsLoaded = false;
     Roles = Roles;
     PERMISSIONS = PERMISSIONS;
     constructor(authContextService, authBeService, router, storageService, toastService) {
@@ -480,6 +481,7 @@ class AuthService {
         // window.dispatchEvent(new CustomEvent('auth-logout'));
         this.router.navigate(['/auth']);
         window.location.reload();
+        this.permissionsLoaded = false;
     }
     logout() {
         this.authBeService.logout().subscribe({
@@ -570,6 +572,7 @@ class AuthService {
                 if (res.success) {
                     this.authContextService.savePermissionsAndRoles(res.data);
                     window.dispatchEvent(new CustomEvent('permissions-changed'));
+                    this.permissionsLoaded = true;
                 }
                 else {
                     this.toastService.toast(`You do not have permission to perform this action`, 'top-center', 'error', 2000, `Please contact your administrator if you think this is a mistake.`);
@@ -675,6 +678,18 @@ class AuthService {
             return requiredAction.some((action) => rolesSet.has(action));
         }
         return false;
+    }
+    permissionsReady() {
+        // If permissions are already loaded, resolve immediately
+        if (this.permissionsLoaded) {
+            return Promise.resolve();
+        }
+        // Otherwise, return a promise that resolves when permissions are loaded
+        return new Promise((resolve) => {
+            window.addEventListener('permissions-changed', () => resolve(), {
+                once: true,
+            });
+        });
     }
     static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.20", ngImport: i0, type: AuthService, deps: [{ token: AuthContextService }, { token: AuthBeService }, { token: i3.Router }, { token: StorageService }, { token: ToastService }], target: i0.ɵɵFactoryTarget.Injectable });
     static ɵprov = i0.ɵɵngDeclareInjectable({ minVersion: "12.0.0", version: "19.2.20", ngImport: i0, type: AuthService, providedIn: 'root' });
@@ -8941,26 +8956,22 @@ const noAuthGuard = () => {
     return true;
 };
 
-// permission.guard.fn.ts
 const PermissionGuard = (route, state) => {
     const authService = inject(AuthService);
-    const router = inject(Router);
     const toastService = inject(ToastService);
-    const hasPermission = authService.hasCategory(route);
-    const hasRole = authService.hasRoles(route);
-    if (hasPermission || hasRole) {
-        //   setTimeout(()=>{
-        //   toastService.toast(`You  have permission`, 'top-center', 'success', 2000);
-        // },500)
-        return true;
-    }
-    else {
-        setTimeout(() => {
-            toastService.toast(`You don't have permission`, 'top-center', 'error', 2000, 'Please contact your administrator if you think this is a mistake.');
-        }, 500);
-        // router.navigate(['/403']);
-        return false;
-    }
+    return authService.permissionsReady().then(() => {
+        const hasPermission = authService.hasCategory(route);
+        const hasRole = authService.hasRoles(route);
+        if (hasPermission || hasRole) {
+            return true;
+        }
+        else {
+            setTimeout(() => {
+                toastService.toast(`You don't have permission`, 'top-center', 'error', 2000, 'Please contact your administrator if you think this is a mistake.');
+            }, 500);
+            return false;
+        }
+    });
 };
 
 class DispatchingFeComponentsService {
