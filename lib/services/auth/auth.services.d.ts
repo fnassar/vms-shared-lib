@@ -14,7 +14,6 @@ export declare class AuthService {
     private toastService;
     private readonly refreshLockKey;
     private readonly refreshLockTtlMs;
-    private permissionsLoadedResolvers;
     Roles: typeof Roles;
     PERMISSIONS: typeof PERMISSIONS;
     constructor(authContextService: AuthContextService, authBeService: AuthBeService, router: Router, storageService: StorageService, toastService: ToastService);
@@ -36,9 +35,6 @@ export declare class AuthService {
     hasCategory(route: ActivatedRouteSnapshot): boolean;
     hasRoles(route: ActivatedRouteSnapshot): boolean;
     canDoAction(action: string[]): boolean;
-    private resolvePermissionsWaiters;
-    permissionsReady(): Promise<void>;
-    get permissionsLoaded(): boolean;
     static ɵfac: i0.ɵɵFactoryDeclaration<AuthService, never>;
     static ɵprov: i0.ɵɵInjectableDeclaration<AuthService>;
 }

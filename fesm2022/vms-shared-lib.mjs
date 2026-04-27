@@ -452,7 +452,6 @@ class AuthService {
     toastService;
     refreshLockKey = 'vms_auth_refresh_lock';
     refreshLockTtlMs = 15000;
-    permissionsLoadedResolvers = [];
     Roles = Roles;
     PERMISSIONS = PERMISSIONS;
     constructor(authContextService, authBeService, router, storageService, toastService) {
@@ -509,7 +508,7 @@ class AuthService {
                 if (res.success) {
                     this.authContextService.saveTokens(res.data);
                     this.releaseRefreshLock();
-                    // window.location.reload();
+                    window.location.reload();
                 }
                 else {
                     this.releaseRefreshLock();
@@ -538,18 +537,59 @@ class AuthService {
         localStorage.removeItem(this.refreshLockKey);
     }
     handlePermissionConfig() {
+        // this.authContextService.savePermissionsAndRoles({
+        // rolesDetails: [],
+        // roles: [Roles.ADMIN],
+        //   permissions: [
+        //     PERMISSIONS.USER_READ_SELF,
+        //     PERMISSIONS.TASK_CREATE_TEAM,
+        //     PERMISSIONS.TASK_VIEW_LIST_SELF,
+        //     PERMISSIONS.TASK_VIEW_DETAILS_SELF,
+        //     PERMISSIONS.PLAN_CREATE_DRAFT_TEAM,
+        //     PERMISSIONS.PLAN_CREATE_PUBLISH_TEAM,
+        //     PERMISSIONS.PLAN_VIEW_GANTT_CHART_SELF,
+        //     PERMISSIONS.PLAN_VIEW_DETAILS_SELF,
+        //     PERMISSIONS.PLAN_UPDATE_SELF,
+        //     PERMISSIONS.VEHICLE_CREATE_ORGANIZATION,
+        //     PERMISSIONS.VEHICLE_VIEW_LIST_ORGANIZATION,
+        //     PERMISSIONS.EQUIPMENT_CREATE_ORGANIZATION,
+        //     PERMISSIONS.EQUIPMENT_VIEW_LIST_ORGANIZATION,
+        //     PERMISSIONS.MOBILE_USER_VIEW_PROFILE_SELF,
+        //     PERMISSIONS.MOBILE_LANDING_VIEW_LANDING_SELF,
+        //     PERMISSIONS.MOBILE_TASK_VIEW_LIST_SELF,
+        //     PERMISSIONS.MOBILE_TASK_VIEW_DETAILS_SELF,
+        //     PERMISSIONS.MOBILE_TASK_START_SELF,
+        //     PERMISSIONS.MOBILE_TASK_PAUSE_SELF,
+        //     PERMISSIONS.MOBILE_TASK_RESUME_SELF,
+        //     PERMISSIONS.MOBILE_TASK_STOP_SELF,
+        //   ],
+        // } as ISessionData);
+        // window.dispatchEvent(new CustomEvent('permissions-changed')); // remove when fixing permissions from backend
         this.authBeService.validateToken().subscribe({
             next: (res) => {
                 if (res.success) {
                     this.authContextService.savePermissionsAndRoles(res.data);
                     window.dispatchEvent(new CustomEvent('permissions-changed'));
-                    this.resolvePermissionsWaiters(); // ← ADD THIS
                 }
                 else {
                     this.toastService.toast(`You do not have permission to perform this action`, 'top-center', 'error', 2000, `Please contact your administrator if you think this is a mistake.`);
                 }
             },
         });
+        // const dummySessionData: ISessionData = {
+        //   roles: [Roles.ADMIN],
+        //   permissions: [
+        //     PERMISSIONS.PARKING_ZONE_VIEW,
+        //     PERMISSIONS.PARKING_ZONE_CREATE,
+        //     PERMISSIONS.PARKING_ZONE_UPDATE,
+        //     PERMISSIONS.PARKING_ZONE_DELETE,
+        //   ],
+        // };
+        // setTimeout(() => {
+        //   this.authContextService.savePermissionsAndRoles(
+        //     dummySessionData as ISessionData
+        //   );
+        // }, 500);
     }
     // Get Auth Data
     isLoggedIn() {
@@ -635,22 +675,6 @@ class AuthService {
             return requiredAction.some((action) => rolesSet.has(action));
         }
         return false;
-    }
-    resolvePermissionsWaiters() {
-        this.permissionsLoadedResolvers.forEach((resolve) => resolve());
-        this.permissionsLoadedResolvers = [];
-    }
-    permissionsReady() {
-        if (this.permissionsLoaded) {
-            return Promise.resolve(); // Already loaded — return immediately
-        }
-        return new Promise((resolve) => {
-            this.permissionsLoadedResolvers.push(resolve); // Queue it
-        });
-    }
-    get permissionsLoaded() {
-        const permissions = this.storageService.getsessionItem(AuthConstant.USER_PERMISSIONS);
-        return !!permissions && permissions !== '[]';
     }
     static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.20", ngImport: i0, type: AuthService, deps: [{ token: AuthContextService }, { token: AuthBeService }, { token: i3.Router }, { token: StorageService }, { token: ToastService }], target: i0.ɵɵFactoryTarget.Injectable });
     static ɵprov = i0.ɵɵngDeclareInjectable({ minVersion: "12.0.0", version: "19.2.20", ngImport: i0, type: AuthService, providedIn: 'root' });
@@ -8917,22 +8941,26 @@ const noAuthGuard = () => {
     return true;
 };
 
+// permission.guard.fn.ts
 const PermissionGuard = (route, state) => {
     const authService = inject(AuthService);
+    const router = inject(Router);
     const toastService = inject(ToastService);
-    return authService.permissionsReady().then(() => {
-        const hasPermission = authService.hasCategory(route);
-        const hasRole = authService.hasRoles(route);
-        if (hasPermission || hasRole) {
-            return true;
-        }
-        else {
-            setTimeout(() => {
-                toastService.toast(`You don't have permission`, 'top-center', 'error', 2000, 'Please contact your administrator if you think this is a mistake.');
-            }, 500);
-            return false;
-        }
-    });
+    const hasPermission = authService.hasCategory(route);
+    const hasRole = authService.hasRoles(route);
+    if (hasPermission || hasRole) {
+        //   setTimeout(()=>{
+        //   toastService.toast(`You  have permission`, 'top-center', 'success', 2000);
+        // },500)
+        return true;
+    }
+    else {
+        setTimeout(() => {
+            toastService.toast(`You don't have permission`, 'top-center', 'error', 2000, 'Please contact your administrator if you think this is a mistake.');
+        }, 500);
+        // router.navigate(['/403']);
+        return false;
+    }
 };
 
 class DispatchingFeComponentsService {
