@@ -453,6 +453,7 @@ class AuthService {
     refreshLockKey = 'vms_auth_refresh_lock';
     refreshLockTtlMs = 15000;
     permissionsLoaded = false;
+    permissionsLoadedResolvers = [];
     Roles = Roles;
     PERMISSIONS = PERMISSIONS;
     constructor(authContextService, authBeService, router, storageService, toastService) {
@@ -573,6 +574,7 @@ class AuthService {
                     this.authContextService.savePermissionsAndRoles(res.data);
                     window.dispatchEvent(new CustomEvent('permissions-changed'));
                     this.permissionsLoaded = true;
+                    this.resolvePermissionsWaiters(); // ← ADD THIS
                 }
                 else {
                     this.toastService.toast(`You do not have permission to perform this action`, 'top-center', 'error', 2000, `Please contact your administrator if you think this is a mistake.`);
@@ -679,17 +681,16 @@ class AuthService {
         }
         return false;
     }
+    resolvePermissionsWaiters() {
+        this.permissionsLoadedResolvers.forEach((resolve) => resolve());
+        this.permissionsLoadedResolvers = [];
+    }
     permissionsReady() {
-        // If permissions are already loaded, resolve immediately
         if (this.permissionsLoaded) {
-            return Promise.resolve();
+            return Promise.resolve(); // Already loaded — return immediately
         }
-        // Otherwise, return a promise that resolves when permissions are loaded
-        // window.location.reload();
         return new Promise((resolve) => {
-            window.addEventListener('permissions-changed', () => resolve(), {
-                once: true,
-            });
+            this.permissionsLoadedResolvers.push(resolve); // Queue it
         });
     }
     static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.20", ngImport: i0, type: AuthService, deps: [{ token: AuthContextService }, { token: AuthBeService }, { token: i3.Router }, { token: StorageService }, { token: ToastService }], target: i0.ɵɵFactoryTarget.Injectable });
