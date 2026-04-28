@@ -36,7 +36,6 @@ export declare class AuthService {
     hasCategory(route: ActivatedRouteSnapshot): boolean;
     hasRoles(route: ActivatedRouteSnapshot): boolean;
     canDoAction(action: string[]): boolean;
-    hasPermissionOrRole(route: ActivatedRouteSnapshot): Promise<boolean>;
     static ɵfac: i0.ɵɵFactoryDeclaration<AuthService, never>;
     static ɵprov: i0.ɵɵInjectableDeclaration<AuthService>;
 }
