@@ -8232,7 +8232,7 @@ class SidenavService {
                 this._isMobileView.set(true);
                 sessionStorage.setItem('isCollapsed', 'false');
             }
-            else if (width < 1025) {
+            else if (width < 1400) {
                 this._isCollapsed.set(true);
                 this._hidden.set(false);
                 this._isMobileView.set(false);
