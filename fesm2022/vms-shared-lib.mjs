@@ -7304,6 +7304,12 @@ class CustomSingleFileUploadComponent {
             const allowedFiles = Array.from(input.files).filter((file) => this.mimeTypes.includes(file.type));
             if (allowedFiles.length > 0) {
                 const file = allowedFiles[0];
+                const maxBytes = this.parseMaxFileSizeToBytes(this.maxFileSize);
+                if (maxBytes > 0 && file.size > maxBytes) {
+                    this._toast.toast(`File size exceeds the maximum allowed size of ${this.maxFileSize}`, 'top-center', 'error', 3000);
+                    this.clearFileInput();
+                    return;
+                }
                 this.selectedFileName = file.name;
                 // Save file as Blob
                 //  const fileBlob = file; // file is already a Blob (File extends Blob)
@@ -7367,6 +7373,21 @@ class CustomSingleFileUploadComponent {
         //   this.FileTypes.map((ext) => this.mimeTypesMap[ext] || 'unknown')
         // );
         return this.FileTypes.map((ext) => this.mimeTypesMap[ext] || 'unknown');
+    }
+    parseMaxFileSizeToBytes(maxFileSize) {
+        const units = {
+            B: 1,
+            KB: 1024,
+            MB: 1024 * 1024,
+            GB: 1024 * 1024 * 1024,
+        };
+        const match = maxFileSize
+            .trim()
+            .toUpperCase()
+            .match(/^(\d+(?:\.\d+)?)\s*(B|KB|MB|GB)$/);
+        if (!match)
+            return 0;
+        return parseFloat(match[1]) * (units[match[2]] || 0);
     }
     // Get appropriate icon for file type
     getFileIconSvg(mimeType) {

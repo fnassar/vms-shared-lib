@@ -39,6 +39,7 @@ export declare class CustomSingleFileUploadComponent {
     containRequiredError(): boolean;
     getFileTypesText(): string;
     get mimeTypes(): string[];
+    private parseMaxFileSizeToBytes;
     getFileIconSvg(mimeType: string): string;
     isImageFile(mimeType: string): boolean;
     onImageError(event: any): void;
