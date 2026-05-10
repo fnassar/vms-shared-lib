@@ -4,6 +4,7 @@ export interface IDropdownOption {
     nameEn: string;
     iconPath?: string;
     value?: number;
+    quantity?: number;
     serialNumber?: string;
     status?: string;
     enumValue?: string;
