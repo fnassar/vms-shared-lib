@@ -451,7 +451,7 @@ class AuthService {
     storageService;
     toastService;
     refreshLockKey = 'vms_auth_refresh_lock';
-    refreshLockTtlMs = 15000;
+    refreshLockTtlMs = 30000;
     Roles = Roles;
     PERMISSIONS = PERMISSIONS;
     constructor(authContextService, authBeService, router, storageService, toastService) {
@@ -499,8 +499,13 @@ class AuthService {
         }
         const refreshToken = this.getRefreshToken();
         if (!refreshToken) {
-            this.releaseRefreshLock();
-            this.logOutUser();
+            setInterval(() => {
+                const refreshToken = this.getRefreshToken();
+                if (!refreshToken) {
+                    this.logOutUser();
+                    this.releaseRefreshLock();
+                }
+            }, 1500);
             return;
         }
         const body = {
