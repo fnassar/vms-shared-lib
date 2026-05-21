@@ -20,7 +20,8 @@ export declare class AuthService {
     login(data: any): void;
     logOutUser(): void;
     logout(): void;
-    handleRefreshToken(): void;
+    handleRefreshToken(): Promise<void>;
+    private waitForRefreshToken;
     private tryAcquireRefreshLock;
     private releaseRefreshLock;
     handlePermissionConfig(): void;

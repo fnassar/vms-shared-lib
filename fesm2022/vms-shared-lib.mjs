@@ -310,9 +310,11 @@ class AuthBeService {
         // alert(`${this.baseUrl}/api/v1/idm/auth/logout`);
         return this.http.post(`${this.baseUrl}/api/v1/idm/auth/logout`, {});
     }
-    refreshToken(param) {
+    refreshToken(param, firstLoad) {
         return this.http.post(`${this.baseUrl}/api/v1/idm/auth/refresh`, param, {
-            context: new HttpContext().set(SKIP_TOKEN, true),
+            context: new HttpContext()
+                .set(SKIP_TOKEN, true)
+                .set(SKIP_LOADER, !firstLoad),
         });
     }
     validateToken() {
@@ -493,25 +495,21 @@ class AuthService {
             },
         });
     }
-    handleRefreshToken() {
+    async handleRefreshToken() {
         if (!this.tryAcquireRefreshLock()) {
             return;
         }
-        const refreshToken = this.getRefreshToken();
+        const refreshToken = await this.waitForRefreshToken();
         if (!refreshToken) {
-            setInterval(() => {
-                const refreshToken = this.getRefreshToken();
-                if (!refreshToken) {
-                    this.logOutUser();
-                    this.releaseRefreshLock();
-                }
-            }, 1500);
+            this.logOutUser();
+            this.releaseRefreshLock();
             return;
         }
+        const firstLoad = !this.getToken() && !!refreshToken;
         const body = {
             refreshToken,
         };
-        this.authBeService.refreshToken(body).subscribe({
+        this.authBeService.refreshToken(body, firstLoad).subscribe({
             next: (res) => {
                 if (res.success) {
                     this.authContextService.saveTokens(res.data);
@@ -528,6 +526,15 @@ class AuthService {
                 this.logOutUser();
             },
         });
+    }
+    async waitForRefreshToken(retries = 3, delayMs = 1000) {
+        let refreshToken = this.getRefreshToken();
+        while (!refreshToken && retries > 0) {
+            await new Promise((resolve) => setTimeout(resolve, delayMs));
+            refreshToken = this.getRefreshToken();
+            retries -= 1;
+        }
+        return refreshToken;
     }
     tryAcquireRefreshLock() {
         const now = Date.now();
