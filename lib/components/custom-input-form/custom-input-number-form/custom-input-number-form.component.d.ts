@@ -2,6 +2,7 @@ import { EventEmitter, SimpleChanges } from '@angular/core';
 import { CustomInputBase } from '../custom-input-base';
 import * as i0 from "@angular/core";
 export declare class CustomInputNumberFormComponent extends CustomInputBase {
+    private _toast;
     numberType: 'outerIncrements' | 'number' | 'outerIncBlue' | null;
     min: number;
     max: number;

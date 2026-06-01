@@ -3113,6 +3113,7 @@ i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.20", ngImpo
             }] } });
 
 class CustomInputNumberFormComponent extends CustomInputBase {
+    _toast = inject(ToastService);
     numberType = null;
     min = 0;
     max = Infinity;
@@ -3188,9 +3189,16 @@ class CustomInputNumberFormComponent extends CustomInputBase {
         event.preventDefault();
         const pastedText = event.clipboardData?.getData('text')?.trim() ?? '';
         if (!/^\d+$/.test(pastedText)) {
+            this._toast.toast('Only numeric values are allowed', 'top-center', 'error', 3000);
             return;
         }
         const pastedNumber = Number(pastedText);
+        if (pastedNumber > this.max) {
+            this._toast.toast(`Value must not exceed ${this.max}`, 'top-center', 'error', 3000);
+        }
+        else if (pastedNumber < this.min) {
+            this._toast.toast(`Value must be at least ${this.min}`, 'top-center', 'error', 3000);
+        }
         const clampedValue = Math.min(this.max, Math.max(this.min, pastedNumber));
         const control = this.parentForm.controls[this.controlName];
         control.setValue(clampedValue);
