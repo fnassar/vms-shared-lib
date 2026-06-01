@@ -14,6 +14,7 @@ export declare class CustomInputNumberFormComponent extends CustomInputBase {
     showPassword: boolean;
     togglePasswordVisibility(): void;
     preventInvalidNumberInput(event: KeyboardEvent): void;
+    handlePaste(event: ClipboardEvent): void;
     incrementValue(): void;
     decrementValue(): void;
     static ɵfac: i0.ɵɵFactoryDeclaration<CustomInputNumberFormComponent, never>;
