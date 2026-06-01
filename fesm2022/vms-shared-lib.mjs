@@ -434,7 +434,7 @@ class ToastService {
         this.show.set(true);
     }
     hideToast() {
-        this.show.set(false);
+        // this.show.set(false);
     }
     static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.20", ngImport: i0, type: ToastService, deps: [], target: i0.ɵɵFactoryTarget.Injectable });
     static ɵprov = i0.ɵɵngDeclareInjectable({ minVersion: "12.0.0", version: "19.2.20", ngImport: i0, type: ToastService, providedIn: 'root' });
