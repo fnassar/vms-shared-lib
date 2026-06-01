@@ -426,14 +426,15 @@ class ToastService {
     }
     remove(id) {
         this.visibleToasts.update((list) => list.filter((t) => t.id !== id));
-        // if (this.visibleToasts().length === 0) this.show.set(false);
+        if (this.visibleToasts().length === 0)
+            this.show.set(false);
     }
     // keep originals
     showToast() {
-        // this.show.set(true);
+        this.show.set(true);
     }
     hideToast() {
-        // this.show.set(false);
+        this.show.set(false);
     }
     static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.20", ngImport: i0, type: ToastService, deps: [], target: i0.ɵɵFactoryTarget.Injectable });
     static ɵprov = i0.ɵɵngDeclareInjectable({ minVersion: "12.0.0", version: "19.2.20", ngImport: i0, type: ToastService, providedIn: 'root' });
