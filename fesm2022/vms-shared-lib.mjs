@@ -1,6 +1,6 @@
 import * as i0 from '@angular/core';
 import { Injectable, signal, InjectionToken, Inject, computed, Optional, HostListener, Input, Directive, EventEmitter, PLATFORM_ID, Output, input, effect, HostBinding, Component, Pipe, inject, ContentChild, ViewChild, ElementRef, Injector, ViewContainerRef, ViewChildren, ApplicationRef, EnvironmentInjector, createComponent } from '@angular/core';
-import { retry, catchError, BehaviorSubject, Subscription, fromEvent, filter, Subject, debounceTime, distinctUntilChanged, takeUntil, ReplaySubject, take, firstValueFrom, Observable, map, throwError, finalize, tap } from 'rxjs';
+import { retry, catchError, BehaviorSubject, Subscription, fromEvent, filter, Subject, debounceTime, distinctUntilChanged, takeUntil, ReplaySubject, take, firstValueFrom, Observable, map, throwError, finalize, tap, of } from 'rxjs';
 import * as i1 from '@angular/common/http';
 import { HttpContextToken, HttpContext, HttpResponse } from '@angular/common/http';
 import * as i3 from '@angular/router';
@@ -16,7 +16,7 @@ import localeAr from '@angular/common/locales/ar';
 import localeEn from '@angular/common/locales/en';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import * as i1$4 from '@angular/platform-browser';
-import { debounceTime as debounceTime$1 } from 'rxjs/operators';
+import { debounceTime as debounceTime$1, take as take$1, timeout, map as map$1, catchError as catchError$1 } from 'rxjs/operators';
 import parsePhoneNumber from 'libphonenumber-js/max';
 
 const ModuleRoutes = {
@@ -9047,24 +9047,25 @@ const noAuthGuard = () => {
     return true;
 };
 
-// permission.guard.fn.ts
-const PermissionGuard = (route, state) => {
-    const authService = inject(AuthService);
-    const router = inject(Router);
-    const toastService = inject(ToastService);
+function evaluatePermission(authService, toastService, route) {
     const hasPermission = authService.hasCategory(route);
     const hasRole = authService.hasRoles(route);
     if (hasPermission || hasRole) {
-        //   setTimeout(()=>{
-        //   toastService.toast(`You  have permission`, 'top-center', 'success', 2000);
-        // },500)
         return true;
     }
-    else {
-        toastService.toast(`You don't have permission`, 'top-center', 'error', 2000, 'Please contact your administrator if you think this is a mistake.');
-        // router.navigate(['/403']);
-        return false;
+    toastService.toast(`You don't have permission`, 'top-center', 'error', 2000, 'Please contact your administrator if you think this is a mistake.');
+    return false;
+}
+const PermissionGuard = (route, state) => {
+    const authService = inject(AuthService);
+    const toastService = inject(ToastService);
+    // Roles already in sessionStorage (same tab navigation) — evaluate immediately
+    if (authService.getCurrentRoles().length > 0) {
+        return evaluatePermission(authService, toastService, route);
     }
+    // New tab: sessionStorage is empty — fetch permissions then re-evaluate
+    authService.handlePermissionConfig();
+    return fromEvent(window, 'permissions-changed').pipe(take$1(1), timeout(8000), map$1(() => evaluatePermission(authService, toastService, route)), catchError$1(() => of(false)));
 };
 
 class DispatchingFeComponentsService {
