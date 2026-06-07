@@ -4861,33 +4861,24 @@ class CustomTimeBaseComponent {
         if (!this.rangeMin && !this.rangeMax) {
             return this.periods;
         }
-        // console.log(
-        //   'Calculating filtered periods with selectedHour:',
-        //   this.rangeMin,
-        //   this.rangeMax,
-        // );
         const validPeriods = [];
         if (this.rangeMin) {
             const [minH] = this.rangeMin.split(':').map(Number);
-            if (minH < 12) {
+            if (minH < 12 && this.getHoursForPeriod('AM').length > 0) {
                 validPeriods.push('AM');
-                // console.log('AM is valid based on rangeMin', minH);
             }
         }
         else {
             validPeriods.push('AM');
-            // console.log('AM is valid because no rangeMin');
         }
         if (this.rangeMax) {
             const [maxH] = this.rangeMax.split(':').map(Number);
-            if (maxH >= 12) {
+            if (maxH >= 12 && this.getHoursForPeriod('PM').length > 0) {
                 validPeriods.push('PM');
-                // console.log('PM is valid based on rangeMax', maxH);
             }
         }
         else {
             validPeriods.push('PM');
-            // console.log('PM is valid because no rangeMax');
         }
         if (validPeriods.length === 1 &&
             this.selectedPeriod &&
@@ -4909,19 +4900,21 @@ class CustomTimeBaseComponent {
         this.scrollToSelectedValues();
     }
     getFilteredHoursList() {
+        return this.getHoursForPeriod(this.selectedPeriod);
+    }
+    getHoursForPeriod(period) {
         return this.hours.filter((h) => {
             let hour24 = h;
-            if (this.selectedPeriod === 'PM' && h !== 12) {
+            if (period === 'PM' && h !== 12) {
                 hour24 = h + 12;
             }
-            else if (this.selectedPeriod === 'AM' && h === 12) {
+            else if (period === 'AM' && h === 12) {
                 hour24 = 0;
             }
             if (this.rangeMin) {
                 const [minH, minM] = this.rangeMin.split(':').map(Number);
                 if (hour24 < minH)
                     return false;
-                // If minutes > 55, exclude the min hour
                 if (hour24 === minH && minM > 55)
                     return false;
             }
@@ -4929,7 +4922,6 @@ class CustomTimeBaseComponent {
                 const [maxH, maxM] = this.rangeMax.split(':').map(Number);
                 if (hour24 > maxH)
                     return false;
-                // If minutes > 55, exclude the max hour
                 if (hour24 === maxH && maxM > 55)
                     return false;
             }

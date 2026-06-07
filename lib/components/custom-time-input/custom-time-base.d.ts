@@ -25,6 +25,7 @@ export declare abstract class CustomTimeBaseComponent implements AfterViewInit {
     protected goToMin(m: number): void;
     protected goToPeriod(p: 'AM' | 'PM'): void;
     protected getFilteredHoursList(): number[];
+    private getHoursForPeriod;
     get filteredMinutes(): number[];
     protected scrollToSelectedValues(): void;
     protected to24Hour(hour: number, period: 'AM' | 'PM'): number;
