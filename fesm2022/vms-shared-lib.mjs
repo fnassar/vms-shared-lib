@@ -8917,8 +8917,17 @@ const ErrorInterceptor = (req, next) => {
                 const errBody = error.error;
                 const lang = translateService.currentLang || 'en';
                 const isAr = lang.toLowerCase() === 'ar';
-                const msg = isAr ? errBody.errorMessageAr : errBody.errorMessageEn;
-                const finalMsg = msg || errBody.errorMessage || 'Bad Request';
+                // Invalid credentials come back as a 400 with a plain
+                // "Authentication failed: ... invalid_grant ..." message.
+                const backendMsg = errBody?.message || '';
+                if (error.status === 400 &&
+                    (backendMsg.toLowerCase().includes('authentication failed') ||
+                        backendMsg.includes('invalid_grant'))) {
+                    toastService.toast(translateService.instant('TOASTERS.AUTHENTICATION_FAILED'), 'top-center', 'error', 2000, translateService.instant('TOASTERS.INVALID_CREDENTIALS'));
+                    break;
+                }
+                const msg = isAr ? errBody?.errorMessageAr : errBody?.errorMessageEn;
+                const finalMsg = msg || errBody?.errorMessage || 'Bad Request';
                 toastService.toast(translateService.instant(finalMsg), 'top-center', 'error', 2000, translateService.instant('TOASTERS.SOMETHING_WENT_WRONG_SUPPORT'));
                 break;
             case 401:
@@ -8930,7 +8939,10 @@ const ErrorInterceptor = (req, next) => {
                     break;
                 }
                 // access token expired / au auth
-                authService.handleRefreshToken();
+                // if not guest-portal or zone-redirect, then refresh token
+                if (!req.url.includes('/api/v1/guest-portal')) {
+                    authService.handleRefreshToken();
+                }
                 //  authContextService.clearData();
                 // window.dispatchEvent(new CustomEvent('auth-logout'));
                 // router.navigate(['/auth/login']);
