@@ -1,6 +1,6 @@
-import { ElementRef, AfterViewInit } from '@angular/core';
+import { ElementRef, AfterViewInit, OnDestroy } from '@angular/core';
 import * as i0 from "@angular/core";
-export declare abstract class CustomTimeBaseComponent implements AfterViewInit {
+export declare abstract class CustomTimeBaseComponent implements AfterViewInit, OnDestroy {
     hourScrollRef: ElementRef<HTMLDivElement>;
     minuteScrollRef: ElementRef<HTMLDivElement>;
     periodScrollRef: ElementRef<HTMLDivElement>;
@@ -18,6 +18,7 @@ export declare abstract class CustomTimeBaseComponent implements AfterViewInit {
     private startScrollTop;
     protected itemHeight: number;
     ngAfterViewInit(): void;
+    ngOnDestroy(): void;
     updateItemHeight: () => void;
     get filteredHours(): number[];
     get filteredPeriods(): ('AM' | 'PM')[];
@@ -35,6 +36,12 @@ export declare abstract class CustomTimeBaseComponent implements AfterViewInit {
     onHourScroll(): void;
     onMinuteScroll(): void;
     onPeriodScroll(): void;
+    /**
+     * Reads the wheels' scroll positions straight off the DOM. The (scroll)
+     * handlers can lag behind momentum/snap scrolling, so this is what makes a
+     * confirm pick up the row the user is actually looking at.
+     */
+    protected syncSelectionFromScroll(): void;
     onMouseDown(event: MouseEvent, el: HTMLDivElement): void;
     onMouseMove(event: MouseEvent, el: HTMLDivElement): void;
     onMouseUp(el: HTMLDivElement): void;

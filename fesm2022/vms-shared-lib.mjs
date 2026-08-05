@@ -4834,6 +4834,11 @@ class CustomTimeBaseComponent {
         this.scrollToSelectedValues();
         window.addEventListener('resize', this.updateItemHeight);
     }
+    ngOnDestroy() {
+        // Without this every picker instance keeps a resize handler (and the
+        // component it closes over) alive for the lifetime of the page.
+        window.removeEventListener('resize', this.updateItemHeight);
+    }
     updateItemHeight = () => {
         const containers = [
             this.hourScrollRef,
@@ -5026,6 +5031,31 @@ class CustomTimeBaseComponent {
             this.selectedPeriod = this.filteredPeriods[index];
         }
     }
+    /**
+     * Reads the wheels' scroll positions straight off the DOM. The (scroll)
+     * handlers can lag behind momentum/snap scrolling, so this is what makes a
+     * confirm pick up the row the user is actually looking at.
+     */
+    syncSelectionFromScroll() {
+        if (this.hourScrollRef) {
+            const index = this.getCenteredIndex(this.hourScrollRef.nativeElement.scrollTop);
+            if (this.filteredHours[index] !== undefined) {
+                this.selectedHour = this.filteredHours[index];
+            }
+        }
+        if (this.minuteScrollRef) {
+            const index = this.getCenteredIndex(this.minuteScrollRef.nativeElement.scrollTop);
+            if (this.filteredMinutes[index] !== undefined) {
+                this.selectedMinute = this.filteredMinutes[index];
+            }
+        }
+        if (this.periodScrollRef) {
+            const index = this.getCenteredIndex(this.periodScrollRef.nativeElement.scrollTop);
+            if (this.filteredPeriods[index] !== undefined) {
+                this.selectedPeriod = this.filteredPeriods[index];
+            }
+        }
+    }
     onMouseDown(event, el) {
         this.isDragging = true;
         this.startY = event.clientY;
@@ -5130,6 +5160,7 @@ class CustomTimeInputFormComponent extends CustomTimeBaseComponent {
     }
     ngOnDestroy() {
         // Clean up event listeners
+        super.ngOnDestroy();
     }
     containRequiredError() {
         return this.validation.some((error) => error.errorType.includes(ComponentFormErrorConstant.REQUIRED));
@@ -7614,34 +7645,46 @@ class CustomTimeInputComponent extends CustomTimeBaseComponent {
     defaultTime = '';
     translate = inject(TranslateService);
     dropdownOpen = signal(false);
+    /**
+     * Last confirmed time ("HH:MM:00"). The form variant reads the form control
+     * for this; here the parent is not guaranteed to bind the emitted value back,
+     * so the confirmed time is kept locally. The field renders from this instead
+     * of from the live wheel state, so it does not churn on every scroll tick.
+     */
+    confirmedTime = null;
     ngOnChanges(changes) {
         // Skip the first cycle — ngOnInit handles the initial value.
         if (changes['value'] && !changes['value'].firstChange) {
             if (this.value) {
                 this.setFromValue(this.value);
+                this.confirmedTime = this.value;
             }
             else {
-                this.selectedHour = null;
-                this.selectedMinute = null;
+                this.clearSelection();
             }
         }
-        if ((changes['rangeMin'] || changes['rangeMax']) &&
-            this.value &&
-            this.selectedHour != null &&
-            this.selectedMinute != null) {
-            if (!this.isTimeInRange()) {
-                this.selectedHour = null;
-                this.selectedMinute = null;
-                this.valueChange.emit(null);
+        if (changes['rangeMin'] || changes['rangeMax']) {
+            if (this.confirmedTime &&
+                this.selectedHour != null &&
+                this.selectedMinute != null) {
+                if (!this.isTimeInRange()) {
+                    this.clearSelection();
+                    this.valueChange.emit(null);
+                }
+            }
+            else {
+                this.clearSelection();
             }
         }
     }
     ngOnInit() {
         if (this.defaultTime) {
             this.setTimeFromString(this.defaultTime);
+            this.confirmedTime = this.buildTimeString();
         }
         if (this.value) {
             this.setFromValue(this.value);
+            this.confirmedTime = this.value;
         }
     }
     ngAfterViewInit() {
@@ -7650,58 +7693,68 @@ class CustomTimeInputComponent extends CustomTimeBaseComponent {
     toggleDropdown() {
         this.dropdownOpen.set(!this.dropdownOpen());
         if (this.dropdownOpen()) {
+            // Re-seed the wheels from the confirmed time so an abandoned scroll from
+            // a previous open never leaks into this one.
+            if (this.confirmedTime) {
+                this.setFromValue(this.confirmedTime);
+            }
             requestAnimationFrame(() => {
                 this.updateItemHeight();
                 this.scrollToSelectedValues();
             });
-        }
-        if (!this.dropdownOpen()) {
-            if (!this.value) {
-                // Set default to current time or 09:00 AM
-                this.selectedHour = this.filteredHours[0] || 9;
-                this.selectedMinute = this.filteredMinutes[0] || 0;
-                this.selectedPeriod = this.filteredPeriods[0] || 'AM';
-            }
-            this.confirmTime();
-        }
-    }
-    onHourChange() {
-        const mins = this.filteredMinutes;
-        if (mins.length === 1) {
-            this.selectedMinute = mins[0];
-        }
-        if (this.selectedMinute != null && !mins.includes(this.selectedMinute)) {
-            this.selectedMinute = undefined;
-        }
-    }
-    confirmTime() {
-        if (this.selectedHour == null ||
-            this.selectedMinute == null ||
-            !this.isTimeInRange()) {
-            this.valueChange.emit(null);
             return;
         }
-        let hour24 = this.selectedHour;
-        if (this.selectedPeriod === 'PM' && hour24 !== 12) {
-            hour24 += 12;
+        this.confirmTime();
+    }
+    confirmTime() {
+        // Read the wheels directly — a scroll that has not settled yet would
+        // otherwise be lost and the previous selection confirmed instead.
+        this.syncSelectionFromScroll();
+        // Use == null so 0 is not treated as missing (12 AM = 0 edge case).
+        this.selectedHour =
+            this.selectedHour == null || Number.isNaN(Number(this.selectedHour))
+                ? (this.filteredHours[0] ?? 9)
+                : this.selectedHour;
+        this.selectedMinute =
+            this.selectedMinute == null || Number.isNaN(Number(this.selectedMinute))
+                ? (this.filteredMinutes[0] ?? 0)
+                : this.selectedMinute;
+        this.selectedPeriod = this.selectedPeriod ?? this.filteredPeriods[0] ?? 'AM';
+        if (!this.isTimeInRange()) {
+            // Snap back to the first in-range slot and stay open rather than silently
+            // wiping the parent's value.
+            this.selectedHour = this.filteredHours[0] ?? 9;
+            this.selectedMinute = this.filteredMinutes[0] ?? 0;
+            this.selectedPeriod = this.filteredPeriods[0] ?? 'AM';
+            this.scrollToSelectedValues();
+            return;
         }
-        if (this.selectedPeriod === 'AM' && hour24 === 12) {
-            hour24 = 0;
-        }
-        const h = hour24.toString().padStart(2, '0');
-        const m = this.selectedMinute.toString().padStart(2, '0');
-        this.valueChange.emit(`${h}:${m}:00`);
+        this.confirmedTime = this.buildTimeString();
         this.dropdownOpen.set(false);
+        this.valueChange.emit(this.confirmedTime);
     }
     displayTime() {
-        if (this.selectedHour == null || this.selectedMinute == null) {
-            return '--:--';
+        if (!this.confirmedTime) {
+            return `--:-- ${this.translate.instant('GENERAL.' + (this.selectedPeriod || 'AM'))}`;
         }
-        return `${this.selectedHour > 12
-            ? this.selectedHour - 12
-            : this.selectedHour.toString().padStart(2, '0')}:${this.selectedMinute
+        const [hour24, minute] = this.confirmedTime.split(':').map(Number);
+        const period = hour24 >= 12 ? 'PM' : 'AM';
+        const hour12 = hour24 % 12 === 0 ? 12 : hour24 % 12;
+        return `${hour12.toString().padStart(2, '0')}:${minute
             .toString()
-            .padStart(2, '0')} ${this.translate.instant('GENERAL.' + this.selectedPeriod)}`;
+            .padStart(2, '0')} ${this.translate.instant('GENERAL.' + period)}`;
+    }
+    clearSelection() {
+        this.selectedHour = null;
+        this.selectedMinute = null;
+        this.confirmedTime = null;
+    }
+    /** Current selection as the "HH:MM:00" 24h string emitted to the parent. */
+    buildTimeString() {
+        const hour24 = this.to24Hour(Number(this.selectedHour), this.selectedPeriod);
+        return `${hour24.toString().padStart(2, '0')}:${Number(this.selectedMinute)
+            .toString()
+            .padStart(2, '0')}:00`;
     }
     setFromValue(value) {
         const timeString = value.substring(0, 5); // "HH:MM"
@@ -7743,11 +7796,11 @@ class CustomTimeInputComponent extends CustomTimeBaseComponent {
         return true;
     }
     static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.20", ngImport: i0, type: CustomTimeInputComponent, deps: null, target: i0.ɵɵFactoryTarget.Component });
-    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "17.0.0", version: "19.2.20", type: CustomTimeInputComponent, isStandalone: true, selector: "custom-time-input", inputs: { value: "value", label: "label", labelClass: "labelClass", inputClass: "inputClass", height: "height", rangeMin: "rangeMin", rangeMax: "rangeMax", required: "required", defaultTime: "defaultTime" }, outputs: { valueChange: "valueChange" }, usesInheritance: true, usesOnChanges: true, ngImport: i0, template: "<div #timeInput class=\"time-picker-container\" [style]=\"{ '--height': height }\">\r\n  @if (label) {\r\n    <label class=\"custom-label {{ labelClass }}\">\r\n      {{ label }}\r\n      @if (required) {\r\n        <span class=\"required\">*</span>\r\n      }\r\n    </label>\r\n  }\r\n\r\n  <div class=\"time-picker__input\">\r\n    <input\r\n      type=\"text\"\r\n      readonly\r\n      class=\"custom-input {{ inputClass }}\"\r\n      [value]=\"displayTime()\"\r\n      (click)=\"toggleDropdown()\"\r\n    />\r\n\r\n    <span class=\"time-picker__input--time-icon\" (click)=\"toggleDropdown()\">\r\n      <svg\r\n        width=\"16\"\r\n        height=\"16\"\r\n        viewBox=\"0 0 16 16\"\r\n        fill=\"none\"\r\n        xmlns=\"http://www.w3.org/2000/svg\"\r\n      >\r\n        <path\r\n          d=\"M14.6663 7.9987C14.6663 11.6787 11.6797 14.6654 7.99967 14.6654C4.31967 14.6654 1.33301 11.6787 1.33301 7.9987C1.33301 4.3187 4.31967 1.33203 7.99967 1.33203C11.6797 1.33203 14.6663 4.3187 14.6663 7.9987Z\"\r\n          stroke=\"#120710\"\r\n          stroke-linecap=\"round\"\r\n          stroke-linejoin=\"round\"\r\n        />\r\n        <path\r\n          d=\"M10.4729 10.1211L8.40626 8.88781C8.04626 8.67448 7.75293 8.16115 7.75293 7.74115V5.00781\"\r\n          stroke=\"#120710\"\r\n          stroke-linecap=\"round\"\r\n          stroke-linejoin=\"round\"\r\n        />\r\n      </svg>\r\n    </span>\r\n  </div>\r\n\r\n  @if (dropdownOpen()) {\r\n    <div\r\n      #dropdownOptions\r\n      [clickOutside]=\"dropdownOptions\"\r\n      (clickOutsideEmitter)=\"toggleDropdown()\"\r\n      class=\"time-picker-modal\"\r\n    >\r\n      <div class=\"time-picker-header\">\r\n        <h3>{{ \"GENERAL.PICKUP_TIME\" | translate }}</h3>\r\n      </div>\r\n\r\n      <div class=\"time-picker-container\">\r\n        <!-- Selection Indicator -->\r\n        <div class=\"selection-indicator\"></div>\r\n        <!--  -->\r\n        <div class=\"time-picker-columns\">\r\n          <!--  -->\r\n          <!-- Hour Column -->\r\n          <div class=\"time-column\">\r\n            <div\r\n              class=\"scroll-container\"\r\n              #hourScroll\r\n              (scroll)=\"onHourScroll()\"\r\n              (mousedown)=\"onMouseDown($event, hourScroll)\"\r\n              (mousemove)=\"onMouseMove($event, hourScroll)\"\r\n              (mouseup)=\"onMouseUp(hourScroll)\"\r\n              (mouseleave)=\"onMouseUp(hourScroll)\"\r\n            >\r\n              <div class=\"scroll-padding\"></div>\r\n              @for (h of filteredHours; track $index) {\r\n                <div\r\n                  class=\"time-item\"\r\n                  id=\"#time-item\"\r\n                  [class.selected]=\"h === selectedHour\"\r\n                  [style.opacity]=\"getItemOpacity($index, hourScrollRef)\"\r\n                  [style.font-weight]=\"getItemFontWeight($index, hourScrollRef)\"\r\n                  (click)=\"goToHour(h)\"\r\n                >\r\n                  {{ h < 10 ? \"0\" + h : h }}\r\n                </div>\r\n              }\r\n              <div class=\"scroll-padding\"></div>\r\n            </div>\r\n          </div>\r\n\r\n          <div class=\"time-separator\">:</div>\r\n\r\n          <!-- Minute Column -->\r\n          <div class=\"time-column\">\r\n            <div\r\n              class=\"scroll-container\"\r\n              #minuteScroll\r\n              (scroll)=\"onMinuteScroll()\"\r\n              (mousedown)=\"onMouseDown($event, minuteScroll)\"\r\n              (mousemove)=\"onMouseMove($event, minuteScroll)\"\r\n              (mouseup)=\"onMouseUp(minuteScroll)\"\r\n              (mouseleave)=\"onMouseUp(minuteScroll)\"\r\n            >\r\n              <div class=\"scroll-padding\"></div>\r\n              @for (m of filteredMinutes; track $index) {\r\n                <div\r\n                  class=\"time-item\"\r\n                  [class.selected]=\"m === selectedMinute\"\r\n                  [style.opacity]=\"getItemOpacity($index, minuteScrollRef)\"\r\n                  [style.font-weight]=\"\r\n                    getItemFontWeight($index, minuteScrollRef)\r\n                  \"\r\n                  (click)=\"goToMin(m)\"\r\n                >\r\n                  {{ m < 10 ? \"0\" + m : m }}\r\n                </div>\r\n              }\r\n              <div class=\"scroll-padding\"></div>\r\n            </div>\r\n          </div>\r\n\r\n          <!-- Period Column -->\r\n          <div class=\"time-column period-column\">\r\n            <div\r\n              class=\"scroll-container\"\r\n              #periodScroll\r\n              (scroll)=\"onPeriodScroll()\"\r\n              (mousedown)=\"onMouseDown($event, periodScroll)\"\r\n              (mousemove)=\"onMouseMove($event, periodScroll)\"\r\n              (mouseup)=\"onMouseUp(periodScroll)\"\r\n              (mouseleave)=\"onMouseUp(periodScroll)\"\r\n            >\r\n              <div class=\"scroll-padding\"></div>\r\n              @for (p of filteredPeriods; track $index) {\r\n                <div\r\n                  class=\"time-item\"\r\n                  [class.selected]=\"p === selectedPeriod\"\r\n                  [style.opacity]=\"getItemOpacity($index, periodScrollRef)\"\r\n                  [style.font-weight]=\"\r\n                    getItemFontWeight($index, periodScrollRef)\r\n                  \"\r\n                  (click)=\"goToPeriod(p)\"\r\n                >\r\n                  {{ \"GENERAL.\" + p | translate }}\r\n                </div>\r\n              }\r\n              <div class=\"scroll-padding\"></div>\r\n            </div>\r\n          </div>\r\n        </div>\r\n      </div>\r\n\r\n      <button type=\"button\" (click)=\"confirmTime()\" class=\"done-btn\">\r\n        <p>\r\n          {{ \"GENERAL.DONE\" | translate }}\r\n        </p>\r\n      </button>\r\n    </div>\r\n  }\r\n</div>\r\n", styles: [".time-picker-container{position:relative;width:100%;cursor:pointer;min-width:8rem;height:100%}.custom-label{font-size:1.4em;display:block;color:var(--vms-color-form-label);margin-bottom:.43em;font-weight:400;line-height:1.43em;letter-spacing:0%}.time-picker__input{position:relative}.custom-input{height:var(--height, 3em);width:100%;border-radius:.29rem;border:1px solid #82828233;padding:0 2rem 0 1rem;outline:none!important;box-shadow:none;font-size:1.4rem;cursor:pointer}.time-picker__input--time-icon{position:absolute;inset-inline-end:.5rem;top:0;pointer-events:none;height:100%;display:flex;justify-content:center;align-items:center}.time-error-container{position:absolute;top:100%;inset-inline-start:1.15rem;width:100%}.time-error-container custom-app-error{pointer-events:none}.time-picker-modal{position:absolute;top:100%;inset-inline-end:0;background:#fff;border-radius:.6em;padding:24px;border:1px solid #82828233;z-index:1000;min-width:20rem;max-width:100%;width:100%;height:33em;display:grid;grid-template-rows:1fr 20em auto;gap:.9em}.time-picker-header h3{font-size:1.5rem;font-weight:600;margin:0;color:#1a1a1a}.time-picker-columns{display:flex;justify-content:center;align-items:center;gap:8px;height:100%}.time-column{flex:1;height:100%;position:relative}.period-column{flex:.8}.time-separator{font-size:1.75em;font-weight:700;color:#1a1a1a;align-self:center;height:1.65em;padding:0 4px;z-index:1}.scroll-container{height:100%;overflow-y:scroll;scroll-snap-type:y mandatory;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none;cursor:grab;-webkit-user-select:none;user-select:none}.scroll-container:active{cursor:grabbing}.scroll-container::-webkit-scrollbar{display:none}.scroll-padding{height:8.625em;flex-shrink:0}.time-item{height:2.15em;display:flex;align-items:center;justify-content:center;font-size:1.25em;color:#1a1a1a;scroll-snap-align:center;scroll-snap-stop:always;transition:opacity .2s ease,font-weight .2s ease;-webkit-user-select:none;user-select:none;flex-shrink:0}.time-item:hover{background:var(--vms-neutral-light)}.time-item.selected{font-weight:700;opacity:1}.selection-indicator{position:absolute;top:50%;inset-inline-start:0;inset-inline-end:0;height:3.6em;transform:translateY(-50%);background:#f8f8f8;pointer-events:none;border-radius:.45em;z-index:0}.done-btn{width:100%;height:3rem;background:var(--vms-primary-normal);color:#fff;border:none;border-radius:.4rem;font-weight:600;cursor:pointer;transition:background .2s ease}.done-btn p{font-size:1.4rem}.done-btn:hover{background:var(--vms-primary-normal-hover)}.done-btn:active{transform:scale(.98)}@media (max-width: 639px){.time-picker-modal{min-width:50vw;max-width:90vw}}\n"], dependencies: [{ kind: "ngmodule", type: TranslateModule }, { kind: "pipe", type: i1$1.TranslatePipe, name: "translate" }, { kind: "directive", type: ClickOutsideDirective, selector: "[clickOutside]", inputs: ["clickOutside"], outputs: ["clickOutsideEmitter"] }] });
+    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "17.0.0", version: "19.2.20", type: CustomTimeInputComponent, isStandalone: true, selector: "custom-time-input", inputs: { value: "value", label: "label", labelClass: "labelClass", inputClass: "inputClass", height: "height", rangeMin: "rangeMin", rangeMax: "rangeMax", required: "required", defaultTime: "defaultTime" }, outputs: { valueChange: "valueChange" }, usesInheritance: true, usesOnChanges: true, ngImport: i0, template: "<div #timeInput class=\"time-picker-container\" [style]=\"{ '--height': height }\">\r\n  @if (label) {\r\n    <label class=\"custom-label {{ labelClass }}\">\r\n      {{ label }}\r\n      @if (required) {\r\n        <span class=\"required\">*</span>\r\n      }\r\n    </label>\r\n  }\r\n\r\n  <div class=\"time-picker__input\">\r\n    <input\r\n      type=\"text\"\r\n      readonly\r\n      class=\"custom-input {{ inputClass }}\"\r\n      [value]=\"displayTime()\"\r\n      (click)=\"toggleDropdown()\"\r\n    />\r\n\r\n    <span class=\"time-picker__input--time-icon\" (click)=\"toggleDropdown()\">\r\n      <svg\r\n        width=\"16\"\r\n        height=\"16\"\r\n        viewBox=\"0 0 16 16\"\r\n        fill=\"none\"\r\n        xmlns=\"http://www.w3.org/2000/svg\"\r\n      >\r\n        <path\r\n          d=\"M14.6663 7.9987C14.6663 11.6787 11.6797 14.6654 7.99967 14.6654C4.31967 14.6654 1.33301 11.6787 1.33301 7.9987C1.33301 4.3187 4.31967 1.33203 7.99967 1.33203C11.6797 1.33203 14.6663 4.3187 14.6663 7.9987Z\"\r\n          stroke=\"#120710\"\r\n          stroke-linecap=\"round\"\r\n          stroke-linejoin=\"round\"\r\n        />\r\n        <path\r\n          d=\"M10.4729 10.1211L8.40626 8.88781C8.04626 8.67448 7.75293 8.16115 7.75293 7.74115V5.00781\"\r\n          stroke=\"#120710\"\r\n          stroke-linecap=\"round\"\r\n          stroke-linejoin=\"round\"\r\n        />\r\n      </svg>\r\n    </span>\r\n  </div>\r\n\r\n  @if (dropdownOpen()) {\r\n    <div\r\n      #dropdownOptions\r\n      [clickOutside]=\"dropdownOptions\"\r\n      (clickOutsideEmitter)=\"toggleDropdown()\"\r\n      class=\"time-picker-modal\"\r\n      [DropdownAnimationObject]=\"dropdownOpen()\"\r\n    >\r\n      <div class=\"time-picker-header\">\r\n        <h3>{{ \"GENERAL.PICKUP_TIME\" | translate }}</h3>\r\n      </div>\r\n\r\n      <div class=\"time-picker-container\">\r\n        <!-- Selection Indicator -->\r\n        <div class=\"selection-indicator\"></div>\r\n        <!--  -->\r\n        <div class=\"time-picker-columns\">\r\n          <!--  -->\r\n          <!-- Hour Column -->\r\n          <div class=\"time-column\">\r\n            <div\r\n              class=\"scroll-container\"\r\n              #hourScroll\r\n              (scroll)=\"onHourScroll()\"\r\n              (mousedown)=\"onMouseDown($event, hourScroll)\"\r\n              (mousemove)=\"onMouseMove($event, hourScroll)\"\r\n              (mouseup)=\"onMouseUp(hourScroll)\"\r\n              (mouseleave)=\"onMouseUp(hourScroll)\"\r\n            >\r\n              <div class=\"scroll-padding\"></div>\r\n              @for (h of filteredHours; track $index) {\r\n                <div\r\n                  class=\"time-item\"\r\n                  [class.selected]=\"h === selectedHour\"\r\n                  [style.opacity]=\"getItemOpacity($index, hourScrollRef)\"\r\n                  [style.font-weight]=\"getItemFontWeight($index, hourScrollRef)\"\r\n                  (click)=\"goToHour(h)\"\r\n                >\r\n                  {{ h < 10 ? \"0\" + h : h }}\r\n                </div>\r\n              }\r\n              <div class=\"scroll-padding\"></div>\r\n            </div>\r\n          </div>\r\n\r\n          <div class=\"time-separator\">:</div>\r\n\r\n          <!-- Minute Column -->\r\n          <div class=\"time-column\">\r\n            <div\r\n              class=\"scroll-container\"\r\n              #minuteScroll\r\n              (scroll)=\"onMinuteScroll()\"\r\n              (mousedown)=\"onMouseDown($event, minuteScroll)\"\r\n              (mousemove)=\"onMouseMove($event, minuteScroll)\"\r\n              (mouseup)=\"onMouseUp(minuteScroll)\"\r\n              (mouseleave)=\"onMouseUp(minuteScroll)\"\r\n            >\r\n              <div class=\"scroll-padding\"></div>\r\n              @for (m of filteredMinutes; track $index) {\r\n                <div\r\n                  class=\"time-item\"\r\n                  [class.selected]=\"m === selectedMinute\"\r\n                  [style.opacity]=\"getItemOpacity($index, minuteScrollRef)\"\r\n                  [style.font-weight]=\"\r\n                    getItemFontWeight($index, minuteScrollRef)\r\n                  \"\r\n                  (click)=\"goToMin(m)\"\r\n                >\r\n                  {{ m < 10 ? \"0\" + m : m }}\r\n                </div>\r\n              }\r\n              <div class=\"scroll-padding\"></div>\r\n            </div>\r\n          </div>\r\n\r\n          <!-- Period Column -->\r\n          <div class=\"time-column period-column\">\r\n            <div\r\n              class=\"scroll-container\"\r\n              #periodScroll\r\n              (scroll)=\"onPeriodScroll()\"\r\n              (mousedown)=\"onMouseDown($event, periodScroll)\"\r\n              (mousemove)=\"onMouseMove($event, periodScroll)\"\r\n              (mouseup)=\"onMouseUp(periodScroll)\"\r\n              (mouseleave)=\"onMouseUp(periodScroll)\"\r\n            >\r\n              <div class=\"scroll-padding\"></div>\r\n              @for (p of filteredPeriods; track $index) {\r\n                <div\r\n                  class=\"time-item\"\r\n                  [class.selected]=\"p === selectedPeriod\"\r\n                  [style.opacity]=\"getItemOpacity($index, periodScrollRef)\"\r\n                  [style.font-weight]=\"\r\n                    getItemFontWeight($index, periodScrollRef)\r\n                  \"\r\n                  (click)=\"goToPeriod(p)\"\r\n                >\r\n                  {{ \"GENERAL.\" + p | translate }}\r\n                </div>\r\n              }\r\n              <div class=\"scroll-padding\"></div>\r\n            </div>\r\n          </div>\r\n        </div>\r\n      </div>\r\n\r\n      <button type=\"button\" (click)=\"confirmTime()\" class=\"done-btn\">\r\n        <p>\r\n          {{ \"GENERAL.DONE\" | translate }}\r\n        </p>\r\n      </button>\r\n    </div>\r\n  }\r\n</div>\r\n", styles: [".time-picker-container{position:relative;width:100%;cursor:pointer;min-width:8rem;height:100%}.custom-label{font-size:1.4em;display:block;color:var(--vms-color-form-label);margin-bottom:.43em;font-weight:400;line-height:1.43em;letter-spacing:0%}.time-picker__input{position:relative}.custom-input{height:var(--height, 3em);width:100%;border-radius:.29rem;border:1px solid #82828233;padding:0 2rem 0 1rem;outline:none!important;box-shadow:none;font-size:1.4rem;cursor:pointer}.time-picker__input--time-icon{position:absolute;inset-inline-end:.5rem;top:0;pointer-events:none;height:100%;display:flex;justify-content:center;align-items:center}.time-picker-modal{position:absolute;top:100%;inset-inline-end:0;background:#fff;border-radius:.6em;padding:24px;border:1px solid #82828233;z-index:1000;min-width:20rem;max-width:100%;width:100%;height:33em;display:grid;grid-template-rows:1fr 20em auto;gap:.9em}.time-picker-header h3{font-size:1.5rem;font-weight:600;margin:0;color:#1a1a1a}.time-picker-columns{display:flex;justify-content:center;align-items:center;gap:8px;height:100%}.time-column{flex:1;height:100%;position:relative}.period-column{flex:.8}.time-separator{font-size:1.75em;font-weight:700;color:#1a1a1a;align-self:center;height:1.65em;padding:0 4px;z-index:1}.scroll-container{height:100%;overflow-y:scroll;scroll-snap-type:y mandatory;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none;cursor:grab;-webkit-user-select:none;user-select:none}.scroll-container:active{cursor:grabbing}.scroll-container::-webkit-scrollbar{display:none}.scroll-padding{height:8.625em;flex-shrink:0}.time-item{height:2.15em;display:flex;align-items:center;justify-content:center;font-size:1.25em;color:#1a1a1a;scroll-snap-align:center;scroll-snap-stop:always;transition:opacity .2s ease,font-weight .2s ease;-webkit-user-select:none;user-select:none;flex-shrink:0}.time-item:hover{background:var(--vms-neutral-light)}.time-item.selected{font-weight:700;opacity:1}.selection-indicator{position:absolute;top:50%;inset-inline-start:0;inset-inline-end:0;height:3.6em;transform:translateY(-50%);background:#f8f8f8;pointer-events:none;border-radius:.45em;z-index:0}.done-btn{width:100%;height:3rem;background:var(--vms-primary-normal);color:#fff;border:none;border-radius:.4rem;font-weight:600;cursor:pointer;transition:background .2s ease}.done-btn p{font-size:1.4rem}.done-btn:hover{background:var(--vms-primary-normal-hover)}.done-btn:active{transform:scale(.98)}@media (max-width: 639px){.time-picker-modal{min-width:50vw;max-width:90vw}}\n"], dependencies: [{ kind: "ngmodule", type: TranslateModule }, { kind: "pipe", type: i1$1.TranslatePipe, name: "translate" }, { kind: "directive", type: ClickOutsideDirective, selector: "[clickOutside]", inputs: ["clickOutside"], outputs: ["clickOutsideEmitter"] }, { kind: "directive", type: DropdownsAnimationDirective, selector: "[DropdownAnimationObject]", inputs: ["DropdownAnimationObject"] }], animations: [dropdownAnimation$1] });
 }
 i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.20", ngImport: i0, type: CustomTimeInputComponent, decorators: [{
             type: Component,
-            args: [{ selector: 'custom-time-input', imports: [TranslateModule, ClickOutsideDirective], template: "<div #timeInput class=\"time-picker-container\" [style]=\"{ '--height': height }\">\r\n  @if (label) {\r\n    <label class=\"custom-label {{ labelClass }}\">\r\n      {{ label }}\r\n      @if (required) {\r\n        <span class=\"required\">*</span>\r\n      }\r\n    </label>\r\n  }\r\n\r\n  <div class=\"time-picker__input\">\r\n    <input\r\n      type=\"text\"\r\n      readonly\r\n      class=\"custom-input {{ inputClass }}\"\r\n      [value]=\"displayTime()\"\r\n      (click)=\"toggleDropdown()\"\r\n    />\r\n\r\n    <span class=\"time-picker__input--time-icon\" (click)=\"toggleDropdown()\">\r\n      <svg\r\n        width=\"16\"\r\n        height=\"16\"\r\n        viewBox=\"0 0 16 16\"\r\n        fill=\"none\"\r\n        xmlns=\"http://www.w3.org/2000/svg\"\r\n      >\r\n        <path\r\n          d=\"M14.6663 7.9987C14.6663 11.6787 11.6797 14.6654 7.99967 14.6654C4.31967 14.6654 1.33301 11.6787 1.33301 7.9987C1.33301 4.3187 4.31967 1.33203 7.99967 1.33203C11.6797 1.33203 14.6663 4.3187 14.6663 7.9987Z\"\r\n          stroke=\"#120710\"\r\n          stroke-linecap=\"round\"\r\n          stroke-linejoin=\"round\"\r\n        />\r\n        <path\r\n          d=\"M10.4729 10.1211L8.40626 8.88781C8.04626 8.67448 7.75293 8.16115 7.75293 7.74115V5.00781\"\r\n          stroke=\"#120710\"\r\n          stroke-linecap=\"round\"\r\n          stroke-linejoin=\"round\"\r\n        />\r\n      </svg>\r\n    </span>\r\n  </div>\r\n\r\n  @if (dropdownOpen()) {\r\n    <div\r\n      #dropdownOptions\r\n      [clickOutside]=\"dropdownOptions\"\r\n      (clickOutsideEmitter)=\"toggleDropdown()\"\r\n      class=\"time-picker-modal\"\r\n    >\r\n      <div class=\"time-picker-header\">\r\n        <h3>{{ \"GENERAL.PICKUP_TIME\" | translate }}</h3>\r\n      </div>\r\n\r\n      <div class=\"time-picker-container\">\r\n        <!-- Selection Indicator -->\r\n        <div class=\"selection-indicator\"></div>\r\n        <!--  -->\r\n        <div class=\"time-picker-columns\">\r\n          <!--  -->\r\n          <!-- Hour Column -->\r\n          <div class=\"time-column\">\r\n            <div\r\n              class=\"scroll-container\"\r\n              #hourScroll\r\n              (scroll)=\"onHourScroll()\"\r\n              (mousedown)=\"onMouseDown($event, hourScroll)\"\r\n              (mousemove)=\"onMouseMove($event, hourScroll)\"\r\n              (mouseup)=\"onMouseUp(hourScroll)\"\r\n              (mouseleave)=\"onMouseUp(hourScroll)\"\r\n            >\r\n              <div class=\"scroll-padding\"></div>\r\n              @for (h of filteredHours; track $index) {\r\n                <div\r\n                  class=\"time-item\"\r\n                  id=\"#time-item\"\r\n                  [class.selected]=\"h === selectedHour\"\r\n                  [style.opacity]=\"getItemOpacity($index, hourScrollRef)\"\r\n                  [style.font-weight]=\"getItemFontWeight($index, hourScrollRef)\"\r\n                  (click)=\"goToHour(h)\"\r\n                >\r\n                  {{ h < 10 ? \"0\" + h : h }}\r\n                </div>\r\n              }\r\n              <div class=\"scroll-padding\"></div>\r\n            </div>\r\n          </div>\r\n\r\n          <div class=\"time-separator\">:</div>\r\n\r\n          <!-- Minute Column -->\r\n          <div class=\"time-column\">\r\n            <div\r\n              class=\"scroll-container\"\r\n              #minuteScroll\r\n              (scroll)=\"onMinuteScroll()\"\r\n              (mousedown)=\"onMouseDown($event, minuteScroll)\"\r\n              (mousemove)=\"onMouseMove($event, minuteScroll)\"\r\n              (mouseup)=\"onMouseUp(minuteScroll)\"\r\n              (mouseleave)=\"onMouseUp(minuteScroll)\"\r\n            >\r\n              <div class=\"scroll-padding\"></div>\r\n              @for (m of filteredMinutes; track $index) {\r\n                <div\r\n                  class=\"time-item\"\r\n                  [class.selected]=\"m === selectedMinute\"\r\n                  [style.opacity]=\"getItemOpacity($index, minuteScrollRef)\"\r\n                  [style.font-weight]=\"\r\n                    getItemFontWeight($index, minuteScrollRef)\r\n                  \"\r\n                  (click)=\"goToMin(m)\"\r\n                >\r\n                  {{ m < 10 ? \"0\" + m : m }}\r\n                </div>\r\n              }\r\n              <div class=\"scroll-padding\"></div>\r\n            </div>\r\n          </div>\r\n\r\n          <!-- Period Column -->\r\n          <div class=\"time-column period-column\">\r\n            <div\r\n              class=\"scroll-container\"\r\n              #periodScroll\r\n              (scroll)=\"onPeriodScroll()\"\r\n              (mousedown)=\"onMouseDown($event, periodScroll)\"\r\n              (mousemove)=\"onMouseMove($event, periodScroll)\"\r\n              (mouseup)=\"onMouseUp(periodScroll)\"\r\n              (mouseleave)=\"onMouseUp(periodScroll)\"\r\n            >\r\n              <div class=\"scroll-padding\"></div>\r\n              @for (p of filteredPeriods; track $index) {\r\n                <div\r\n                  class=\"time-item\"\r\n                  [class.selected]=\"p === selectedPeriod\"\r\n                  [style.opacity]=\"getItemOpacity($index, periodScrollRef)\"\r\n                  [style.font-weight]=\"\r\n                    getItemFontWeight($index, periodScrollRef)\r\n                  \"\r\n                  (click)=\"goToPeriod(p)\"\r\n                >\r\n                  {{ \"GENERAL.\" + p | translate }}\r\n                </div>\r\n              }\r\n              <div class=\"scroll-padding\"></div>\r\n            </div>\r\n          </div>\r\n        </div>\r\n      </div>\r\n\r\n      <button type=\"button\" (click)=\"confirmTime()\" class=\"done-btn\">\r\n        <p>\r\n          {{ \"GENERAL.DONE\" | translate }}\r\n        </p>\r\n      </button>\r\n    </div>\r\n  }\r\n</div>\r\n", styles: [".time-picker-container{position:relative;width:100%;cursor:pointer;min-width:8rem;height:100%}.custom-label{font-size:1.4em;display:block;color:var(--vms-color-form-label);margin-bottom:.43em;font-weight:400;line-height:1.43em;letter-spacing:0%}.time-picker__input{position:relative}.custom-input{height:var(--height, 3em);width:100%;border-radius:.29rem;border:1px solid #82828233;padding:0 2rem 0 1rem;outline:none!important;box-shadow:none;font-size:1.4rem;cursor:pointer}.time-picker__input--time-icon{position:absolute;inset-inline-end:.5rem;top:0;pointer-events:none;height:100%;display:flex;justify-content:center;align-items:center}.time-error-container{position:absolute;top:100%;inset-inline-start:1.15rem;width:100%}.time-error-container custom-app-error{pointer-events:none}.time-picker-modal{position:absolute;top:100%;inset-inline-end:0;background:#fff;border-radius:.6em;padding:24px;border:1px solid #82828233;z-index:1000;min-width:20rem;max-width:100%;width:100%;height:33em;display:grid;grid-template-rows:1fr 20em auto;gap:.9em}.time-picker-header h3{font-size:1.5rem;font-weight:600;margin:0;color:#1a1a1a}.time-picker-columns{display:flex;justify-content:center;align-items:center;gap:8px;height:100%}.time-column{flex:1;height:100%;position:relative}.period-column{flex:.8}.time-separator{font-size:1.75em;font-weight:700;color:#1a1a1a;align-self:center;height:1.65em;padding:0 4px;z-index:1}.scroll-container{height:100%;overflow-y:scroll;scroll-snap-type:y mandatory;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none;cursor:grab;-webkit-user-select:none;user-select:none}.scroll-container:active{cursor:grabbing}.scroll-container::-webkit-scrollbar{display:none}.scroll-padding{height:8.625em;flex-shrink:0}.time-item{height:2.15em;display:flex;align-items:center;justify-content:center;font-size:1.25em;color:#1a1a1a;scroll-snap-align:center;scroll-snap-stop:always;transition:opacity .2s ease,font-weight .2s ease;-webkit-user-select:none;user-select:none;flex-shrink:0}.time-item:hover{background:var(--vms-neutral-light)}.time-item.selected{font-weight:700;opacity:1}.selection-indicator{position:absolute;top:50%;inset-inline-start:0;inset-inline-end:0;height:3.6em;transform:translateY(-50%);background:#f8f8f8;pointer-events:none;border-radius:.45em;z-index:0}.done-btn{width:100%;height:3rem;background:var(--vms-primary-normal);color:#fff;border:none;border-radius:.4rem;font-weight:600;cursor:pointer;transition:background .2s ease}.done-btn p{font-size:1.4rem}.done-btn:hover{background:var(--vms-primary-normal-hover)}.done-btn:active{transform:scale(.98)}@media (max-width: 639px){.time-picker-modal{min-width:50vw;max-width:90vw}}\n"] }]
+            args: [{ selector: 'custom-time-input', imports: [TranslateModule, ClickOutsideDirective, DropdownsAnimationDirective], animations: [dropdownAnimation$1], template: "<div #timeInput class=\"time-picker-container\" [style]=\"{ '--height': height }\">\r\n  @if (label) {\r\n    <label class=\"custom-label {{ labelClass }}\">\r\n      {{ label }}\r\n      @if (required) {\r\n        <span class=\"required\">*</span>\r\n      }\r\n    </label>\r\n  }\r\n\r\n  <div class=\"time-picker__input\">\r\n    <input\r\n      type=\"text\"\r\n      readonly\r\n      class=\"custom-input {{ inputClass }}\"\r\n      [value]=\"displayTime()\"\r\n      (click)=\"toggleDropdown()\"\r\n    />\r\n\r\n    <span class=\"time-picker__input--time-icon\" (click)=\"toggleDropdown()\">\r\n      <svg\r\n        width=\"16\"\r\n        height=\"16\"\r\n        viewBox=\"0 0 16 16\"\r\n        fill=\"none\"\r\n        xmlns=\"http://www.w3.org/2000/svg\"\r\n      >\r\n        <path\r\n          d=\"M14.6663 7.9987C14.6663 11.6787 11.6797 14.6654 7.99967 14.6654C4.31967 14.6654 1.33301 11.6787 1.33301 7.9987C1.33301 4.3187 4.31967 1.33203 7.99967 1.33203C11.6797 1.33203 14.6663 4.3187 14.6663 7.9987Z\"\r\n          stroke=\"#120710\"\r\n          stroke-linecap=\"round\"\r\n          stroke-linejoin=\"round\"\r\n        />\r\n        <path\r\n          d=\"M10.4729 10.1211L8.40626 8.88781C8.04626 8.67448 7.75293 8.16115 7.75293 7.74115V5.00781\"\r\n          stroke=\"#120710\"\r\n          stroke-linecap=\"round\"\r\n          stroke-linejoin=\"round\"\r\n        />\r\n      </svg>\r\n    </span>\r\n  </div>\r\n\r\n  @if (dropdownOpen()) {\r\n    <div\r\n      #dropdownOptions\r\n      [clickOutside]=\"dropdownOptions\"\r\n      (clickOutsideEmitter)=\"toggleDropdown()\"\r\n      class=\"time-picker-modal\"\r\n      [DropdownAnimationObject]=\"dropdownOpen()\"\r\n    >\r\n      <div class=\"time-picker-header\">\r\n        <h3>{{ \"GENERAL.PICKUP_TIME\" | translate }}</h3>\r\n      </div>\r\n\r\n      <div class=\"time-picker-container\">\r\n        <!-- Selection Indicator -->\r\n        <div class=\"selection-indicator\"></div>\r\n        <!--  -->\r\n        <div class=\"time-picker-columns\">\r\n          <!--  -->\r\n          <!-- Hour Column -->\r\n          <div class=\"time-column\">\r\n            <div\r\n              class=\"scroll-container\"\r\n              #hourScroll\r\n              (scroll)=\"onHourScroll()\"\r\n              (mousedown)=\"onMouseDown($event, hourScroll)\"\r\n              (mousemove)=\"onMouseMove($event, hourScroll)\"\r\n              (mouseup)=\"onMouseUp(hourScroll)\"\r\n              (mouseleave)=\"onMouseUp(hourScroll)\"\r\n            >\r\n              <div class=\"scroll-padding\"></div>\r\n              @for (h of filteredHours; track $index) {\r\n                <div\r\n                  class=\"time-item\"\r\n                  [class.selected]=\"h === selectedHour\"\r\n                  [style.opacity]=\"getItemOpacity($index, hourScrollRef)\"\r\n                  [style.font-weight]=\"getItemFontWeight($index, hourScrollRef)\"\r\n                  (click)=\"goToHour(h)\"\r\n                >\r\n                  {{ h < 10 ? \"0\" + h : h }}\r\n                </div>\r\n              }\r\n              <div class=\"scroll-padding\"></div>\r\n            </div>\r\n          </div>\r\n\r\n          <div class=\"time-separator\">:</div>\r\n\r\n          <!-- Minute Column -->\r\n          <div class=\"time-column\">\r\n            <div\r\n              class=\"scroll-container\"\r\n              #minuteScroll\r\n              (scroll)=\"onMinuteScroll()\"\r\n              (mousedown)=\"onMouseDown($event, minuteScroll)\"\r\n              (mousemove)=\"onMouseMove($event, minuteScroll)\"\r\n              (mouseup)=\"onMouseUp(minuteScroll)\"\r\n              (mouseleave)=\"onMouseUp(minuteScroll)\"\r\n            >\r\n              <div class=\"scroll-padding\"></div>\r\n              @for (m of filteredMinutes; track $index) {\r\n                <div\r\n                  class=\"time-item\"\r\n                  [class.selected]=\"m === selectedMinute\"\r\n                  [style.opacity]=\"getItemOpacity($index, minuteScrollRef)\"\r\n                  [style.font-weight]=\"\r\n                    getItemFontWeight($index, minuteScrollRef)\r\n                  \"\r\n                  (click)=\"goToMin(m)\"\r\n                >\r\n                  {{ m < 10 ? \"0\" + m : m }}\r\n                </div>\r\n              }\r\n              <div class=\"scroll-padding\"></div>\r\n            </div>\r\n          </div>\r\n\r\n          <!-- Period Column -->\r\n          <div class=\"time-column period-column\">\r\n            <div\r\n              class=\"scroll-container\"\r\n              #periodScroll\r\n              (scroll)=\"onPeriodScroll()\"\r\n              (mousedown)=\"onMouseDown($event, periodScroll)\"\r\n              (mousemove)=\"onMouseMove($event, periodScroll)\"\r\n              (mouseup)=\"onMouseUp(periodScroll)\"\r\n              (mouseleave)=\"onMouseUp(periodScroll)\"\r\n            >\r\n              <div class=\"scroll-padding\"></div>\r\n              @for (p of filteredPeriods; track $index) {\r\n                <div\r\n                  class=\"time-item\"\r\n                  [class.selected]=\"p === selectedPeriod\"\r\n                  [style.opacity]=\"getItemOpacity($index, periodScrollRef)\"\r\n                  [style.font-weight]=\"\r\n                    getItemFontWeight($index, periodScrollRef)\r\n                  \"\r\n                  (click)=\"goToPeriod(p)\"\r\n                >\r\n                  {{ \"GENERAL.\" + p | translate }}\r\n                </div>\r\n              }\r\n              <div class=\"scroll-padding\"></div>\r\n            </div>\r\n          </div>\r\n        </div>\r\n      </div>\r\n\r\n      <button type=\"button\" (click)=\"confirmTime()\" class=\"done-btn\">\r\n        <p>\r\n          {{ \"GENERAL.DONE\" | translate }}\r\n        </p>\r\n      </button>\r\n    </div>\r\n  }\r\n</div>\r\n", styles: [".time-picker-container{position:relative;width:100%;cursor:pointer;min-width:8rem;height:100%}.custom-label{font-size:1.4em;display:block;color:var(--vms-color-form-label);margin-bottom:.43em;font-weight:400;line-height:1.43em;letter-spacing:0%}.time-picker__input{position:relative}.custom-input{height:var(--height, 3em);width:100%;border-radius:.29rem;border:1px solid #82828233;padding:0 2rem 0 1rem;outline:none!important;box-shadow:none;font-size:1.4rem;cursor:pointer}.time-picker__input--time-icon{position:absolute;inset-inline-end:.5rem;top:0;pointer-events:none;height:100%;display:flex;justify-content:center;align-items:center}.time-picker-modal{position:absolute;top:100%;inset-inline-end:0;background:#fff;border-radius:.6em;padding:24px;border:1px solid #82828233;z-index:1000;min-width:20rem;max-width:100%;width:100%;height:33em;display:grid;grid-template-rows:1fr 20em auto;gap:.9em}.time-picker-header h3{font-size:1.5rem;font-weight:600;margin:0;color:#1a1a1a}.time-picker-columns{display:flex;justify-content:center;align-items:center;gap:8px;height:100%}.time-column{flex:1;height:100%;position:relative}.period-column{flex:.8}.time-separator{font-size:1.75em;font-weight:700;color:#1a1a1a;align-self:center;height:1.65em;padding:0 4px;z-index:1}.scroll-container{height:100%;overflow-y:scroll;scroll-snap-type:y mandatory;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none;cursor:grab;-webkit-user-select:none;user-select:none}.scroll-container:active{cursor:grabbing}.scroll-container::-webkit-scrollbar{display:none}.scroll-padding{height:8.625em;flex-shrink:0}.time-item{height:2.15em;display:flex;align-items:center;justify-content:center;font-size:1.25em;color:#1a1a1a;scroll-snap-align:center;scroll-snap-stop:always;transition:opacity .2s ease,font-weight .2s ease;-webkit-user-select:none;user-select:none;flex-shrink:0}.time-item:hover{background:var(--vms-neutral-light)}.time-item.selected{font-weight:700;opacity:1}.selection-indicator{position:absolute;top:50%;inset-inline-start:0;inset-inline-end:0;height:3.6em;transform:translateY(-50%);background:#f8f8f8;pointer-events:none;border-radius:.45em;z-index:0}.done-btn{width:100%;height:3rem;background:var(--vms-primary-normal);color:#fff;border:none;border-radius:.4rem;font-weight:600;cursor:pointer;transition:background .2s ease}.done-btn p{font-size:1.4rem}.done-btn:hover{background:var(--vms-primary-normal-hover)}.done-btn:active{transform:scale(.98)}@media (max-width: 639px){.time-picker-modal{min-width:50vw;max-width:90vw}}\n"] }]
         }], propDecorators: { value: [{
                 type: Input
             }], valueChange: [{

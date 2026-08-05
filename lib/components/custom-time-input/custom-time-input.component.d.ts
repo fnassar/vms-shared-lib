@@ -14,13 +14,22 @@ export declare class CustomTimeInputComponent extends CustomTimeBaseComponent im
     defaultTime: string;
     private translate;
     dropdownOpen: import("@angular/core").WritableSignal<boolean>;
+    /**
+     * Last confirmed time ("HH:MM:00"). The form variant reads the form control
+     * for this; here the parent is not guaranteed to bind the emitted value back,
+     * so the confirmed time is kept locally. The field renders from this instead
+     * of from the live wheel state, so it does not churn on every scroll tick.
+     */
+    private confirmedTime;
     ngOnChanges(changes: SimpleChanges): void;
     ngOnInit(): void;
     ngAfterViewInit(): void;
     toggleDropdown(): void;
-    onHourChange(): void;
     confirmTime(): void;
     displayTime(): string;
+    private clearSelection;
+    /** Current selection as the "HH:MM:00" 24h string emitted to the parent. */
+    private buildTimeString;
     private setFromValue;
     private isTimeInRange;
     static ɵfac: i0.ɵɵFactoryDeclaration<CustomTimeInputComponent, never>;
