@@ -48,6 +48,7 @@ var AuthConstant;
     AuthConstant["USER_ROLES"] = "roles";
     AuthConstant["USER_ROLES_DETAILS"] = "rolesDetails";
     AuthConstant["EXPIRES_AT"] = "expiresIn";
+    AuthConstant["SESSION_EXPIRED"] = "session-expired";
 })(AuthConstant || (AuthConstant = {}));
 var UserStatus;
 (function (UserStatus) {
@@ -137,6 +138,9 @@ var I18nConstant;
 })(I18nConstant || (I18nConstant = {}));
 
 class StorageService {
+    // Keys that must outlive a session wipe (e.g. the session-timeout notice the
+    // login screen shows after the user is kicked out).
+    sessionKeepKeys = [AuthConstant.SESSION_EXPIRED];
     constructor() { }
     setLocalStorage(data) {
         for (const [key, value] of Object.entries(data)) {
@@ -184,8 +188,15 @@ class StorageService {
             localStorage.setItem('lang', lang);
         }
     }
+    removeSessionItem(key) {
+        sessionStorage.removeItem(key);
+    }
     clearSession() {
+        const preserved = this.sessionKeepKeys
+            .map((key) => [key, sessionStorage.getItem(key)])
+            .filter(([, value]) => value !== null);
         sessionStorage.clear();
+        preserved.forEach(([key, value]) => sessionStorage.setItem(key, value));
     }
     clearAll() {
         this.clearLocalStorage();
@@ -479,8 +490,13 @@ class AuthService {
             },
         });
     }
-    logOutUser() {
+    // `sessionExpired` is opt-in: only the refresh-token failure paths pass true,
+    // so the login screen never shows the timeout notice after a manual logout.
+    logOutUser(sessionExpired = false) {
         this.authContextService.clearData();
+        if (sessionExpired) {
+            this.storageService.addSessionItem(AuthConstant.SESSION_EXPIRED, 'true');
+        }
         localStorage.removeItem('is-logging-in');
         // window.dispatchEvent(new CustomEvent('auth-logout'));
         this.router.navigate(['/auth']);
@@ -518,12 +534,12 @@ class AuthService {
                 }
                 else {
                     this.releaseRefreshLock();
-                    this.logOutUser();
+                    this.logOutUser(true);
                 }
             },
             error: () => {
                 this.releaseRefreshLock();
-                this.logOutUser();
+                this.logOutUser(true);
             },
         });
     }
@@ -8959,6 +8975,7 @@ const ErrorInterceptor = (req, next) => {
     let authContextService = inject(AuthContextService);
     let router = inject(Router);
     let toastService = inject(ToastService);
+    const storageService = inject(StorageService);
     const translateService = inject(TranslateService);
     return next(req).pipe(catchError((error) => {
         const lang = translateService.currentLang || 'en';
@@ -8987,6 +9004,9 @@ const ErrorInterceptor = (req, next) => {
                 // Do not recurse when refresh endpoint itself returns 401.
                 if (isRefreshRequest) {
                     authContextService.clearData();
+                    // Survives clearData() - read once by the login screen to explain
+                    // why the user was kicked out.
+                    storageService.addSessionItem(AuthConstant.SESSION_EXPIRED, 'true');
                     window.dispatchEvent(new CustomEvent('auth-logout'));
                     router.navigate(['/auth']);
                     break;
@@ -9009,6 +9029,7 @@ const ErrorInterceptor = (req, next) => {
             case 406:
                 // refresh expired
                 authContextService.clearData();
+                storageService.addSessionItem(AuthConstant.SESSION_EXPIRED, 'true');
                 window.dispatchEvent(new CustomEvent('auth-logout'));
                 router.navigate(['/auth']);
                 break;

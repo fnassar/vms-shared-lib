@@ -1,12 +1,14 @@
 import { ILocalData, ISessionData } from '../../interfaces';
 import * as i0 from "@angular/core";
 export declare class StorageService {
+    private readonly sessionKeepKeys;
     constructor();
     setLocalStorage(data: ILocalData): void;
     setSession(data: ISessionData): void;
     addLocalStorageItem(key: string, value: any): void;
     addSessionItem(key: string, value: any): void;
     clearLocalStorage(): void;
+    removeSessionItem(key: string): void;
     clearSession(): void;
     clearAll(): void;
     getLocalStorageAll(): Record<string, any>;

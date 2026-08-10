@@ -5,7 +5,8 @@ export declare enum AuthConstant {
     USER_PERMISSIONS = "permissions",
     USER_ROLES = "roles",
     USER_ROLES_DETAILS = "rolesDetails",
-    EXPIRES_AT = "expiresIn"
+    EXPIRES_AT = "expiresIn",
+    SESSION_EXPIRED = "session-expired"
 }
 export declare enum UserStatus {
     ACTIVE = "ACTIVE",

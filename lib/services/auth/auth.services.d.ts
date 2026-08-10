@@ -18,7 +18,7 @@ export declare class AuthService {
     PERMISSIONS: typeof PERMISSIONS;
     constructor(authContextService: AuthContextService, authBeService: AuthBeService, router: Router, storageService: StorageService, toastService: ToastService);
     login(data: any): void;
-    logOutUser(): void;
+    logOutUser(sessionExpired?: boolean): void;
     logout(): void;
     handleRefreshToken(): Promise<void>;
     private waitForRefreshToken;
