@@ -575,7 +575,14 @@ class AuthService {
                     window.dispatchEvent(new CustomEvent('permissions-changed'));
                 }
                 else {
-                    this.toastService.toast(`You do not have permission to perform this action`, 'top-center', 'error', 2000, `Please contact your administrator if you think this is a mistake.`);
+                    // this.toastService.toast(
+                    //   `You do not have permission to perform this action`,
+                    //   'top-center',
+                    //   'error',
+                    //   2000,
+                    //   `Please contact your administrator if you think this is a mistake.`,
+                    // );
+                    console.error('You do not have permission to perform this action! Please contact your administrator if you think this is a mistake.');
                 }
             },
         });
