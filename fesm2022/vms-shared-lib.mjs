@@ -9047,7 +9047,14 @@ const ErrorInterceptor = (req, next) => {
                 toastService.toast(translateService.instant('TOASTERS.SERVICE_UNAVAILABLE'), 'top-center', 'error', 2000, translateService.instant('TOASTERS.SERVICE_UNAVAILABLE_SUPPORT'));
                 break;
             default:
-                toastService.toast(translateService.instant('TOASTERS.SOMETHING_WENT_WRONG'), 'top-center', 'error', 2000, translateService.instant('TOASTERS.SOMETHING_WENT_WRONG_SUPPORT'));
+                // toastService.toast(
+                //   translateService.instant('TOASTERS.SOMETHING_WENT_WRONG'),
+                //   'top-center',
+                //   'error',
+                //   2000,
+                //   translateService.instant('TOASTERS.SOMETHING_WENT_WRONG_SUPPORT'),
+                // );
+                console.error(translateService.instant('TOASTERS.SOMETHING_WENT_WRONG'));
         }
         // refresh token + code
         // access token
