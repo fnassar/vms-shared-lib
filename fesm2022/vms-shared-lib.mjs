@@ -9174,11 +9174,64 @@ i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.20", ngImpo
                 }]
         }], ctorParameters: () => [] });
 
+const _backCameraSupport = signal('unknown');
+const backCameraSupport = _backCameraSupport.asReadonly();
+function hasBackCamera() {
+    return _backCameraSupport() === 'available';
+}
+const BACK_CAMERA_LABEL = /back|rear|environment|world|arrière|trasera|خلف/i;
+// Detects without prompting for permission. Labels are blank until camera access has
+// been granted once, so we fall back to the device count: phones enumerate 2+ video
+// inputs, a laptop webcam enumerates 1. Re-run after the first getUserMedia() to get
+// an exact answer.
+async function detectBackCamera() {
+    const mediaDevices = navigator.mediaDevices;
+    if (!mediaDevices?.enumerateDevices || !mediaDevices.getUserMedia) {
+        return setSupport('unavailable');
+    }
+    if (mediaDevices.getSupportedConstraints?.().facingMode !== true) {
+        return setSupport('unavailable');
+    }
+    let devices;
+    try {
+        devices = await mediaDevices.enumerateDevices();
+    }
+    catch {
+        return setSupport('unavailable');
+    }
+    const videoInputs = devices.filter((device) => device.kind === 'videoinput');
+    if (videoInputs.length === 0) {
+        return setSupport('unavailable');
+    }
+    const labelled = videoInputs.filter((device) => !!device.label);
+    if (labelled.length > 0) {
+        return setSupport(labelled.some((device) => BACK_CAMERA_LABEL.test(device.label))
+            ? 'available'
+            : 'unavailable');
+    }
+    return setSupport(videoInputs.length > 1 ? 'available' : 'unavailable');
+}
+function watchBackCamera(onChange) {
+    const mediaDevices = navigator.mediaDevices;
+    if (!mediaDevices?.addEventListener) {
+        return () => undefined;
+    }
+    const handler = () => {
+        void detectBackCamera().then((support) => onChange?.(support));
+    };
+    mediaDevices.addEventListener('devicechange', handler);
+    return () => mediaDevices.removeEventListener('devicechange', handler);
+}
+function setSupport(support) {
+    _backCameraSupport.set(support);
+    return support;
+}
+
 // export * from './lib/layout/index';
 
 /**
  * Generated bundle index. Do not edit.
  */
 
-export { API_BASE_URL, ActivityTimePipe, AllowNumberOnlyDirective, ArabicOnlyDirective, AuthBeService, AuthConstant, AuthContextService, AuthDirective, AuthInterceptor, AuthService, BlurBackdropDirective, ClickOutsideDirective, CommonHttpService, ComponentFormErrorConstant, ConfirmDialogService, CustomActionsDropdownComponent, CustomAppErrorComponent, CustomAvatarsComponent, CustomBreadcrumbComponent, CustomButtonComponent, CustomCalendarComponent, CustomCalenderFormComponent, CustomCalenderOpenFormComponent, CustomCheckBoxComponent, CustomCheckBoxFormComponent, CustomConfirmPopupComponent, CustomDropdownComponent, CustomDropdownFormComponent, CustomDropdownMultiselectFormComponent, CustomDropdownWithAddComponent, CustomExpandingContainerComponent, CustomFilterDynamicFormComponent, CustomInputComponent, CustomInputFormComponent, CustomInputNumberFormComponent, CustomInputSearchFormComponent, CustomInputSearchFormExpandedComponent, CustomLoadingSpinnerComponent, CustomModalComponent, CustomModalService, CustomMultiSelectExpandedFormComponent, CustomOtpInputFormComponent, CustomPaginationComponent, CustomPhoneFormComponent, CustomPillTabsComponent, CustomPlaceHolderComponent, CustomPlateNumberInputComponent, CustomRadioComponentComponent, CustomRadioGroupFormComponent, CustomReactiveSearchInputComponent, CustomSearchInputComponent, CustomSideTabsComponent, CustomSingleFileUploadComponent, CustomSmDynamicTableComponent, CustomStatusLabelComponent, CustomSvgIconComponent, CustomTableComponent, CustomTextareaComponent, CustomTextareaFormComponent, CustomTimeInputComponent, CustomTimeInputFormComponent, CustomToastComponent, CustomToggleSwitchComponent, CustomToggleSwitchFormComponent, CustomTooltipComponent, DispatchingFeComponentsService, DropdownsAnimationDirective, EnglishOnlyDirective, ErrorInterceptor, GeoLocationService, I18nConstant, Lang, LoadingService, LocalizePipe, MODAL_REF, ModuleRoutes, NetworkConnectionInterceptor, OverlayPanelComponent, PERMISSIONS, PermissionGuard, Roles, SHOW_SUCCESS_TOASTER, SKIP_LOADER, SKIP_TOKEN, SidenavService, StepperService, StorageService, ToastService, ToggleElementDirective, TranslationService, USE_TOKEN, UserDataService, UserStatus, authGuard, b64toBlob, blobToB64, convertDateFormat, convertFileToBase64, convertFormGroupToFormData, diffTime, downloadBlob, dropdownAnimation$1 as dropdownAnimation, excelDateToJSDate, flattenTree, formatDate, formatDateWithTime, formatTimestamp, formatinitialTakeTime, generateRandomColor, generateUniqueNumber, getErrorValidation, getFormValidationErrors, injectModalRef, isDocumentPath, isImagePath, isVedioPath, loadingInterceptor, logger, noAuthGuard, someFieldsContainData, timeAgo, toE164OrNull };
+export { API_BASE_URL, ActivityTimePipe, AllowNumberOnlyDirective, ArabicOnlyDirective, AuthBeService, AuthConstant, AuthContextService, AuthDirective, AuthInterceptor, AuthService, BlurBackdropDirective, ClickOutsideDirective, CommonHttpService, ComponentFormErrorConstant, ConfirmDialogService, CustomActionsDropdownComponent, CustomAppErrorComponent, CustomAvatarsComponent, CustomBreadcrumbComponent, CustomButtonComponent, CustomCalendarComponent, CustomCalenderFormComponent, CustomCalenderOpenFormComponent, CustomCheckBoxComponent, CustomCheckBoxFormComponent, CustomConfirmPopupComponent, CustomDropdownComponent, CustomDropdownFormComponent, CustomDropdownMultiselectFormComponent, CustomDropdownWithAddComponent, CustomExpandingContainerComponent, CustomFilterDynamicFormComponent, CustomInputComponent, CustomInputFormComponent, CustomInputNumberFormComponent, CustomInputSearchFormComponent, CustomInputSearchFormExpandedComponent, CustomLoadingSpinnerComponent, CustomModalComponent, CustomModalService, CustomMultiSelectExpandedFormComponent, CustomOtpInputFormComponent, CustomPaginationComponent, CustomPhoneFormComponent, CustomPillTabsComponent, CustomPlaceHolderComponent, CustomPlateNumberInputComponent, CustomRadioComponentComponent, CustomRadioGroupFormComponent, CustomReactiveSearchInputComponent, CustomSearchInputComponent, CustomSideTabsComponent, CustomSingleFileUploadComponent, CustomSmDynamicTableComponent, CustomStatusLabelComponent, CustomSvgIconComponent, CustomTableComponent, CustomTextareaComponent, CustomTextareaFormComponent, CustomTimeInputComponent, CustomTimeInputFormComponent, CustomToastComponent, CustomToggleSwitchComponent, CustomToggleSwitchFormComponent, CustomTooltipComponent, DispatchingFeComponentsService, DropdownsAnimationDirective, EnglishOnlyDirective, ErrorInterceptor, GeoLocationService, I18nConstant, Lang, LoadingService, LocalizePipe, MODAL_REF, ModuleRoutes, NetworkConnectionInterceptor, OverlayPanelComponent, PERMISSIONS, PermissionGuard, Roles, SHOW_SUCCESS_TOASTER, SKIP_LOADER, SKIP_TOKEN, SidenavService, StepperService, StorageService, ToastService, ToggleElementDirective, TranslationService, USE_TOKEN, UserDataService, UserStatus, authGuard, b64toBlob, backCameraSupport, blobToB64, convertDateFormat, convertFileToBase64, convertFormGroupToFormData, detectBackCamera, diffTime, downloadBlob, dropdownAnimation$1 as dropdownAnimation, excelDateToJSDate, flattenTree, formatDate, formatDateWithTime, formatTimestamp, formatinitialTakeTime, generateRandomColor, generateUniqueNumber, getErrorValidation, getFormValidationErrors, hasBackCamera, injectModalRef, isDocumentPath, isImagePath, isVedioPath, loadingInterceptor, logger, noAuthGuard, someFieldsContainData, timeAgo, toE164OrNull, watchBackCamera };
 //# sourceMappingURL=vms-shared-lib.mjs.map
